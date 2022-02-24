@@ -9,8 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.nsu.spirin.gamestudios.dao.RoleDAO;
 import ru.nsu.spirin.gamestudios.dao.UserDAO;
-import ru.nsu.spirin.gamestudios.model.Role;
-import ru.nsu.spirin.gamestudios.model.User;
+import ru.nsu.spirin.gamestudios.model.user.Role;
+import ru.nsu.spirin.gamestudios.model.user.User;
 
 import java.util.ArrayList;
 import java.util.List;

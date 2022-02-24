@@ -1,13 +1,15 @@
 package ru.nsu.spirin.gamestudios.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.nsu.spirin.gamestudios.model.Attachment;
-import ru.nsu.spirin.gamestudios.model.Message;
+import ru.nsu.spirin.gamestudios.model.message.Attachment;
+import ru.nsu.spirin.gamestudios.model.message.Message;
 import ru.nsu.spirin.gamestudios.utils.AttachmentUtils;
 
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MessageSentMapper implements RowMapper<Message> {
@@ -19,7 +21,8 @@ public class MessageSentMapper implements RowMapper<Message> {
         String content = rs.getString("content");
         List<Attachment> attachments = AttachmentUtils.parseAttachments(rs.getString("attachments"));
         String sender = rs.getString("sender");
-        List<String> receivers = List.of((String[])rs.getArray("receivers").getArray());
+        Array array = rs.getArray("receivers");
+        List<String> receivers = array == null ? new ArrayList<>() : List.of((String[])array.getArray());
 
         return new Message(messageID, date, topic, content, attachments, sender, receivers, true);
     }

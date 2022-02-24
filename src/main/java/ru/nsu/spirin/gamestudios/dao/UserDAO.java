@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.spirin.gamestudios.mapper.UserMapper;
-import ru.nsu.spirin.gamestudios.model.User;
+import ru.nsu.spirin.gamestudios.model.user.User;
 
 import javax.sql.DataSource;
 
@@ -21,7 +21,10 @@ public class UserDAO extends JdbcDaoSupport {
 
     public User findUserAccount(String userName) {
         // SELECT ... FROM account acc WHERE acc.email = ?
-        String sql = UserMapper.BASE_SQL + " WHERE acc.email = ? ";
+        String sql = """
+                    SELECT acc.email, acc.passwd_hash, acc.employee_id, acc.active
+                    FROM (account NATURAL JOIN employee) acc  WHERE acc.email = ?;
+        """;
 
         Object[] params = new Object[]{userName};
         UserMapper mapper = new UserMapper();

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.spirin.gamestudios.mapper.MessageReceivedMapper;
 import ru.nsu.spirin.gamestudios.mapper.MessageSentMapper;
-import ru.nsu.spirin.gamestudios.model.Message;
+import ru.nsu.spirin.gamestudios.model.message.Message;
 import ru.nsu.spirin.gamestudios.utils.AttachmentUtils;
 
 import javax.sql.DataSource;
@@ -34,13 +34,13 @@ public class MessageDAO extends JdbcDaoSupport {
 
         String sqlSent = """
                             SELECT *
-                            FROM (message NATURAL JOIN
+                            FROM (message LEFT JOIN
                                     (
                                         SELECT received.message_id, array_agg(received.receiver) as receivers
                                         FROM (message NATURAL JOIN received_message) received
                                         GROUP BY received.message_id
                                     ) as received1
-                                 ) msg
+                                 on message.message_id = received1.message_id) msg
                             WHERE msg.sender = ?;
                          """;
         MessageSentMapper sentMapper = new MessageSentMapper();
@@ -78,14 +78,14 @@ public class MessageDAO extends JdbcDaoSupport {
 
         String sqlSent = """
                             SELECT *
-                            FROM (message NATURAL JOIN
+                            FROM message LEFT JOIN
                                     (
                                         SELECT received.message_id, array_agg(received.receiver) as receivers
                                         FROM (message NATURAL JOIN received_message) received
                                         GROUP BY received.message_id
                                     ) as received1
-                                 ) msg
-                            WHERE msg.message_id = ?;
+                                 on message.message_id = received1.message_id
+                            WHERE message.message_id = ?;
                         """;
         MessageSentMapper sentMapper = new MessageSentMapper();
         return this.getJdbcTemplate().queryForObject(sqlSent, sentMapper, params);
@@ -147,5 +147,33 @@ public class MessageDAO extends JdbcDaoSupport {
             };
             this.getJdbcTemplate().update(sqlInsertReceiver, params);
         }
+    }
+
+    public void readMessage(Long messageID, Principal principal) {
+        String sql = """
+                        UPDATE received_message
+                        SET read = true
+                        WHERE message_id = ? AND receiver = ?;
+                    """;
+        User user = (User) ((Authentication) principal).getPrincipal();
+        this.getJdbcTemplate().update(sql, messageID, user.getUsername());
+    }
+
+    public void deleteReceivedMessage(Long messageID, Principal principal) {
+        String sql = """
+                        DELETE FROM received_message
+                        WHERE message_id = ? AND receiver = ?;
+                    """;
+        User user = (User) ((Authentication) principal).getPrincipal();
+        this.getJdbcTemplate().update(sql, messageID, user.getUsername());
+    }
+
+    public void deleteSentMessage(Long messageID, Principal principal) {
+        String sql = """
+                        DELETE FROM message
+                        WHERE message_id = ? AND sender = ?;
+                    """;
+        User user = (User) ((Authentication) principal).getPrincipal();
+        this.getJdbcTemplate().update(sql, messageID, user.getUsername());
     }
 }

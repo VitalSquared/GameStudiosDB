@@ -1,4 +1,4 @@
-package ru.nsu.spirin.gamestudios.model;
+package ru.nsu.spirin.gamestudios.model.message;
 
 import lombok.Data;
 

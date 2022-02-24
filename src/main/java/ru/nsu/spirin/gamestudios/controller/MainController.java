@@ -3,17 +3,17 @@ package ru.nsu.spirin.gamestudios.controller;
 import java.security.Principal;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import ru.nsu.spirin.gamestudios.model.user.Role;
 import ru.nsu.spirin.gamestudios.utils.WebUtils;
 
 @Controller
 public class MainController {
-
-
 
     @RequestMapping(value = { "/", "/welcome" }, method = RequestMethod.GET)
     public String welcomePage(Model model) {
@@ -34,15 +34,14 @@ public class MainController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String loginPage(Model model) {
-
-        return "loginPage";
+    public String loginPage(Model model, Principal principal) {
+        return principal == null ? "loginPage" : "redirect:/";
     }
 
     @RequestMapping(value = "/logoutSuccessful", method = RequestMethod.GET)
     public String logoutSuccessfulPage(Model model) {
         model.addAttribute("title", "Logout");
-        return "logoutSuccessfulPage";
+        return "redirect:/login";
     }
 
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
@@ -75,12 +74,11 @@ public class MainController {
             model.addAttribute("userInfo", userInfo);
 
             String message = "Hi " + principal.getName() //
-                    + "<br> You do not have permission to access this page!";
+                    + "\n You do not have permission to access this page!";
             model.addAttribute("message", message);
 
         }
 
         return "403Page";
     }
-
 }

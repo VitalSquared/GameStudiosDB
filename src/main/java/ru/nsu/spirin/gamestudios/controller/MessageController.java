@@ -12,8 +12,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.spirin.gamestudios.dao.MessageDAO;
-import ru.nsu.spirin.gamestudios.model.Attachment;
-import ru.nsu.spirin.gamestudios.model.Message;
+import ru.nsu.spirin.gamestudios.model.message.Attachment;
+import ru.nsu.spirin.gamestudios.model.message.Message;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
@@ -51,6 +51,7 @@ public class MessageController {
     @PreAuthorize("@messageDAO.canViewMessage(#messageID, #principal)")
     public String show(@PathVariable("id") Long messageID, Model model, Principal principal) {
         model.addAttribute("message", messageDAO.getMessageByID(messageID));
+        messageDAO.readMessage(messageID, principal);
         return "messages/message";
     }
 
@@ -104,6 +105,18 @@ public class MessageController {
         //}
 
         messageDAO.newMessage(message);
+        return "redirect:/messages/sent";
+    }
+
+    @GetMapping(value = "/delete_recv/{id}")
+    public String removeReceived(@PathVariable("id") Long messageID, Principal principal) {
+        messageDAO.deleteReceivedMessage(messageID, principal);
+        return "redirect:/messages/received";
+    }
+
+    @GetMapping(value = "/delete_sent/{id}")
+    public String removeSent(@PathVariable("id") Long messageID, Principal principal) {
+        messageDAO.deleteSentMessage(messageID, principal);
         return "redirect:/messages/sent";
     }
 }

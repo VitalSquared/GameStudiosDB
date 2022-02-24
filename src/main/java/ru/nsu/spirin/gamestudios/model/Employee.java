@@ -15,5 +15,4 @@ public class Employee {
     private Long categoryID;
     private Long studioID;
     private Long departmentID;
-    private boolean isDepartmentHead;
 }

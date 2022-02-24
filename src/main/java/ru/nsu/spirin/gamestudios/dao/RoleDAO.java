@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.spirin.gamestudios.model.Role;
+import ru.nsu.spirin.gamestudios.model.user.Role;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -26,7 +26,7 @@ public class RoleDAO extends JdbcDaoSupport {
         Integer devsCount = this.getJdbcTemplate().queryForObject(sqlDeveloper, params, Integer.class);
 
         if (devsCount == null || devsCount > 0) {
-            return List.of(Role.ROLE_DEVELOPER);
+            return List.of(Role.ROLE_DEVELOPER);    //developer
         }
 
         String sqlDirector = "SELECT dir.studio_id FROM director dir WHERE dir.employee_id = ?";
@@ -34,7 +34,8 @@ public class RoleDAO extends JdbcDaoSupport {
                 (ResultSet rs, int rowNum) -> rs.getInt("studio_id"));
 
         return studioID == null ? new ArrayList<>() :
-                studioID == 0 ? List.of(Role.ROLE_ADMIN, Role.ROLE_DIRECTOR, Role.ROLE_DEVELOPER) :
-                        List.of(Role.ROLE_DIRECTOR, Role.ROLE_DEVELOPER);
+                studioID != 0 ? List.of(Role.ROLE_STUDIO_DIRECTOR, Role.ROLE_DEVELOPER) :   //studio director
+                        employeeID != 0 ? List.of(Role.ROLE_GENERAL_DIRECTOR, Role.ROLE_STUDIO_DIRECTOR, Role.ROLE_DEVELOPER) : //general director
+                                List.of(Role.ROLE_ADMIN, Role.ROLE_GENERAL_DIRECTOR, Role.ROLE_STUDIO_DIRECTOR, Role.ROLE_DEVELOPER);    //admin
     }
 }

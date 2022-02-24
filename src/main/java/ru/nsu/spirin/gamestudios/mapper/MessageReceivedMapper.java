@@ -1,8 +1,8 @@
 package ru.nsu.spirin.gamestudios.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.nsu.spirin.gamestudios.model.Attachment;
-import ru.nsu.spirin.gamestudios.model.Message;
+import ru.nsu.spirin.gamestudios.model.message.Attachment;
+import ru.nsu.spirin.gamestudios.model.message.Message;
 import ru.nsu.spirin.gamestudios.utils.AttachmentUtils;
 
 import java.sql.ResultSet;

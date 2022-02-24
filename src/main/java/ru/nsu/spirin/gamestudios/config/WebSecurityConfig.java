@@ -44,15 +44,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
 
+        //http.authorizeRequests().anyRequest().access("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN')");
+
         // The pages does not require login
         http.authorizeRequests().antMatchers("/", "/login", "/logout").permitAll();
 
         // /userInfo page requires login as ROLE_USER or ROLE_ADMIN.
         // If no login, it will redirect to /login page.
-        http.authorizeRequests().antMatchers("/userInfo").access("hasAnyRole('DEVELOPER', 'DIRECTOR', 'ADMIN')");
+        http.authorizeRequests().antMatchers("/userInfo").access("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN')");
 
-        http.authorizeRequests().antMatchers("/messages/**").access("hasAnyRole('DEVELOPER', 'DIRECTOR', 'ADMIN')");
-
+        http.authorizeRequests().antMatchers("/messages/**").access("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN')");
+        http.authorizeRequests().antMatchers("/employees**").access("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN')");
         // For ADMIN only.
         http.authorizeRequests().antMatchers("/admin").access("hasRole('ADMIN')");
 
@@ -66,11 +68,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Submit URL of login page.
                 .loginProcessingUrl("/j_spring_security_check") // Submit URL
                 .loginPage("/login")//
-                .defaultSuccessUrl("/userAccountInfo")//
+                .defaultSuccessUrl("/")//
                 .failureUrl("/login?error=true")//
                 .usernameParameter("username")//
                 .passwordParameter("password")
                 // Config for Logout Page
-                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/logoutSuccessful");
+                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/login");
     }
 }
