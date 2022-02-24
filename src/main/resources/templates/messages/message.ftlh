@@ -6,7 +6,9 @@
 <p>${message.getDate()}</p>
 <h2>${message.getTopic()}</h2>
 <p>From:  ${message.getSender()}</p>
-<p>To: ${message.getReceivers()?join(', ')}</p>
+<#if message.getReceivers()?size gt 0>
+    <p>To: ${message.getReceivers()?join(', ')}</p>
+</#if>
 <p></p>
 <p>${message.getContent()}</p>
 
@@ -15,6 +17,7 @@
         <i class="fa fa-download"></i>
         <span>${attach.getName()}</span>
     </a>
+    <br/>
 </#foreach>
 
 </@c.page>

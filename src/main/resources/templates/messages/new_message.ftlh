@@ -15,11 +15,12 @@
     <@spring.formInput "message.content"/>
     <br/>
 
-    <div>
-    <label>Add attachment: </label>
-    <input type="file" name="file"/>
-    </div>
-
+    <#foreach idx in [1, 2, 3, 4, 5]>
+        <div>
+            <label>Add attachment ${idx}: </label>
+            <input type="file" name="file"/>
+        </div>
+    </#foreach>
     <br/>
     <input type="submit" value="Send!"/>
 </form>

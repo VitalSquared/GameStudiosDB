@@ -2,6 +2,9 @@ package ru.nsu.spirin.gamestudios.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -34,16 +37,20 @@ public class MessageController {
     }
 
     @GetMapping("/sent")
-    public String indexSentMessages(Model model, Principal principal) {
+    public String indexSentMessages(Model model, Principal principal,
+                                    @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        model.addAttribute("messages", messageDAO.getSentMessagesByUsername(user.getUsername()));
+        model.addAttribute("page", messageDAO.getSentMessagesByUsername(user.getUsername(), pageable));
+        model.addAttribute("url", "/messages/sent");
         return "messages/sent";
     }
 
     @GetMapping("/received")
-    public String indexReceivedMessages(Model model, Principal principal) {
+    public String indexReceivedMessages(Model model, Principal principal,
+                                        @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        model.addAttribute("messages", messageDAO.getReceivedMessagesByUsername(user.getUsername()));
+        model.addAttribute("page", messageDAO.getReceivedMessagesByUsername(user.getUsername(), pageable));
+        model.addAttribute("url", "/messages/received");
         return "messages/received";
     }
 
@@ -85,7 +92,7 @@ public class MessageController {
     public String create(@ModelAttribute("message") Message message,
                          BindingResult bindingResult,
                          Principal principal,
-                         @RequestParam("file") MultipartFile file) throws SQLException, IOException {
+                         @RequestParam("file") MultipartFile[] files) throws SQLException, IOException {
         if (bindingResult.hasErrors()) {
             return "messages/new_message";
         }
@@ -94,15 +101,23 @@ public class MessageController {
         message.setSender(user.getUsername());
         message.convertReceivers();
         message.setAttachments(new ArrayList<>());
-        //for (var file : files) {
-        if (file != null) {
-            Attachment attachment = new Attachment();
-            attachment.setID(0);
-            attachment.setName(file.getOriginalFilename());
-            attachment.setContent(file.getBytes());
-            message.getAttachments().add(attachment);
+
+        int idx = 0;
+        for (var file : files) {
+            if (file != null) {
+                if (file.getOriginalFilename().isEmpty() || file.getBytes().length == 0) {
+                    continue;
+                }
+
+                Attachment attachment = new Attachment();
+                attachment.setID(idx);
+                attachment.setName(file.getOriginalFilename());
+                attachment.setContent(file.getBytes());
+                message.getAttachments().add(attachment);
+
+                idx++;
+            }
         }
-        //}
 
         messageDAO.newMessage(message);
         return "redirect:/messages/sent";

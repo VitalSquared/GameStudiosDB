@@ -2,6 +2,9 @@ package ru.nsu.spirin.gamestudios.dao;
 
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -29,11 +32,11 @@ public class MessageDAO extends JdbcDaoSupport {
         this.setDataSource(dataSource);
     }
 
-    public List<Message> getSentMessagesByUsername(String userName) {
+    public Page<Message> getSentMessagesByUsername(String userName, Pageable pageable) {
         Object[] params = new Object[]{ userName };
 
-        String sqlSent = """
-                            SELECT *
+        String sqlTotal = """
+                            SELECT count(1) AS row_count
                             FROM (message LEFT JOIN
                                     (
                                         SELECT received.message_id, array_agg(received.receiver) as receivers
@@ -43,34 +46,74 @@ public class MessageDAO extends JdbcDaoSupport {
                                  on message.message_id = received1.message_id) msg
                             WHERE msg.sender = ?;
                          """;
-        MessageSentMapper sentMapper = new MessageSentMapper();
-        return this.getJdbcTemplate().query(sqlSent, sentMapper, params);
+        int total = this.getJdbcTemplate().queryForObject(sqlTotal, params, (rs, rowNum) -> rs.getInt(1));
+
+        String querySql = """
+                            SELECT *
+                            FROM (message LEFT JOIN
+                                    (
+                                        SELECT received.message_id, array_agg(received.receiver) as receivers
+                                        FROM (message NATURAL JOIN received_message) received
+                                        GROUP BY received.message_id
+                                    ) as received1
+                                 on message.message_id = received1.message_id) msg
+                            WHERE msg.sender = ?
+                        """ +
+                            "LIMIT " + pageable.getPageSize() + " " +
+                            "OFFSET " + pageable.getOffset();
+
+        List<Message> messages = this.getJdbcTemplate().query(querySql, new MessageSentMapper(), params);
+        return new PageImpl<>(messages, pageable, total);
     }
 
-    public List<Message> getReceivedMessagesByUsername(String userName) {
+    public Page<Message> getReceivedMessagesByUsername(String userName, Pageable pageable) {
         Object[] params = new Object[]{ userName, userName };
 
-        String sqlReceived = """
-                                    SELECT *
-                                    FROM (message NATURAL JOIN
+        String sqlTotal = """
+                            SELECT count(1) AS row_count
+                            FROM (message NATURAL JOIN
+                                    (
+                                        (
+                                            SELECT received.message_id, array_agg(received.receiver) as receivers
+                                            FROM (message NATURAL JOIN received_message) received
+                                            GROUP BY received.message_id
+                                            HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
+                                        ) as received1
+                                        NATURAL JOIN
+                                        (
+                                            SELECT received.message_id, received.read
+                                            FROM received_message received
+                                            WHERE received.receiver = ?
+                                        ) as read
+                                    ) as received2
+                                ) msg;
+                         """;
+        int total = this.getJdbcTemplate().queryForObject(sqlTotal, params, (rs, rowNum) -> rs.getInt(1));
+
+        String querySql = """
+                                SELECT *
+                                FROM (message NATURAL JOIN
+                                        (
                                             (
-                                                (
-                                                    SELECT received.message_id, array_agg(received.receiver) as receivers
-                                                    FROM (message NATURAL JOIN received_message) received
-                                                    GROUP BY received.message_id
-                                                    HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
-                                                ) as received1
-                                                NATURAL JOIN
-                                                (
-                                                    SELECT received.message_id, received.read
-                                                    FROM received_message received
-                                                    WHERE received.receiver = ?
-                                                ) as read
-                                            ) as received2
-                                        ) msg;
-                                """;
-        MessageReceivedMapper receivedMapper = new MessageReceivedMapper();
-        return this.getJdbcTemplate().query(sqlReceived, receivedMapper, params);
+                                                SELECT received.message_id, array_agg(received.receiver) as receivers
+                                                FROM (message NATURAL JOIN received_message) received
+                                                GROUP BY received.message_id
+                                                HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
+                                            ) as received1
+                                            NATURAL JOIN
+                                            (
+                                                SELECT received.message_id, received.read
+                                                FROM received_message received
+                                                WHERE received.receiver = ?
+                                            ) as read
+                                        ) as received2
+                                    ) msg
+                            """ +
+                                "LIMIT " + pageable.getPageSize() + " " +
+                                "OFFSET " + pageable.getOffset();
+
+        List<Message> messages = this.getJdbcTemplate().query(querySql, new MessageReceivedMapper(), params);
+        return new PageImpl<>(messages, pageable, total);
     }
 
     public Message getMessageByID(Long id) {
