@@ -1,8 +1,9 @@
 <#import "../parts/common.ftlh" as c>
 <#import "/spring.ftl" as spring />
+<#import "_header.ftlh" as header>
 
 <@c.page "New Message">
-<#include "_header.ftlh">
+<@header.header numberOfUnread/>
 
 <form method="POST" action="/messages" enctype="multipart/form-data">
     <label for="receivers">Send to: </label>

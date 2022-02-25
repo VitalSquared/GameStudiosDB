@@ -22,6 +22,8 @@ import java.security.Principal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -32,42 +34,105 @@ public class MessageDAO extends JdbcDaoSupport {
         this.setDataSource(dataSource);
     }
 
-    public Page<Message> getSentMessagesByUsername(String userName, Pageable pageable) {
+    public Page<Message> getSentMessagesByUsername(String userName,
+                                                   String topic,
+                                                   String receiver,
+                                                   String date,
+                                                   Pageable pageable) {
         Object[] params = new Object[]{ userName };
+
+        String topicWhere = topic == null ? " TRUE " : " msg.topic ILIKE '%" + topic + "%' ";
+        String receiverWhere = receiver == null ? " TRUE " : " msg.receivers_string ILIKE '%" + receiver + "%' ";
+
+        String leftDate = null, rightDate = null;
+        if (date != null) {
+            try {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                String[] dates = date.split("_-_");
+                Date leftDate1 = format.parse(dates[0]);
+                Date rightDate1 = format.parse(dates[1]);
+                leftDate = format.format(leftDate1);
+                rightDate = format.format(rightDate1);
+            }
+            catch (Exception ignored) {
+                leftDate = null;
+            }
+        }
+        String dateWhere = leftDate == null ? " TRUE " : " msg.date BETWEEN '" + leftDate + " 00:00:00' AND '" + rightDate + " 23:59:59' ";
 
         String sqlTotal = """
                             SELECT count(1) AS row_count
                             FROM (message LEFT JOIN
                                     (
-                                        SELECT received.message_id, array_agg(received.receiver) as receivers
+                                        SELECT received.message_id, array_agg(received.receiver) as receivers, string_agg(received.receiver, ' ') as  receivers_string
                                         FROM (message NATURAL JOIN received_message) received
                                         GROUP BY received.message_id
                                     ) as received1
                                  on message.message_id = received1.message_id) msg
-                            WHERE msg.sender = ?;
-                         """;
+                            WHERE msg.sender = ?
+                         """ +
+                         " AND " + topicWhere + " AND " + receiverWhere + " AND " + dateWhere;
         int total = this.getJdbcTemplate().queryForObject(sqlTotal, params, (rs, rowNum) -> rs.getInt(1));
 
         String querySql = """
                             SELECT *
                             FROM (message LEFT JOIN
                                     (
-                                        SELECT received.message_id, array_agg(received.receiver) as receivers
+                                        SELECT received.message_id, array_agg(received.receiver) as receivers, string_agg(received.receiver, ' ') as  receivers_string
                                         FROM (message NATURAL JOIN received_message) received
                                         GROUP BY received.message_id
                                     ) as received1
                                  on message.message_id = received1.message_id) msg
                             WHERE msg.sender = ?
-                        """ +
+                        """  +
+                            " AND " + topicWhere + " AND " + receiverWhere + " AND " + dateWhere + " "
+                             +
+                            "ORDER BY msg.date DESC " +
                             "LIMIT " + pageable.getPageSize() + " " +
-                            "OFFSET " + pageable.getOffset();
+                            "OFFSET " + pageable.getOffset() + " ";
+
 
         List<Message> messages = this.getJdbcTemplate().query(querySql, new MessageSentMapper(), params);
         return new PageImpl<>(messages, pageable, total);
     }
 
-    public Page<Message> getReceivedMessagesByUsername(String userName, Pageable pageable) {
+    public Page<Message> getReceivedMessagesByUsername(String userName,
+                                                       String topic,
+                                                       String date,
+                                                       String sender,
+                                                       String read,
+                                                       Pageable pageable) {
         Object[] params = new Object[]{ userName, userName };
+
+        String topicWhere = topic == null ? " TRUE " : " msg.topic ILIKE '%" + topic + "%' ";
+        String senderWhere = sender == null ? " TRUE " : " msg.sender ILIKE '%" + sender + "%' ";
+
+        String leftDate = null, rightDate = null;
+        if (date != null) {
+            try {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                String[] dates = date.split("_-_");
+                Date leftDate1 = format.parse(dates[0]);
+                Date rightDate1 = format.parse(dates[1]);
+                leftDate = format.format(leftDate1);
+                rightDate = format.format(rightDate1);
+            }
+            catch (Exception ignored) {
+                leftDate = null;
+            }
+        }
+        String dateWhere = leftDate == null ? " TRUE " : " msg.date BETWEEN '" + leftDate + " 00:00:00' AND '" + rightDate + " 23:59:59' ";
+
+
+        int readValue = 0;
+        try {
+            readValue = Integer.parseInt(read);
+            if (readValue < 0 || readValue > 2) readValue = 0;
+        }
+        catch (Exception ignored) {}
+        String readWhere = readValue == 0 ? " TRUE " :
+                readValue == 1 ? " msg.read = TRUE " :
+                        " msg.read = FALSE ";
 
         String sqlTotal = """
                             SELECT count(1) AS row_count
@@ -86,8 +151,10 @@ public class MessageDAO extends JdbcDaoSupport {
                                             WHERE received.receiver = ?
                                         ) as read
                                     ) as received2
-                                ) msg;
-                         """;
+                                ) msg
+                                WHERE 
+                         """ +
+                                topicWhere + " AND " + senderWhere + " AND " + dateWhere + " AND " + readWhere;
         int total = this.getJdbcTemplate().queryForObject(sqlTotal, params, (rs, rowNum) -> rs.getInt(1));
 
         String querySql = """
@@ -108,12 +175,42 @@ public class MessageDAO extends JdbcDaoSupport {
                                             ) as read
                                         ) as received2
                                     ) msg
+                                    WHERE 
                             """ +
+                                topicWhere + " AND " + senderWhere + " AND " + dateWhere + " AND " + readWhere + " "
+                                +
+                                "ORDER BY msg.date DESC " +
                                 "LIMIT " + pageable.getPageSize() + " " +
                                 "OFFSET " + pageable.getOffset();
 
         List<Message> messages = this.getJdbcTemplate().query(querySql, new MessageReceivedMapper(), params);
         return new PageImpl<>(messages, pageable, total);
+    }
+
+    public int getNumberOfUnreadMessages(String userName) {
+        Object[] params = new Object[]{ userName, userName };
+
+        String sqlTotal = """
+                            SELECT count(1) AS row_count
+                            FROM (message NATURAL JOIN
+                                    (
+                                        (
+                                            SELECT received.message_id, array_agg(received.receiver) as receivers
+                                            FROM (message NATURAL JOIN received_message) received
+                                            GROUP BY received.message_id
+                                            HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
+                                        ) as received1
+                                        NATURAL JOIN
+                                        (
+                                            SELECT received.message_id, received.read
+                                            FROM received_message received
+                                            WHERE received.receiver = ?
+                                        ) as read
+                                    ) as received2
+                                ) msg
+                             WHERE msg.read = FALSE;
+                         """;
+        return this.getJdbcTemplate().queryForObject(sqlTotal, params, (rs, rowNum) -> rs.getInt(1));
     }
 
     public Message getMessageByID(Long id) {

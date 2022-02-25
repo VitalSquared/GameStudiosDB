@@ -38,19 +38,41 @@ public class MessageController {
 
     @GetMapping("/sent")
     public String indexSentMessages(Model model, Principal principal,
-                                    @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable) {
+                                    @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable,
+                                    @RequestParam(name = "topic", required = false, defaultValue = "") String topic,
+                                    @RequestParam(name = "receiver", required = false, defaultValue = "") String receiver,
+                                    @RequestParam(name = "date", required = false, defaultValue = "") String date) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        model.addAttribute("page", messageDAO.getSentMessagesByUsername(user.getUsername(), pageable));
+        var messages = messageDAO.getSentMessagesByUsername(user.getUsername(), topic, receiver, date, pageable);
+        model.addAttribute("page", messages);
+        model.addAttribute("topic", topic);
+        model.addAttribute("receiver", receiver);
+        model.addAttribute("date", date);
         model.addAttribute("url", "/messages/sent");
+        model.addAttribute("numberOfUnread", messageDAO.getNumberOfUnreadMessages(user.getUsername()));
+        model.addAttribute("anyFilters", !topic.isEmpty() || !receiver.isEmpty() || !date.isEmpty());
         return "messages/sent";
     }
 
     @GetMapping("/received")
     public String indexReceivedMessages(Model model, Principal principal,
-                                        @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable) {
+                                        @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable,
+                                        @RequestParam(name = "topic", required = false, defaultValue = "") String topic,
+                                        @RequestParam(name = "date", required = false, defaultValue = "") String date,
+                                        @RequestParam(name = "sender", required = false, defaultValue = "") String sender,
+                                        @RequestParam(name = "read", required = false, defaultValue = "") String read) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        model.addAttribute("page", messageDAO.getReceivedMessagesByUsername(user.getUsername(), pageable));
+        var messages = messageDAO.getReceivedMessagesByUsername(user.getUsername(),
+                topic, date, sender, read, pageable);
+        model.addAttribute("page", messages);
+        model.addAttribute("topic", topic);
+        model.addAttribute("date", date);
+        model.addAttribute("sender", sender);
+        model.addAttribute("read", read);
         model.addAttribute("url", "/messages/received");
+        model.addAttribute("numberOfUnread",
+                messages.getContent().stream().filter(msg -> !msg.getRead()).count());
+        model.addAttribute("anyFilters", !topic.isEmpty() || !sender.isEmpty() || !date.isEmpty() || (read.equals("1") || read.equals("2")));
         return "messages/received";
     }
 
@@ -84,7 +106,9 @@ public class MessageController {
     }
 
     @GetMapping("/new_message")
-    public String newMessage(@ModelAttribute("message") Message message) {
+    public String newMessage(@ModelAttribute("message") Message message, Model model, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        model.addAttribute("numberOfUnread", messageDAO.getNumberOfUnreadMessages(user.getUsername()));
         return "messages/new_message";
     }
 

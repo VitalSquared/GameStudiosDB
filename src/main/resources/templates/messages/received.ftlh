@@ -1,7 +1,8 @@
 <#import "../parts/common.ftlh" as c>
 <#import "message_cards.ftlh" as card>
+<#import "_header.ftlh" as header>
 
 <@c.page "Received messages">
-    <#include "_header.ftlh">
-    <@card.content page url false/>
+    <@header.header numberOfUnread/>
+    <@card.content page url false anyFilters/>
 </@c.page>
