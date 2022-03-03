@@ -7,6 +7,7 @@
             Filters
         </#if>
     </a>
+    <br/>
     <style>
         .filterCollapse {
             border: 4px solid black;
@@ -40,6 +41,23 @@
                                                 </#if>
                                         >
                                             ${params[param][idx]}
+                                        </option>
+                                    </#foreach>
+                                </select>
+                            </label>
+                        </div>
+                        <#break>
+                    <#case 'selection'>
+                        <div class="btn-group btn-group-inline" >
+                            <label>
+                                <select name="${param}" class="form-control" >
+                                    <#foreach idx in 2..(params[param]?sequence?size-1)>
+                                        <option value="${params[param][idx][1]}"
+                                                <#if params[param][idx][1]?string == .vars[param]!>
+                                                    selected
+                                                </#if>
+                                        >
+                                            ${params[param][idx][0]}
                                         </option>
                                     </#foreach>
                                 </select>

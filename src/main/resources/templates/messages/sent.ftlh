@@ -4,5 +4,5 @@
 
 <@c.page "Sent messages">
     <@header.header numberOfUnread/>
-    <@card.content page url true anyFilters/>
+    <@card.content page url true filters/>
 </@c.page>

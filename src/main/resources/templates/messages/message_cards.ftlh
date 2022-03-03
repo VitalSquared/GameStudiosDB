@@ -1,9 +1,11 @@
-<#macro content page url sent any_filters>
+<#macro content page url sent filters>
 <#import "../parts/pager.ftlh" as p>
 <#import "../parts/filter.ftlh" as f>
 
+<#assign any_filters = (filters?string?length gt 0) />
+
 <#if page.content?size gt 0>
-    <@p.pager url page/>
+    <@p.pager url page filters/>
 </#if>
 <#if sent>
      <@f.filter url
@@ -116,7 +118,7 @@
 </div>
 
 <#if page.content?size gt 0>
-    <@p.pager url page/>
+    <@p.pager url page filters/>
 </#if>
 
 </#macro>

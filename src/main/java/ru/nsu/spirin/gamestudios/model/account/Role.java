@@ -1,4 +1,4 @@
-package ru.nsu.spirin.gamestudios.model.user;
+package ru.nsu.spirin.gamestudios.model.account;
 
 public enum Role {
     ROLE_DEVELOPER(),

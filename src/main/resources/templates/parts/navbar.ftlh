@@ -16,26 +16,36 @@
                     <a class="nav-link" href="/messages/sent">Messages</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/employees">Employees</a>
+                    <a class="nav-link" href="/studios">Studios</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="/contracts">Contracts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/testings">Testings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/games">Games</a>
+                </li>
+                <#if isAdmin>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin_panel/categories">Admin Panel</a>
+                    </li>
+                </#if>
+                <!--<li class="nav-item">
                     <a class="nav-link" href="/userInfo">Profile</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/admin">Admin</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout">Log out</a>
-                </li>
-            <#else>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Log in</a>
-                </li>
+                </li>-->
             </#if>
-
-
         </ul>
 
-        <div class="navbar-text mr-3"><#if user??>${name}<#else>Please, login</#if></div>
+        <#if user??>
+            <a class="navbar-text mr-3" href="/userInfo">${name}</a>
+            <a class="nav-link btn btn-primary" href="/logout">Log out</a>
+        <#else>
+            <a class="nav-link btn btn-primary" href="/login">Log in</a>
+        </#if>
     </div>
 </nav>

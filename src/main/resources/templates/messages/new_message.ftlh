@@ -13,7 +13,7 @@
     <@spring.formInput "message.topic"/>
     <br/>
     <label for="content"></label>
-    <@spring.formInput "message.content"/>
+    <@spring.formTextarea "message.content"/>
     <br/>
 
     <#foreach idx in [1, 2, 3, 4, 5]>

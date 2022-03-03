@@ -14,10 +14,9 @@
                         </#if>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/messages/new_message">New Message</a>
-                </li>
             </ul>
+
+            <a class="nav-link btn btn-primary" href="/messages/new_message">New Message</a>
         </div>
     </nav>
 </#macro>

@@ -3,13 +3,11 @@ package ru.nsu.spirin.gamestudios.controller;
 import java.security.Principal;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import ru.nsu.spirin.gamestudios.model.user.Role;
 import ru.nsu.spirin.gamestudios.utils.WebUtils;
 
 @Controller

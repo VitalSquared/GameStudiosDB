@@ -17,7 +17,8 @@ public class EmployeeMapper implements RowMapper<Employee> {
         Long categoryID = rs.getLong("category_id");
         Long studioID = rs.getLong("studio_id");
         Long departmentID = rs.getLong("department_id");
+        Boolean active = rs.getBoolean("active");
 
-        return new Employee(employeeID, firstName, lastName, birthDate, categoryID, studioID, departmentID);
+        return new Employee(employeeID, firstName, lastName, birthDate, categoryID, studioID, departmentID, active);
     }
 }

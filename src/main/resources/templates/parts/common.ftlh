@@ -47,6 +47,22 @@
 
 <script type="text/javascript">
     $(function() {
+        $('input[id="birthday"]').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            minYear: 1901,
+            maxYear: parseInt(moment().format('YYYY'),10),
+            locale: {
+                format: 'YYYY-MM-DD'
+            }
+        });
+    });
+</script>
+
+
+
+<script type="text/javascript">
+    $(function() {
 
         $('input[id="datefilter"]').daterangepicker({
             autoUpdateInput: false,

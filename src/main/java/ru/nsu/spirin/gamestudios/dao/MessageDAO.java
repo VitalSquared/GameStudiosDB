@@ -135,22 +135,20 @@ public class MessageDAO extends JdbcDaoSupport {
                         " msg.read = FALSE ";
 
         String sqlTotal = """
-                            SELECT count(1) AS row_count
-                            FROM (message NATURAL JOIN
-                                    (
-                                        (
-                                            SELECT received.message_id, array_agg(received.receiver) as receivers
-                                            FROM (message NATURAL JOIN received_message) received
-                                            GROUP BY received.message_id
-                                            HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
-                                        ) as received1
-                                        NATURAL JOIN
-                                        (
+                          WITH received1 AS (
+                                        SELECT received.message_id, array_agg(received.receiver) as receivers
+                                        FROM (message NATURAL JOIN received_message) received
+                                        GROUP BY received.message_id
+                                        HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
+                                    ),
+                                read AS (
                                             SELECT received.message_id, received.read
                                             FROM received_message received
                                             WHERE received.receiver = ?
-                                        ) as read
-                                    ) as received2
+                                 )
+                            SELECT count(1) AS row_count
+                            FROM (message NATURAL JOIN
+                                    (received1 NATURAL JOIN read) as received2
                                 ) msg
                                 WHERE 
                          """ +
@@ -158,22 +156,20 @@ public class MessageDAO extends JdbcDaoSupport {
         int total = this.getJdbcTemplate().queryForObject(sqlTotal, params, (rs, rowNum) -> rs.getInt(1));
 
         String querySql = """
+                                WITH received1 AS (
+                                        SELECT received.message_id, array_agg(received.receiver) as receivers
+                                        FROM (message NATURAL JOIN received_message) received
+                                        GROUP BY received.message_id
+                                        HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
+                                    ),
+                                    read AS (
+                                        SELECT received.message_id, received.read
+                                        FROM received_message received
+                                        WHERE received.receiver = ?
+                                 )
                                 SELECT *
                                 FROM (message NATURAL JOIN
-                                        (
-                                            (
-                                                SELECT received.message_id, array_agg(received.receiver) as receivers
-                                                FROM (message NATURAL JOIN received_message) received
-                                                GROUP BY received.message_id
-                                                HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
-                                            ) as received1
-                                            NATURAL JOIN
-                                            (
-                                                SELECT received.message_id, received.read
-                                                FROM received_message received
-                                                WHERE received.receiver = ?
-                                            ) as read
-                                        ) as received2
+                                        (received1 NATURAL JOIN read) as received2
                                     ) msg
                                     WHERE 
                             """ +
@@ -191,22 +187,20 @@ public class MessageDAO extends JdbcDaoSupport {
         Object[] params = new Object[]{ userName, userName };
 
         String sqlTotal = """
+                            WITH received1 AS (
+                                        SELECT received.message_id, array_agg(received.receiver) as receivers
+                                        FROM (message NATURAL JOIN received_message) received
+                                        GROUP BY received.message_id
+                                        HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
+                                    ),
+                                 read AS (
+                                        SELECT received.message_id, received.read
+                                        FROM received_message received
+                                        WHERE received.receiver = ?
+                                 )
                             SELECT count(1) AS row_count
                             FROM (message NATURAL JOIN
-                                    (
-                                        (
-                                            SELECT received.message_id, array_agg(received.receiver) as receivers
-                                            FROM (message NATURAL JOIN received_message) received
-                                            GROUP BY received.message_id
-                                            HAVING array_agg(received.receiver) @> ARRAY [?::varchar]
-                                        ) as received1
-                                        NATURAL JOIN
-                                        (
-                                            SELECT received.message_id, received.read
-                                            FROM received_message received
-                                            WHERE received.receiver = ?
-                                        ) as read
-                                    ) as received2
+                                    (received1 NATURAL JOIN read) as received2
                                 ) msg
                              WHERE msg.read = FALSE;
                          """;
@@ -253,27 +247,29 @@ public class MessageDAO extends JdbcDaoSupport {
             return;
         }
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String sql0 = "SELECT MAX(message_id) as max_id FROM message";
+        Long id = this.getJdbcTemplate().queryForObject(sql0, Long.class) + 1;
+
         String sqlInsertSender = """
                                     INSERT INTO message (message_id, date, topic, content, sender, attachments) VALUES
-                                         (default, now(), ?, ?, ?, ?)
+                                         (?, now(), ?, ?, ?, ?)
                                          RETURNING message_id;
                                 """;
         this.getJdbcTemplate().update(
                 con -> {
                     PreparedStatement ps =con.prepareStatement(sqlInsertSender, Statement.RETURN_GENERATED_KEYS);
-                    ps.setString(1, message.getTopic());
-                    ps.setString(2, message.getContent());
-                    ps.setString(3, message.getSender());
+                    ps.setLong(1, id);
+                    ps.setString(2, message.getTopic());
+                    ps.setString(3, message.getContent());
+                    ps.setString(4, message.getSender());
 
                     PGobject jsonObject = new PGobject();
                     jsonObject.setType("json");
                     jsonObject.setValue(AttachmentUtils.parseTo(message.getAttachments()));
-                    ps.setObject(4, jsonObject);
+                    ps.setObject(5, jsonObject);
 
                     return ps;
-                },
-                keyHolder
+                }
         );
 
         String sqlInsertReceiver = """
@@ -281,11 +277,7 @@ public class MessageDAO extends JdbcDaoSupport {
                                             (?, ?, false);
                                     """;
         for (var receiver : message.getReceivers()) {
-            Object[] params = new Object[]{
-                    keyHolder.getKey().longValue(),
-                    receiver
-            };
-            this.getJdbcTemplate().update(sqlInsertReceiver, params);
+            this.getJdbcTemplate().update(sqlInsertReceiver, id, receiver);
         }
     }
 

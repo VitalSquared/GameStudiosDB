@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -34,6 +36,11 @@ public class MessageController {
     @Autowired
     public MessageController(MessageDAO messageDAO) {
         this.messageDAO = messageDAO;
+    }
+
+    @GetMapping("")
+    public String redirectMessages() {
+        return "redirect:/messages/sent";
     }
 
     @GetMapping("/sent")
@@ -50,7 +57,23 @@ public class MessageController {
         model.addAttribute("date", date);
         model.addAttribute("url", "/messages/sent");
         model.addAttribute("numberOfUnread", messageDAO.getNumberOfUnreadMessages(user.getUsername()));
-        model.addAttribute("anyFilters", !topic.isEmpty() || !receiver.isEmpty() || !date.isEmpty());
+
+        Map<String, String> filters = new HashMap<>();
+        filters.put("topic", topic);
+        filters.put("receiver", receiver);
+        filters.put("date", date);
+        StringBuilder filtersString = new StringBuilder();
+        boolean anyFilters = false;
+        for (var key : filters.keySet()) {
+            String filter = filters.get(key);
+            if (!filter.isEmpty()) {
+                if (anyFilters) filtersString.append("&").append(key).append("=").append(filter);
+                else filtersString.append(key).append("=").append(filter);
+                anyFilters = true;
+            }
+        }
+        model.addAttribute("filters", filtersString.toString());
+
         return "messages/sent";
     }
 
@@ -70,9 +93,25 @@ public class MessageController {
         model.addAttribute("sender", sender);
         model.addAttribute("read", read);
         model.addAttribute("url", "/messages/received");
-        model.addAttribute("numberOfUnread",
-                messages.getContent().stream().filter(msg -> !msg.getRead()).count());
-        model.addAttribute("anyFilters", !topic.isEmpty() || !sender.isEmpty() || !date.isEmpty() || (read.equals("1") || read.equals("2")));
+        model.addAttribute("numberOfUnread", messageDAO.getNumberOfUnreadMessages(user.getUsername()));
+
+        Map<String, String> filters = new HashMap<>();
+        filters.put("topic", topic);
+        filters.put("sender", sender);
+        filters.put("date", date);
+        filters.put("read", read.equals("1") || read.equals("2") ? read : "");
+        StringBuilder filtersString = new StringBuilder();
+        boolean anyFilters = false;
+        for (var key : filters.keySet()) {
+            String filter = filters.get(key);
+            if (!filter.isEmpty()) {
+                if (anyFilters) filtersString.append("&").append(key).append("=").append(filter);
+                else filtersString.append(key).append("=").append(filter);
+                anyFilters = true;
+            }
+        }
+        model.addAttribute("filters", filtersString.toString());
+
         return "messages/received";
     }
 

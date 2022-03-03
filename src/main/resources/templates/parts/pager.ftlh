@@ -1,4 +1,5 @@
-<#macro pager url page>
+<#macro pager url page filters>
+    <#assign filters_with_amp = (filters?string?length gt 0)?then('&' + filters, '') />
     <#if page.getTotalPages() gt 7>
         <#assign
             totalPages = page.getTotalPages()
@@ -30,7 +31,7 @@
                     </li>
                 <#else>
                     <li class="page-item">
-                        <a class="page-link" href="${url}?page=${p - 1}&size=${page.getSize()}" tabindex="-1">${p}</a>
+                        <a class="page-link" href="${url}?page=${p - 1}&size=${page.getSize()}${filters_with_amp}" tabindex="-1">${p}</a>
                     </li>
                 </#if>
             </#list>
@@ -47,7 +48,7 @@
                     </li>
                 <#else>
                     <li class="page-item">
-                        <a class="page-link" href="${url}?page=${page.getNumber()}&size=${c}" tabindex="-1">${c}</a>
+                        <a class="page-link" href="${url}?page=${page.getNumber()}&size=${c}${filters_with_amp}" tabindex="-1">${c}</a>
                     </li>
                 </#if>
             </#list>
