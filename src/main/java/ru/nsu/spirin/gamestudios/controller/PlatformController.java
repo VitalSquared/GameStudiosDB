@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.nsu.spirin.gamestudios.dao.*;
-import ru.nsu.spirin.gamestudios.model.Platform;
+import ru.nsu.spirin.gamestudios.model.entity.Platform;
 
 import java.security.Principal;
 import java.sql.SQLException;

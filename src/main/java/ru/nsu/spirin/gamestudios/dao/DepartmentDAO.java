@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.spirin.gamestudios.mapper.DepartmentMapper;
-import ru.nsu.spirin.gamestudios.model.Department;
+import ru.nsu.spirin.gamestudios.model.mapper.DepartmentMapper;
+import ru.nsu.spirin.gamestudios.model.entity.Department;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;

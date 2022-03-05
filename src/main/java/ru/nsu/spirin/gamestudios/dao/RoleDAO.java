@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.spirin.gamestudios.model.account.Role;
+import ru.nsu.spirin.gamestudios.model.entity.account.Role;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;

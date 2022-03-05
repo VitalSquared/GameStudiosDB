@@ -5,8 +5,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.spirin.gamestudios.mapper.AccountMapper;
-import ru.nsu.spirin.gamestudios.model.account.Account;
+import ru.nsu.spirin.gamestudios.model.mapper.AccountMapper;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 
 import javax.sql.DataSource;
 import java.util.HashMap;

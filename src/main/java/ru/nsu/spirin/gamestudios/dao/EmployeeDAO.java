@@ -7,16 +7,15 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.spirin.gamestudios.mapper.EmployeeMapper;
-import ru.nsu.spirin.gamestudios.model.Employee;
-import ru.nsu.spirin.gamestudios.model.account.Account;
+import ru.nsu.spirin.gamestudios.model.mapper.EmployeeMapper;
+import ru.nsu.spirin.gamestudios.model.entity.Employee;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Objects;
 
 @Repository
 @Transactional

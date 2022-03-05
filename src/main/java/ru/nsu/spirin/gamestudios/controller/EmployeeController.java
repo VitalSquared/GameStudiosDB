@@ -7,8 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.nsu.spirin.gamestudios.dao.*;
-import ru.nsu.spirin.gamestudios.model.Employee;
-import ru.nsu.spirin.gamestudios.model.account.Account;
+import ru.nsu.spirin.gamestudios.model.entity.Employee;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 
 import java.security.Principal;
 import java.sql.SQLException;
@@ -66,7 +66,6 @@ public class EmployeeController {
     public String newEmployee(@ModelAttribute("employee") Employee employee,
                               @ModelAttribute("account") Account account,
                               Model model, Principal principal) {
-        employee.setEmployeeType("developer");
         model.addAttribute("studios", studioDAO.getAllStudios());
         model.addAttribute("departments", departmentDAO.getAllDepartments());
         model.addAttribute("categories", categoryDAO.getAllCategories());

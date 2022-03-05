@@ -6,15 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.spirin.gamestudios.mapper.MessageReceivedMapper;
-import ru.nsu.spirin.gamestudios.mapper.MessageSentMapper;
-import ru.nsu.spirin.gamestudios.model.message.Message;
+import ru.nsu.spirin.gamestudios.model.mapper.MessageReceivedMapper;
+import ru.nsu.spirin.gamestudios.model.mapper.MessageSentMapper;
+import ru.nsu.spirin.gamestudios.model.entity.message.Message;
 import ru.nsu.spirin.gamestudios.utils.AttachmentUtils;
 
 import javax.sql.DataSource;

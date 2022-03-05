@@ -15,8 +15,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.spirin.gamestudios.dao.MessageDAO;
-import ru.nsu.spirin.gamestudios.model.message.Attachment;
-import ru.nsu.spirin.gamestudios.model.message.Message;
+import ru.nsu.spirin.gamestudios.model.entity.message.Attachment;
+import ru.nsu.spirin.gamestudios.model.entity.message.Message;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;

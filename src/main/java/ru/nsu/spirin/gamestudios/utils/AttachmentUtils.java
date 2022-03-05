@@ -3,7 +3,7 @@ package ru.nsu.spirin.gamestudios.utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import ru.nsu.spirin.gamestudios.model.message.Attachment;
+import ru.nsu.spirin.gamestudios.model.entity.message.Attachment;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -9,8 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.nsu.spirin.gamestudios.dao.RoleDAO;
 import ru.nsu.spirin.gamestudios.dao.AccountDAO;
-import ru.nsu.spirin.gamestudios.model.account.Account;
-import ru.nsu.spirin.gamestudios.model.account.Role;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
+import ru.nsu.spirin.gamestudios.model.entity.account.Role;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         return new org.springframework.security.core.userdetails.User(
                 account.getLogin(), account.getPasswordHash(),
-                account.isActive(), account.isActive(), account.isActive(), account.isActive(),
+                account.getActive(), account.getActive(), account.getActive(), account.getActive(),
                 authorities
         );
     }

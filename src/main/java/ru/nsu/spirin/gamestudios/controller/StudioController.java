@@ -8,9 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.nsu.spirin.gamestudios.dao.*;
-import ru.nsu.spirin.gamestudios.model.Employee;
-import ru.nsu.spirin.gamestudios.model.Studio;
-import ru.nsu.spirin.gamestudios.model.account.Account;
+import ru.nsu.spirin.gamestudios.model.entity.Employee;
+import ru.nsu.spirin.gamestudios.model.entity.Studio;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 
 import java.security.Principal;
 import java.sql.SQLException;
