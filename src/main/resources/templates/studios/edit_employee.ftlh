@@ -15,7 +15,7 @@
         <label for="birth_date">Birth Date: </label>
         <label for="birthday">
             <@spring.bind "employee.birthDate"/>
-            <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${employee.birthDate?string('YYYY-MM-dd2')!}" placeholder="" />
+            <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${employee.birthDate?string('YYYY-MM-dd')!}" placeholder="" />
         </label>
         <br/>
         <#assign studios_map = {}>

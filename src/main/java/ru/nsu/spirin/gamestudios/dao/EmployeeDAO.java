@@ -81,6 +81,16 @@ public class EmployeeDAO extends JdbcDaoSupport {
         return this.getJdbcTemplate().query(sqlSent, new EmployeeMapper(), studioID, studioID);
     }
 
+    public List<Employee> getEmployeesByGameID(Long gameID) {
+        String sqlSent = """
+                            SELECT e.employee_id, e.first_name, e.last_name, e.birth_date,
+                                        dev.category_id, dev.department_id, e.active, d.studio_id
+                            FROM (employee e NATURAL JOIN (developer dev NATURAL JOIN department d)) NATURAL JOIN game__employee
+                            WHERE e.employee_id != 0 AND game_id = ?
+                         """;
+        return this.getJdbcTemplate().query(sqlSent, new EmployeeMapper(), gameID);
+    }
+
     public List<Employee> getEmployeesByDepartment(Long departmentID) {
         String sqlSent = """
                             SELECT e.employee_id, e.first_name, e.last_name, e.birth_date, e.category_id, e.department_id, 

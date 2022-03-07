@@ -22,7 +22,7 @@
                     <a class="nav-link" href="/contracts">Contracts</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/testings">Testings</a>
+                    <a class="nav-link" href="/tests">Testings</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/games">Games</a>

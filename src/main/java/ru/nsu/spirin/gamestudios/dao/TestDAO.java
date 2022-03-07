@@ -31,9 +31,9 @@ public class TestDAO extends JdbcDaoSupport {
 
     public void newTest(Test test) {
         String sql = """
-                                    INSERT INTO test (test_id, start_date, end_date, grand, min_studios_num, apps_deadline, status_id) VALUES
-                                         (default, ?, ?, ?, ?, ?, ?)
-                                """;
+                        INSERT INTO test (test_id, start_date, end_date, grand, min_studios_num, apps_deadline, status_id) VALUES
+                             (default, ?, ?, ?, ?, ?, ?)
+                    """;
         this.getJdbcTemplate().update(sql, test.getStartDate(), test.getEndDate(), test.getGrand(), test.getMinStudiosNum(), test.getAppsDeadline(), test.getStatusID());
     }
 

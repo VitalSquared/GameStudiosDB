@@ -2,7 +2,7 @@
 <#import "../parts/filter.ftlh" as f>
 <#import "../parts/security.ftlh" as s>
 
-<@c.page "Testings">
+<@c.page "Contracts">
     <#if s.isAdmin || s.isGeneralDirector>
         <a class="nav-link btn btn-primary" href="/contracts/new">Create new contract</a>
     </#if>
@@ -26,7 +26,7 @@
                 <td>${contract.testID}</td>
                 <td>
                     <#if s.isAdmin>
-                        <a class="nav-link btn btn-primary" href="/contracts/${contract.contractID}/edit">Edit</a>
+                        <a class="nav-link btn btn-primary" href="/contracts/${contract.contractID}">View</a>
                     </#if>
                 </td>
             </tr>

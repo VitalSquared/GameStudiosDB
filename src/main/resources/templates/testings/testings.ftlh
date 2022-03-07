@@ -32,7 +32,7 @@
                 <td>${test.statusID}</td>
                 <td>
                     <#if s.isAdmin>
-                        <a class="nav-link btn btn-primary" href="/tests/${test.testID}/edit">Edit</a>
+                        <a class="nav-link btn btn-primary" href="/tests/${test.testID}">View</a>
                     </#if>
                 </td>
             </tr>

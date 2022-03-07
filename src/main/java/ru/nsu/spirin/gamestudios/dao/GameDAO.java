@@ -43,6 +43,47 @@ public class GameDAO extends JdbcDaoSupport {
                                     SET start_date = ?, dev_name = ?, release_name = ?, expenses = ?
                                     WHERE game_id = ?
                                 """;
-        this.getJdbcTemplate().update(sql, game.getStartDate(), game.getDevName(), game.getReleaseName(), id);
+        this.getJdbcTemplate().update(sql, game.getStartDate(), game.getDevName(), game.getReleaseName(), game.getExpenses(), id);
+    }
+
+    public List<Game> getGamesByContractID(Long contractID) {
+        String sql = """
+                        SELECT game.game_id, game.start_date, game.studio_id, game.dev_name, game.release_name, game.expenses
+                        FROM game NATURAL JOIN contract__game
+                        WHERE contract_id = ?;
+                    """;
+        return this.getJdbcTemplate().query(sql, new GameMapper(), contractID);
+    }
+
+    public void addGenre(Long gameID, Long genreID) {
+        String sql = """
+                        INSERT INTO game__genre (game_id, genre_id) VALUES
+                             (?, ?)
+                    """;
+        this.getJdbcTemplate().update(sql,  gameID, genreID);
+    }
+
+    public void removeGenreFromGame(Long gameID, Long genreID) {
+        String sql = """
+                        DELETE FROM game__genre
+                        WHERE game_id = ? AND genre_id = ?
+                    """;
+        this.getJdbcTemplate().update(sql, gameID, genreID);
+    }
+
+    public void addEmployee(Long gameID, Long employeeID) {
+        String sql = """
+                        INSERT INTO game__employee (game_id, employee_id) VALUES
+                             (?, ?)
+                    """;
+        this.getJdbcTemplate().update(sql,  gameID, employeeID);
+    }
+
+    public void removeEmployeeFromGame(Long gameID, Long employeeID) {
+        String sql = """
+                        DELETE FROM game__employee
+                        WHERE game_id = ? AND employee_id = ?
+                    """;
+        this.getJdbcTemplate().update(sql, gameID, employeeID);
     }
 }

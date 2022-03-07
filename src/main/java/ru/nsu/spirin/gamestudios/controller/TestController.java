@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Controller
-@RequestMapping("/testings")
+@RequestMapping("/tests")
 public class TestController {
     private final TestDAO testDAO;
 
@@ -38,6 +38,7 @@ public class TestController {
     @PostMapping("")
     public String create(@ModelAttribute("test") Test test,
                          Model model, Principal principal) throws SQLException {
+        test.setStatusID(0L);
         testDAO.newTest(test);
         return "redirect:/tests";
     }

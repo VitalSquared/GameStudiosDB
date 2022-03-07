@@ -31,18 +31,43 @@ public class ContractDAO extends JdbcDaoSupport {
 
     public void newContract(Contract contract) {
         String sql = """
-                                    INSERT INTO contract (contract_id, date, percent, test_id) VALUES
-                                         (default, ?, ?, ?)
-                                """;
+                        INSERT INTO contract (contract_id, date, percent, test_id) VALUES
+                             (default, ?, ?, ?)
+                    """;
         this.getJdbcTemplate().update(sql, contract.getDate(), contract.getPercent(), contract.getTestID());
     }
 
     public void updateContract(Long id, Contract contract) {
         String sql = """
                                     UPDATE contract
-                                    SET date = ?, percent = ?, test_id = ?
+                                    SET date = ?, percent = ?
                                     WHERE contract_id = ?
                                 """;
-        this.getJdbcTemplate().update(sql, contract.getDate(), contract.getPercent(), contract.getTestID(), id);
+        this.getJdbcTemplate().update(sql, contract.getDate(), contract.getPercent(), id);
+    }
+
+    public List<Contract> getContractsByGameID(Long gameID) {
+        String sql = """
+                        SELECT c.contract_id, c.percent, c.date, c.test_id
+                        FROM (contract NATURAL JOIN contract__game) c
+                        WHERE c.game_id = ?;
+                    """;
+        return this.getJdbcTemplate().query(sql, new ContractMapper(), gameID);
+    }
+
+    public void addGameToContract(Long contractID, Long gameID) {
+        String sql = """
+                        INSERT INTO contract__game (game_id, contract_id) VALUES
+                                                (?, ?)
+                    """;
+        this.getJdbcTemplate().update(sql, gameID, contractID);
+    }
+
+    public void removeGameFromContract(Long contractID, Long gameID) {
+        String sql = """
+                        DELETE FROM contract__game
+                        WHERE game_id = ? AND contract_id = ?;
+                    """;
+        this.getJdbcTemplate().update(sql, gameID, contractID);
     }
 }
