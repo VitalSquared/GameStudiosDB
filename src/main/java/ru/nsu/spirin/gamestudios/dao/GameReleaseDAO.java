@@ -27,4 +27,30 @@ public class GameReleaseDAO extends JdbcDaoSupport {
                     """;
         return this.getJdbcTemplate().query(sql, new GameReleaseMapper(), gameID);
     }
+
+    public void addRelease(Long gameID, GameRelease gameRelease) {
+        String sql = """
+                    INSERT INTO game__contract__platform (game_id, contract_id, platform_id, release_date, cost, sold_count) VALUES 
+                    (?, ?, ?, ?, ?, ?);
+                """;
+        this.getJdbcTemplate().update(sql, gameID, gameRelease.getContractID(), gameRelease.getPlatformID(), gameRelease.getReleaseDate(), gameRelease.getCost(), gameRelease.getSoldCount());
+    }
+
+    public GameRelease getReleaseByGameAndPlatform(Long gameID, Long platformID) {
+        String sql = """
+                        SELECT * 
+                        FROM game__contract__platform
+                        WHERE game_id = ? AND platform_id = ?;
+                    """;
+        return this.getJdbcTemplate().queryForObject(sql, new GameReleaseMapper(), gameID, platformID);
+    }
+
+    public void updateRelease(Long gameID, Long platformID, GameRelease release) {
+        String sql = """
+                    UPDATE game__contract__platform
+                    SET release_date = ?, cost = ?, sold_count = ?
+                    WHERE game_id = ? AND platform_id = ?;
+                """;
+        this.getJdbcTemplate().update(sql, release.getReleaseDate(), release.getCost(), release.getSoldCount(), gameID, platformID);
+    }
 }

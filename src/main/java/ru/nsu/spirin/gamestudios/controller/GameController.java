@@ -5,10 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.nsu.spirin.gamestudios.dao.*;
-import ru.nsu.spirin.gamestudios.model.entity.Contract;
-import ru.nsu.spirin.gamestudios.model.entity.Employee;
-import ru.nsu.spirin.gamestudios.model.entity.Game;
-import ru.nsu.spirin.gamestudios.model.entity.Genre;
+import ru.nsu.spirin.gamestudios.model.entity.*;
 
 import java.security.Principal;
 import java.sql.SQLException;
@@ -23,6 +20,7 @@ public class GameController {
     private final ContractDAO contractDAO;
     private final GameReleaseDAO gameReleaseDAO;
     private final StudioDAO studioDAO;
+    private final PlatformDAO platformDAO;
 
     @Autowired
     public GameController(GameDAO gameDAO,
@@ -30,13 +28,15 @@ public class GameController {
                           EmployeeDAO employeeDAO,
                           ContractDAO contractDAO,
                           GameReleaseDAO gameReleaseDAO,
-                          StudioDAO studioDAO) {
+                          StudioDAO studioDAO,
+                          PlatformDAO platformDAO) {
         this.gameDAO = gameDAO;
         this.genreDAO = genreDAO;
         this.employeeDAO = employeeDAO;
         this.contractDAO = contractDAO;
         this.gameReleaseDAO = gameReleaseDAO;
         this.studioDAO = studioDAO;
+        this.platformDAO = platformDAO;
     }
 
     @GetMapping("")
@@ -128,6 +128,38 @@ public class GameController {
                          Principal principal,
                          @PathVariable("id") Long id) throws SQLException {
         gameDAO.updateGame(id, game);
+        return "redirect:/games/{id}";
+    }
+
+    @GetMapping("/{id}/add_release")
+    public String addReleaseGet(@ModelAttribute("release") GameRelease release,
+                              Model model, Principal principal, @PathVariable(name = "id") Long gameID) {
+        model.addAttribute("contracts", contractDAO.getContractsByGameID(gameID));
+        model.addAttribute("platforms", platformDAO.getAllPlatforms());
+        model.addAttribute("gameID", gameID);
+        return "/games/add_release";
+    }
+
+    @PostMapping("/{id}/release")
+    public String addReleasePost(@ModelAttribute("release") GameRelease release,
+                               Model model, Principal principal, @PathVariable(name = "id") Long gameID) throws SQLException {
+        gameReleaseDAO.addRelease(gameID, release);
+        return "redirect:/games/{id}";
+    }
+
+    @GetMapping("/{id}/edit_release/{id1}")
+    public String editRelease(Model model, @PathVariable("id") Long gameID, @PathVariable("id1") Long platformID) {
+        model.addAttribute("release", gameReleaseDAO.getReleaseByGameAndPlatform(gameID, platformID));
+        model.addAttribute("gameID", gameID);
+        model.addAttribute("platformID", platformID);
+        return "/games/edit_release";
+    }
+
+    @PostMapping("/{id}/edit_release/{id1}/post")
+    public String updateRelease(@ModelAttribute("release") GameRelease release,
+                                 Principal principal,
+                                 @PathVariable("id") Long gameID, @PathVariable("id1") Long platformID) throws SQLException {
+        gameReleaseDAO.updateRelease(gameID, platformID, release);
         return "redirect:/games/{id}";
     }
 }

@@ -122,6 +122,7 @@
             <th scope="col">Release Date</th>
             <th scope="col">Percent</th>
             <th scope="col">Sold Count</th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -132,6 +133,11 @@
                 <td>${release.releaseDate}</td>
                 <td>${release.cost}</td>
                 <td>${release.soldCount}</td>
+                <td>
+                    <#if s.isAdmin>
+                        <a class="nav-link btn btn-primary" href="/games/${game.gameID}/edit_release/${release.platformID}">Edit</a>
+                    </#if>
+                </td>
             </tr>
         </#foreach>
         </tbody>

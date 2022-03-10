@@ -2,16 +2,32 @@ package ru.nsu.spirin.gamestudios.controller;
 
 import java.security.Principal;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import ru.nsu.spirin.gamestudios.dao.AccountDAO;
+import ru.nsu.spirin.gamestudios.dao.EmployeeDAO;
+import ru.nsu.spirin.gamestudios.model.entity.Employee;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 import ru.nsu.spirin.gamestudios.utils.WebUtils;
 
 @Controller
 public class MainController {
+
+    private final EmployeeDAO employeeDAO;
+    private final AccountDAO accountDAO;
+
+    @Autowired
+    public MainController(EmployeeDAO employeeDAO, AccountDAO accountDAO) {
+        this.employeeDAO = employeeDAO;
+        this.accountDAO = accountDAO;
+    }
+
 
     @RequestMapping(value = { "/", "/welcome" }, method = RequestMethod.GET)
     public String welcomePage(Model model) {
@@ -44,21 +60,12 @@ public class MainController {
 
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public String userInfo(Model model, Principal principal) {
-
-        // (1) (en)
-        // After user login successfully.
-        // (vi)
-        // Sau khi user login thanh cong se co principal
         String userName = principal.getName();
-
-        System.out.println("User Name: " + userName);
-
-        User loginedUser = (User) ((Authentication) principal).getPrincipal();
-
-        String userInfo = WebUtils.toString(loginedUser);
-        model.addAttribute("userInfo", userInfo);
-
-        return "userInfoPage";
+        Account account = accountDAO.findUserAccount(userName);
+        Employee employee = employeeDAO.getEmployeeByID(account.getEmployeeID());
+        model.addAttribute("employee", employee);
+        model.addAttribute("account", account);
+        return "myaccount/index";
     }
 
     @RequestMapping(value = "/403", method = RequestMethod.GET)

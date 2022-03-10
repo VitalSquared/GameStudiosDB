@@ -106,6 +106,17 @@ public class EmployeeDAO extends JdbcDaoSupport {
         return this.getJdbcTemplate().query(sqlSent, new EmployeeMapper(), departmentID);
     }
 
+    public List<Employee> getEmployeesByTestApp(Long appID) {
+        String sqlSent = """
+                            SELECT e.employee_id, e.first_name, e.last_name, e.birth_date, e.category_id, e.department_id, 
+                                 e.studio_id, e.active
+                            FROM ((employee NATURAL JOIN (developer NATURAL JOIN department) as dev1
+                            ) e1 NATURAL JOIN test_app__employee) e
+                            WHERE e.employee_id != 0 AND e.app_id = ?;
+                         """;
+        return this.getJdbcTemplate().query(sqlSent, new EmployeeMapper(), appID);
+    }
+
     public void newEmployee(Employee employee, Account account) throws SQLException {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String sqlInsert1 = """

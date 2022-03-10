@@ -65,4 +65,14 @@ public class GenreDAO extends JdbcDaoSupport {
                     """;
         return this.getJdbcTemplate().query(sql, new GenreMapper(), gameID);
     }
+
+    public List<Genre> getGenresByTestID(Long testID) {
+        String sql = """
+                        SELECT genre_id, name
+                        FROM genre NATURAL JOIN test__genre
+                        WHERE test_id = ?
+                        ORDER BY genre_id
+                    """;
+        return this.getJdbcTemplate().query(sql, new GenreMapper(), testID);
+    }
 }

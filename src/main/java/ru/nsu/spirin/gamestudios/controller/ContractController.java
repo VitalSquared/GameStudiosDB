@@ -41,7 +41,7 @@ public class ContractController {
     @GetMapping("/new")
     public String newContract(@ModelAttribute("contract") Contract contract,
                           Model model, Principal principal) {
-        model.addAttribute("tests", testDAO.getAllTests());
+        model.addAttribute("tests", testDAO.getResultedTests());
         return "/contracts/new_contract";
     }
 
