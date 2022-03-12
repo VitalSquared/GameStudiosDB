@@ -52,7 +52,7 @@
         </div>
 
         <label for="login">Email: </label>
-        <@spring.formInput "account.login"/>
+        <@spring.formInput "account.email"/>
         <br/>
         <#assign resets_map = {"do_nothing" : "Do Nothing", "reset" : "Reset"}>
         <label for="resets">Password Reset: </label>

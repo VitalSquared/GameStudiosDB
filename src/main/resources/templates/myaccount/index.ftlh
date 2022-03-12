@@ -23,7 +23,7 @@
             <td>${employee.studioID}</td>
             <td>${employee.departmentID}</td>
             <td>${employee.active?c}</td>
-            <td>${account.login}</td>
+            <td>${account.email}</td>
         </tr>
         </tbody>
     </table>

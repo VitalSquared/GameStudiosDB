@@ -7,42 +7,41 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.nsu.spirin.gamestudios.dao.*;
 import ru.nsu.spirin.gamestudios.model.entity.Department;
 import ru.nsu.spirin.gamestudios.model.entity.Employee;
 import ru.nsu.spirin.gamestudios.model.entity.account.Account;
+import ru.nsu.spirin.gamestudios.service.AccountService;
+import ru.nsu.spirin.gamestudios.service.DepartmentService;
+import ru.nsu.spirin.gamestudios.service.EmployeeService;
+import ru.nsu.spirin.gamestudios.service.StudioService;
 
 import java.security.Principal;
-import java.sql.SQLException;
 
 @Controller
 @RequestMapping("/departments")
 public class DepartmentController {
-    private final StudioDAO studioDAO;
-    private final CategoryDAO categoryDAO;
-    private final DepartmentDAO departmentDAO;
-    private final EmployeeDAO employeeDAO;
-    private final AccountDAO accountDAO;
+    private final StudioService studioService;
+    private final DepartmentService departmentService;
+    private final EmployeeService employeeService;
+    private final AccountService accountService;
 
     @Autowired
-    public DepartmentController(StudioDAO studioDAO,
-                                CategoryDAO categoryDAO,
-                                DepartmentDAO departmentDAO,
-                                EmployeeDAO employeeDAO,
-                                AccountDAO accountDAO) {
-        this.studioDAO = studioDAO;
-        this.categoryDAO = categoryDAO;
-        this.departmentDAO = departmentDAO;
-        this.employeeDAO = employeeDAO;
-        this.accountDAO = accountDAO;
+    public DepartmentController(StudioService studioService,
+                                DepartmentService departmentService,
+                                EmployeeService employeeService,
+                                AccountService accountService) {
+        this.studioService = studioService;
+        this.departmentService = departmentService;
+        this.employeeService = employeeService;
+        this.accountService = accountService;
     }
 
-    @GetMapping("")
+    @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexDepartments(Model model, Principal principal,
                                    @RequestParam(name = "studio", required = false, defaultValue = "0") String studio) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        Account account = accountDAO.findUserAccount(user.getUsername());
-        Employee employee = employeeDAO.getEmployeeByID(account.getEmployeeID());
+        Account account = accountService.findAccountByEmail(user.getUsername());
+        Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
 
         Long parsedStudioID;
         try {
@@ -58,46 +57,45 @@ public class DepartmentController {
 
         model.addAttribute("studio", studio);
         model.addAttribute("url", "/departments");
-        model.addAttribute("departments", departmentDAO.getAllDepartmentsOfStudio(parsedStudioID));
-        model.addAttribute("studios", studioDAO.getStudiosListByID(employee.getStudioID()));
+        model.addAttribute("departments", departmentService.getAllDepartmentsOfStudio(parsedStudioID));
+        model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
         return "studios/departments";
     }
 
-    @GetMapping("/new")
     @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newDepartment(@ModelAttribute("department") Department department, Model model, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        Account account = accountDAO.findUserAccount(user.getUsername());
-        Employee employee = employeeDAO.getEmployeeByID(account.getEmployeeID());
-        model.addAttribute("studios", studioDAO.getStudiosListByID(employee.getStudioID()));
-        model.addAttribute("employees", employeeDAO.getEmployeesByDepartment(department.getDepartmentID()));
+        Account account = accountService.findAccountByEmail(user.getUsername());
+        Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
+        model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
+        model.addAttribute("employees", employeeService.getEmployeesByDepartment(department.getDepartmentID()));
         return "/studios/new_department";
     }
 
-    @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    public String create(@ModelAttribute("department") Department department, Principal principal) throws SQLException {
-        departmentDAO.newDepartment(department);
+    @RequestMapping(path = "", method = RequestMethod.POST)
+    public String create(@ModelAttribute("department") Department department) {
+        departmentService.newDepartment(department);
         return "redirect:/departments";
     }
 
-    @GetMapping("/{id}/edit")
     @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editDepartment(Model model, @PathVariable("id") Long departmentID, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        Account account = accountDAO.findUserAccount(user.getUsername());
-        Employee employee = employeeDAO.getEmployeeByID(account.getEmployeeID());
-        model.addAttribute("studios", studioDAO.getStudiosListByID(employee.getStudioID()));
-        model.addAttribute("department", departmentDAO.getDepartmentByID(departmentID));
-        model.addAttribute("employees", employeeDAO.getEmployeesByDepartment(departmentID));
+        Account account = accountService.findAccountByEmail(user.getUsername());
+        Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
+        model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
+        model.addAttribute("department", departmentService.getDepartmentByID(departmentID));
+        model.addAttribute("employees", employeeService.getEmployeesByDepartment(departmentID));
         return "/studios/edit_department";
     }
 
-    @PostMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String update(@ModelAttribute("department") Department department, Principal principal,
-                         @PathVariable("id") Long id) throws SQLException {
-        departmentDAO.updateDepartment(id, department);
+    @RequestMapping(path = "/{id}", method = RequestMethod.POST)
+    public String update(@ModelAttribute("department") Department department, @PathVariable("id") Long id) {
+        departmentService.updateDepartment(id, department);
         return "redirect:/departments";
     }
 }

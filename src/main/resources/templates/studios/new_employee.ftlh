@@ -52,7 +52,7 @@
         </div>
 
         <label for="first_name">Email: </label>
-        <@spring.formInput "account.login"/>
+        <@spring.formInput "account.email"/>
         <br/>
         <#assign actives_map = {"true" : "Active", "false" : "Inactive"}>
         <label for="active">Active: </label>

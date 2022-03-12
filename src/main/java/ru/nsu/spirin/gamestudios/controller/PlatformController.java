@@ -4,70 +4,58 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import ru.nsu.spirin.gamestudios.dao.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import ru.nsu.spirin.gamestudios.model.entity.Platform;
+import ru.nsu.spirin.gamestudios.service.PlatformService;
 
-import java.security.Principal;
-import java.sql.SQLException;
 import java.util.List;
 
 @Controller
 @RequestMapping("/admin_panel/platforms")
 public class PlatformController {
-    private final StudioDAO studioDAO;
-    private final PlatformDAO platformDAO;
-    private final DepartmentDAO departmentDAO;
-    private final EmployeeDAO employeeDAO;
-    private final AccountDAO accountDAO;
+    private final PlatformService platformService;
 
     @Autowired
-    public PlatformController(StudioDAO studioDAO,
-                              PlatformDAO platformDAO,
-                              DepartmentDAO departmentDAO,
-                              EmployeeDAO employeeDAO,
-                              AccountDAO accountDAO) {
-        this.studioDAO = studioDAO;
-        this.platformDAO = platformDAO;
-        this.departmentDAO = departmentDAO;
-        this.employeeDAO = employeeDAO;
-        this.accountDAO = accountDAO;
+    public PlatformController(PlatformService platformService) {
+        this.platformService = platformService;
     }
 
-    @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    public String indexPlatforms(Model model, Principal principal) {
-        List<Platform> platforms = platformDAO.getAllPlatforms();
+    @RequestMapping(path = "", method = RequestMethod.GET)
+    public String indexPlatforms(Model model) {
+        List<Platform> platforms = platformService.getAllPlatforms();
         model.addAttribute("platforms", platforms);
         model.addAttribute("url", "/admin_panel/platforms");
         return "admin/platforms";
     }
 
-    @GetMapping("/new")
     @PreAuthorize("hasRole('ADMIN')")
-    public String newPlatform(@ModelAttribute("platform") Platform platform, Model model, Principal principal) {
+    @RequestMapping(path = "/new", method = RequestMethod.GET)
+    public String newPlatform(@ModelAttribute("platform") Platform platform) {
         return "/admin/new_platform";
     }
 
-    @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    public String create(@ModelAttribute("platform") Platform platform, Principal principal) throws SQLException {
-        platformDAO.newPlatform(platform);
+    @RequestMapping(path = "", method = RequestMethod.POST)
+    public String createPlatform(@ModelAttribute("platform") Platform platform) {
+        platformService.createNewPlatform(platform);
         return "redirect:/admin_panel/platforms";
     }
 
-    @GetMapping("/{id}/edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public String editPlatform(Model model, @PathVariable("id") Long platformID, Principal principal) {
-        model.addAttribute("platform", platformDAO.getPlatformByID(platformID));
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
+    public String editPlatform(Model model, @PathVariable("id") Long platformID) {
+        model.addAttribute("platform", platformService.getPlatformByID(platformID));
         return "/admin/edit_platform";
     }
 
-    @PostMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String update(@ModelAttribute("platform") Platform platform, Principal principal,
-                         @PathVariable("id") Long id) throws SQLException {
-        platformDAO.updatePlatform(id, platform);
+    @RequestMapping(path = "/{id}", method = RequestMethod.POST)
+    public String updatePlatform(@ModelAttribute("platform") Platform platform, @PathVariable("id") Long id) {
+        platformService.updatePlatform(id, platform);
         return "redirect:/admin_panel/platforms";
     }
 }

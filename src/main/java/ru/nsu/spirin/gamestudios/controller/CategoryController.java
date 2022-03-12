@@ -4,70 +4,57 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import ru.nsu.spirin.gamestudios.dao.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import ru.nsu.spirin.gamestudios.model.entity.Category;
-
-import java.security.Principal;
-import java.sql.SQLException;
-import java.util.List;
+import ru.nsu.spirin.gamestudios.service.CategoryService;
 
 @Controller
 @RequestMapping("/admin_panel/categories")
 public class CategoryController {
-    private final StudioDAO studioDAO;
-    private final CategoryDAO categoryDAO;
-    private final DepartmentDAO departmentDAO;
-    private final EmployeeDAO employeeDAO;
-    private final AccountDAO accountDAO;
+    private final CategoryService categoryService;
 
     @Autowired
-    public CategoryController(StudioDAO studioDAO,
-                                CategoryDAO categoryDAO,
-                                DepartmentDAO departmentDAO,
-                                EmployeeDAO employeeDAO,
-                                AccountDAO accountDAO) {
-        this.studioDAO = studioDAO;
-        this.categoryDAO = categoryDAO;
-        this.departmentDAO = departmentDAO;
-        this.employeeDAO = employeeDAO;
-        this.accountDAO = accountDAO;
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
-    @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    public String indexCategories(Model model, Principal principal) {
-        List<Category> categories = categoryDAO.getAllCategories();
-        model.addAttribute("categories", categories);
+    @RequestMapping(path = "", method = RequestMethod.GET)
+    public String indexCategories(Model model) {
+        model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("url", "/admin_panel/categories");
         return "admin/categories";
     }
 
-    @GetMapping("/new")
     @PreAuthorize("hasRole('ADMIN')")
-    public String newCategory(@ModelAttribute("category") Category category, Model model, Principal principal) {
+    @RequestMapping(path = "/new", method = RequestMethod.GET)
+    public String newCategory(@ModelAttribute("category") Category category) {
         return "/admin/new_category";
     }
 
-    @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    public String create(@ModelAttribute("category") Category category, Principal principal) throws SQLException {
-        categoryDAO.newCategory(category);
+    @RequestMapping(path = "", method = RequestMethod.POST)
+    public String createCategory(@ModelAttribute("category") Category category)  {
+        categoryService.createNewCategory(category);
         return "redirect:/admin_panel/categories";
     }
 
-    @GetMapping("/{id}/edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public String editCategory(Model model, @PathVariable("id") Long categoryID, Principal principal) {
-        model.addAttribute("category", categoryDAO.getCategoryByID(categoryID));
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
+    public String editCategory(Model model,
+                               @PathVariable("id") Long categoryID) {
+        model.addAttribute("category", categoryService.getCategoryByID(categoryID));
         return "/admin/edit_category";
     }
 
-    @PostMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String update(@ModelAttribute("category") Category category, Principal principal,
-                         @PathVariable("id") Long id) throws SQLException {
-        categoryDAO.updateCategory(id, category);
+    @RequestMapping(path = "/{id}", method = RequestMethod.POST)
+    public String updateCategory(@ModelAttribute("category") Category category,
+                         @PathVariable("id") Long id) {
+        categoryService.updateCategory(id, category);
         return "redirect:/admin_panel/categories";
     }
 }

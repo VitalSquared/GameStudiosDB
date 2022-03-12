@@ -12,11 +12,17 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import ru.nsu.spirin.gamestudios.dao.MessageDAO;
 import ru.nsu.spirin.gamestudios.model.entity.message.Attachment;
 import ru.nsu.spirin.gamestudios.model.entity.message.Message;
+import ru.nsu.spirin.gamestudios.service.MessageService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
@@ -31,11 +37,11 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/messages")
 public class MessageController {
-    private final MessageDAO messageDAO;
+    private final MessageService messageService;
 
     @Autowired
-    public MessageController(MessageDAO messageDAO) {
-        this.messageDAO = messageDAO;
+    public MessageController(MessageService messageService) {
+        this.messageService = messageService;
     }
 
     @GetMapping("")
@@ -50,13 +56,13 @@ public class MessageController {
                                     @RequestParam(name = "receiver", required = false, defaultValue = "") String receiver,
                                     @RequestParam(name = "date", required = false, defaultValue = "") String date) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        var messages = messageDAO.getSentMessagesByUsername(user.getUsername(), topic, receiver, date, pageable);
+        var messages = messageService.getSentMessagesByUsername(user.getUsername(), topic, receiver, date, pageable);
         model.addAttribute("page", messages);
         model.addAttribute("topic", topic);
         model.addAttribute("receiver", receiver);
         model.addAttribute("date", date);
         model.addAttribute("url", "/messages/sent");
-        model.addAttribute("numberOfUnread", messageDAO.getNumberOfUnreadMessages(user.getUsername()));
+        model.addAttribute("numberOfUnread", messageService.getNumberOfUnreadMessages(user.getUsername()));
 
         Map<String, String> filters = new HashMap<>();
         filters.put("topic", topic);
@@ -85,7 +91,7 @@ public class MessageController {
                                         @RequestParam(name = "sender", required = false, defaultValue = "") String sender,
                                         @RequestParam(name = "read", required = false, defaultValue = "") String read) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        var messages = messageDAO.getReceivedMessagesByUsername(user.getUsername(),
+        var messages = messageService.getReceivedMessagesByUsername(user.getUsername(),
                 topic, date, sender, read, pageable);
         model.addAttribute("page", messages);
         model.addAttribute("topic", topic);
@@ -93,7 +99,7 @@ public class MessageController {
         model.addAttribute("sender", sender);
         model.addAttribute("read", read);
         model.addAttribute("url", "/messages/received");
-        model.addAttribute("numberOfUnread", messageDAO.getNumberOfUnreadMessages(user.getUsername()));
+        model.addAttribute("numberOfUnread", messageService.getNumberOfUnreadMessages(user.getUsername()));
 
         Map<String, String> filters = new HashMap<>();
         filters.put("topic", topic);
@@ -116,22 +122,23 @@ public class MessageController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("@messageDAO.canViewMessage(#messageID, #principal)")
+    @PreAuthorize("@messageService.canViewMessage(#messageID, #principal)")
     public String show(@PathVariable("id") Long messageID, Model model, Principal principal) {
-        model.addAttribute("message", messageDAO.getMessageByID(messageID));
-        messageDAO.readMessage(messageID, principal);
+        model.addAttribute("message", messageService.getMessageByID(messageID));
+        User user = (User) ((Authentication) principal).getPrincipal();
+        messageService.readMessage(messageID, user.getUsername());
         return "messages/message";
     }
 
     @RequestMapping(value = "/{id}/download", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @PreAuthorize("@messageDAO.canViewMessage(#messageID, #principal)")
+    @PreAuthorize("@messageService.canViewMessage(#messageID, #principal)")
     @ResponseBody
     public InputStreamResource downloadFile(@PathVariable(value = "id") Long messageID,
                                             @RequestParam(value = "name") String fileName,
                                             @RequestParam(value = "id1") Long attID,
                                             Principal principal,
                                             HttpServletResponse response) throws IOException {
-        Message message = messageDAO.getMessageByID(messageID);
+        Message message = messageService.getMessageByID(messageID);
         Optional<Attachment> attachment = message.getAttachments()
                 .stream()
                 .filter(att -> att.getName().equals(fileName) && att.getID() == attID)
@@ -147,7 +154,7 @@ public class MessageController {
     @GetMapping("/new_message")
     public String newMessage(@ModelAttribute("message") Message message, Model model, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        model.addAttribute("numberOfUnread", messageDAO.getNumberOfUnreadMessages(user.getUsername()));
+        model.addAttribute("numberOfUnread", messageService.getNumberOfUnreadMessages(user.getUsername()));
         return "messages/new_message";
     }
 
@@ -182,19 +189,20 @@ public class MessageController {
             }
         }
 
-        messageDAO.newMessage(message);
+        messageService.newMessage(message);
         return "redirect:/messages/sent";
     }
 
     @GetMapping(value = "/delete_recv/{id}")
     public String removeReceived(@PathVariable("id") Long messageID, Principal principal) {
-        messageDAO.deleteReceivedMessage(messageID, principal);
+        User user = (User) ((Authentication) principal).getPrincipal();
+        messageService.deleteReceivedMessage(messageID, user.getUsername());
         return "redirect:/messages/received";
     }
 
     @GetMapping(value = "/delete_sent/{id}")
-    public String removeSent(@PathVariable("id") Long messageID, Principal principal) {
-        messageDAO.deleteSentMessage(messageID, principal);
+    public String removeSent(@PathVariable("id") Long messageID) {
+        messageService.deleteSentMessage(messageID);
         return "redirect:/messages/sent";
     }
 }

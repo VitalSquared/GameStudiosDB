@@ -1,98 +1,104 @@
 package ru.nsu.spirin.gamestudios.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import ru.nsu.spirin.gamestudios.dao.ContractDAO;
-import ru.nsu.spirin.gamestudios.dao.GameDAO;
-import ru.nsu.spirin.gamestudios.dao.TestDAO;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import ru.nsu.spirin.gamestudios.model.entity.Contract;
 import ru.nsu.spirin.gamestudios.model.entity.Game;
-import ru.nsu.spirin.gamestudios.model.entity.Test;
+import ru.nsu.spirin.gamestudios.service.ContractService;
+import ru.nsu.spirin.gamestudios.service.GameService;
+import ru.nsu.spirin.gamestudios.service.TestService;
 
-import java.security.Principal;
 import java.sql.SQLException;
 import java.util.List;
 
 @Controller
 @RequestMapping("/contracts")
 public class ContractController {
-    private final ContractDAO contractDAO;
-    private final TestDAO testDAO;
-    private final GameDAO gameDAO;
+    private final ContractService contractService;
+    private final TestService testService;
+    private final GameService gameService;
 
     @Autowired
-    public ContractController(ContractDAO contractDAO,
-                              TestDAO testDAO,
-                              GameDAO gameDAO) {
-        this.contractDAO = contractDAO;
-        this.testDAO = testDAO;
-        this.gameDAO = gameDAO;
+    public ContractController(ContractService contractService,
+                              TestService testService,
+                              GameService gameService) {
+        this.contractService = contractService;
+        this.testService = testService;
+        this.gameService = gameService;
     }
 
-    @GetMapping("")
-    public String indexContracts(Model model, Principal principal) {
-        List<Contract> contracts = contractDAO.getAllContracts();
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @RequestMapping(path = "", method = RequestMethod.GET)
+    public String indexContracts(Model model) {
+        List<Contract> contracts = contractService.getAllContracts();
         model.addAttribute("contracts", contracts);
         return "contracts/contracts";
     }
 
-    @GetMapping("/new")
-    public String newContract(@ModelAttribute("contract") Contract contract,
-                          Model model, Principal principal) {
-        model.addAttribute("tests", testDAO.getResultedTests());
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @RequestMapping(path = "/new", method = RequestMethod.GET)
+    public String newContract(@ModelAttribute("contract") Contract contract, Model model) {
+        model.addAttribute("tests", testService.getResultedTests());
         return "/contracts/new_contract";
     }
 
-    @PostMapping("")
-    public String create(@ModelAttribute("contract") Contract contract,
-                         Model model, Principal principal) throws SQLException {
-        contractDAO.newContract(contract);
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @RequestMapping(path = "", method = RequestMethod.POST)
+    public String create(@ModelAttribute("contract") Contract contract) throws SQLException {
+        contractService.createNewContract(contract);
         return "redirect:/contracts";
     }
 
-    @GetMapping("/{id}")
-    public String viewContract(Model model, Principal principal, @PathVariable(name = "id") Long contractID) {
-        model.addAttribute("games", gameDAO.getGamesByContractID(contractID));
-        model.addAttribute("contract", contractDAO.getContractByID(contractID));
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+    public String viewContract(Model model, @PathVariable(name = "id") Long contractID) {
+        model.addAttribute("games", gameService.getGamesByContractID(contractID));
+        model.addAttribute("contract", contractService.getContractByID(contractID));
         return "contracts/view_contract";
     }
 
-    @GetMapping("/{id}/add_game")
-    public String addGameGet(@ModelAttribute("game") Game game,
-                              Model model, Principal principal, @PathVariable(name = "id") Long contractID) {
-        model.addAttribute("games", gameDAO.getAllGames());
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @RequestMapping(path = "/{id}/add_game", method = RequestMethod.GET)
+    public String addGameGet(@ModelAttribute("game") Game game, Model model,
+                             @PathVariable(name = "id") Long contractID) {
+        model.addAttribute("games", gameService.getAllGames());
         model.addAttribute("contractID", contractID);
         return "/contracts/add_game";
     }
 
-    @PostMapping("/{id}/game")
-    public String addGamePost(@ModelAttribute("game") Game game,
-                         Model model, Principal principal, @PathVariable(name = "id") Long contractID) throws SQLException {
-        contractDAO.addGameToContract(contractID, game.getGameID());
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @RequestMapping(path = "/{id}/game", method = RequestMethod.POST)
+    public String addGamePost(@ModelAttribute("game") Game game, @PathVariable(name = "id") Long contractID) {
+        contractService.addGameToContract(contractID, game.getGameID());
         return "redirect:/contracts/{id}";
     }
 
-    @GetMapping("/{id}/remove_game/{id1}")
-    public String removeGameGet(Model model, Principal principal,
-                                @PathVariable(name = "id") Long contractID,
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @RequestMapping(path = "/{id}/remove_game/{id1}", method = RequestMethod.GET)
+    public String removeGameGet(@PathVariable(name = "id") Long contractID,
                                 @PathVariable(name = "id1") Long gameID) {
-        contractDAO.removeGameFromContract(contractID, gameID);
+        contractService.removeGameFromContract(contractID, gameID);
         return "redirect:/contracts/{id}";
     }
 
-    @GetMapping("/{id}/edit")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editContract(Model model, @PathVariable("id") Long contractID) {
-        model.addAttribute("contract", contractDAO.getContractByID(contractID));
+        model.addAttribute("contract", contractService.getContractByID(contractID));
         return "/contracts/edit_contract";
     }
 
-    @PostMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @RequestMapping(path = "/{id}", method = RequestMethod.POST)
     public String update(@ModelAttribute("contract") Contract contract,
-                         Principal principal,
                          @PathVariable("id") Long id) throws SQLException {
-        contractDAO.updateContract(id, contract);
+        contractService.updateContract(id, contract);
         return "redirect:/contracts/{id}";
     }
 }
