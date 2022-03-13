@@ -11,14 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.spirin.gamestudios.model.mapper.MessageReceivedMapper;
 import ru.nsu.spirin.gamestudios.model.mapper.MessageSentMapper;
 import ru.nsu.spirin.gamestudios.model.entity.message.Message;
+import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
 import ru.nsu.spirin.gamestudios.repository.query.MessageQueries;
 import ru.nsu.spirin.gamestudios.utils.AttachmentUtils;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -29,61 +28,13 @@ public class MessageRepository extends JdbcDaoSupport {
         this.setDataSource(dataSource);
     }
 
-    private String queryTopic(String topic) {
-        return topic == null ? " TRUE " : " msg.topic ILIKE '%" + topic + "%' ";
-    }
-
-    private String queryReceiver(String receiver) {
-        return receiver == null ? " TRUE " : " msg.receivers_string ILIKE '%" + receiver + "%' ";
-    }
-
-    private String querySender(String sender) {
-        return sender == null ? " TRUE " : " msg.sender ILIKE '%" + sender + "%' ";
-    }
-
-    private String queryDate(String date) {
-        String leftDate = null, rightDate = null;
-        if (date != null) {
-            try {
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                String[] dates = date.split("_-_");
-                Date leftDate1 = format.parse(dates[0]);
-                Date rightDate1 = format.parse(dates[1]);
-                leftDate = format.format(leftDate1);
-                rightDate = format.format(rightDate1);
-            }
-            catch (Exception ignored) {
-                leftDate = null;
-            }
-        }
-        return leftDate == null ? " TRUE " : " msg.date BETWEEN '" + leftDate + " 00:00:00' AND '" + rightDate + " 23:59:59' ";
-    }
-
-    private String queryRead(String read) {
-        int readValue = 0;
-        try {
-            readValue = Integer.parseInt(read);
-            if (readValue < 0 || readValue > 2) readValue = 0;
-        }
-        catch (Exception ignored) {}
-        return readValue == 0 ? " TRUE " : readValue == 1 ? " msg.read = TRUE " : " msg.read = FALSE ";
-    }
-
-    public Page<Message> findAllSentMessagesByEmail(String email,
-                                                       String topic,
-                                                       String receiver,
-                                                       String date,
-                                                       Pageable pageable) {
+    public Page<Message> findAllSentMessagesByEmail(String email, Filtration filtration, Pageable pageable) {
         if (null == this.getJdbcTemplate()) {
             return null;
         }
 
-        String topicWhere = queryTopic(topic);
-        String receiverWhere = queryReceiver(receiver);
-        String dateWhere = queryDate(date);
-
         Long total = this.getJdbcTemplate().queryForObject(
-                String.format(MessageQueries.QUERY_COUNT_TOTAL_SENT_BY_EMAIL, " AND " + topicWhere + " AND " + receiverWhere + " AND " + dateWhere),
+                String.format(MessageQueries.QUERY_COUNT_TOTAL_SENT_BY_EMAIL, filtration.buildQuery()),
                 (rs, rowNum) -> rs.getLong(1),
                 email
         );
@@ -92,30 +43,20 @@ public class MessageRepository extends JdbcDaoSupport {
         }
 
         List<Message> messages = this.getJdbcTemplate().query(
-                String.format(MessageQueries.QUERY_FIND_ALL_SENT_BY_EMAIL, " AND " + topicWhere + " AND " + receiverWhere + " AND " + dateWhere + " "),
+                String.format(MessageQueries.QUERY_FIND_ALL_SENT_BY_EMAIL, filtration.buildQuery()),
                 new MessageSentMapper(),
                 email, pageable.getPageSize(), pageable.getOffset()
         );
         return new PageImpl<>(messages, pageable, total);
     }
 
-    public Page<Message> findAllReceivedMessagesByUsername(String email,
-                                                           String topic,
-                                                           String date,
-                                                           String sender,
-                                                           String read,
-                                                           Pageable pageable) {
+    public Page<Message> findAllReceivedMessagesByUsername(String email, Filtration filtration, Pageable pageable) {
         if (null == this.getJdbcTemplate()) {
             return null;
         }
 
-        String topicWhere = queryTopic(topic);
-        String senderWhere = querySender(sender);
-        String dateWhere = queryDate(date);
-        String readWhere = queryRead(read);
-
         Long total = this.getJdbcTemplate().queryForObject(
-                String.format(MessageQueries.QUERY_COUNT_TOTAL_RECEIVED_BY_EMAIL, topicWhere + " AND " + senderWhere + " AND " + dateWhere + " AND " + readWhere),
+                String.format(MessageQueries.QUERY_COUNT_TOTAL_RECEIVED_BY_EMAIL, filtration.buildQuery()),
                 (rs, rowNum) -> rs.getLong(1),
                 email, email
         );
@@ -124,7 +65,7 @@ public class MessageRepository extends JdbcDaoSupport {
         }
 
         List<Message> messages = this.getJdbcTemplate().query(
-                String.format(MessageQueries.QUERY_FIND_ALL_RECEIVED_BY_EMAIL, topicWhere + " AND " + senderWhere + " AND " + dateWhere + " AND " + readWhere + " "),
+                String.format(MessageQueries.QUERY_FIND_ALL_RECEIVED_BY_EMAIL, filtration.buildQuery()),
                 new MessageReceivedMapper(),
                 email, email, pageable.getPageSize(), pageable.getOffset()
         );

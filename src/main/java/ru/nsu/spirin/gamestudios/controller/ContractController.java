@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import ru.nsu.spirin.gamestudios.service.ContractService;
 import ru.nsu.spirin.gamestudios.service.GameService;
 import ru.nsu.spirin.gamestudios.service.TestService;
 
+import javax.validation.Valid;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -49,8 +51,11 @@ public class ContractController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
-    @RequestMapping(path = "", method = RequestMethod.POST)
-    public String create(@ModelAttribute("contract") Contract contract) throws SQLException {
+    @RequestMapping(path = "/new", method = RequestMethod.POST)
+    public String createContract(@Valid @ModelAttribute("contract") Contract contract, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "/contracts/new_contract";
+        }
         contractService.createNewContract(contract);
         return "redirect:/contracts";
     }
@@ -90,15 +95,24 @@ public class ContractController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editContract(Model model, @PathVariable("id") Long contractID) {
+        model.addAttribute("contractID", contractID);
         model.addAttribute("contract", contractService.getContractByID(contractID));
         return "/contracts/edit_contract";
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
-    @RequestMapping(path = "/{id}", method = RequestMethod.POST)
-    public String update(@ModelAttribute("contract") Contract contract,
-                         @PathVariable("id") Long id) throws SQLException {
-        contractService.updateContract(id, contract);
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.POST)
+    public String updateContract(@ModelAttribute("contract") Contract contract,
+                                 BindingResult bindingResult,
+                                 Model model,
+                                 @PathVariable("id") Long contractID) {
+        model.addAttribute("contractID", contractID);
+
+        if (bindingResult.hasErrors()) {
+            return "/contracts/edit_contract";
+        }
+
+        contractService.updateContract(contractID, contract);
         return "redirect:/contracts/{id}";
     }
 }

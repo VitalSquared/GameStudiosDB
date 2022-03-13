@@ -29,14 +29,14 @@ public class StudioService {
         return this.studioRepository.findAll();
     }
 
-    public void newStudio(Studio studio) throws SQLException {
+    public void newStudio(Studio studio) {
         if (studio.getName() == null || studio.getAddress() == null) {
             return;
         }
         this.studioRepository.save(studio);
     }
 
-    public void updateStudio(Long id, Studio studio) throws SQLException {
+    public void updateStudio(Long id, Studio studio) {
         if (studio.getAddress() == null || studio.getName() == null) {
             return;
         }

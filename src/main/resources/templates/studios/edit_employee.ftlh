@@ -5,17 +5,20 @@
 <@c.page "Edit Employee">
     <@header.header/>
     <br/>
-    <form method="POST" action="/employees/${employee.employeeID}" enctype="multipart/form-data">
+    <form method="POST" action="/employees/${employeeID}/edit" enctype="multipart/form-data">
         <label for="first_name">First Name: </label>
         <@spring.formInput "employee.firstName"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
         <label for="last_name">Last Name: </label>
         <@spring.formInput "employee.lastName"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
         <label for="birth_date">Birth Date: </label>
         <label for="birthday">
             <@spring.bind "employee.birthDate"/>
-            <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${employee.birthDate?string('YYYY-MM-dd')!}" placeholder="" />
+            <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${(employee.birthDate!.now)?string('YYYY-MM-dd')}" placeholder="" />
+            <@spring.showErrors "<br>" "color:red;"/>
         </label>
         <br/>
         <#assign studios_map = {}>
@@ -53,6 +56,7 @@
 
         <label for="login">Email: </label>
         <@spring.formInput "account.email"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
         <#assign resets_map = {"do_nothing" : "Do Nothing", "reset" : "Reset"}>
         <label for="resets">Password Reset: </label>

@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import ru.nsu.spirin.gamestudios.model.entity.message.Message;
 import ru.nsu.spirin.gamestudios.repository.MessageRepository;
+import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
 
 import java.security.Principal;
 import java.util.List;
@@ -22,11 +23,20 @@ public class MessageService {
     }
 
     public Page<Message> getSentMessagesByUsername(String email, String topic, String receiver, String date, Pageable pageable) {
-        return this.messageRepository.findAllSentMessagesByEmail(email, topic, receiver, date, pageable);
+        Filtration filtration = new Filtration();
+        filtration.addFilter("msg.topic", Filtration.FiltrationType.String, topic);
+        filtration.addFilter("msg.receivers_string", Filtration.FiltrationType.String, receiver);
+        filtration.addFilter("msg.date", Filtration.FiltrationType.DoubleDate, date);
+        return this.messageRepository.findAllSentMessagesByEmail(email, filtration, pageable);
     }
 
     public Page<Message> getReceivedMessagesByUsername(String email, String topic, String date, String sender, String read, Pageable pageable) {
-        return this.messageRepository.findAllReceivedMessagesByUsername(email, topic, date, sender, read, pageable);
+        Filtration filtration = new Filtration();
+        filtration.addFilter("msg.topic", Filtration.FiltrationType.String, topic);
+        filtration.addFilter("msg.sender", Filtration.FiltrationType.String, sender);
+        filtration.addFilter("msg.date", Filtration.FiltrationType.DoubleDate, date);
+        filtration.addFilter("msg.read", Filtration.FiltrationType.Boolean, read);
+        return this.messageRepository.findAllReceivedMessagesByUsername(email, filtration, pageable);
     }
 
     public Long getNumberOfUnreadMessages(String email) {

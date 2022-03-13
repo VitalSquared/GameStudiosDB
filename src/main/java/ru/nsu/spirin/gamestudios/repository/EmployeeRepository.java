@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.spirin.gamestudios.model.mapper.EmployeeMapper;
 import ru.nsu.spirin.gamestudios.model.entity.Employee;
+import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
 import ru.nsu.spirin.gamestudios.repository.query.EmployeeQueries;
 
 import javax.sql.DataSource;
@@ -55,11 +56,42 @@ public class EmployeeRepository extends JdbcDaoSupport {
         return this.getJdbcTemplate().query(EmployeeQueries.QUERY_FIND_ALL, new EmployeeMapper());
     }
 
+    public List<Employee> findAllByStudioIDWithFiltration(Long studioID, Filtration filtration, String sortField, String sortDir) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
+        String dirStudio = "dir.studio_id = ?", depStudio = "dep.studio_id = ?";
+        Object[] params = new Object[] { studioID, studioID };
+        if (studioID == -1) {
+            dirStudio = "TRUE";
+            depStudio = "TRUE";
+            params = new Object[] {};
+        }
+        String orderByQuery = "";
+        if (null != sortField && !sortField.isEmpty() && sortDir != null && !sortDir.isEmpty()) {
+            String dir = sortDir.equalsIgnoreCase("ASC") ? "ASC" : sortDir.equalsIgnoreCase("DESC") ? "DESC" : "";
+            if (!dir.isEmpty()) {
+                orderByQuery = "ORDER BY e." + sortField + " " + dir;
+            }
+        }
+        return this.getJdbcTemplate().query(
+                String.format(
+                        EmployeeQueries.QUERY_FIND_ALL_BY_STUDIO_ID_WITH_FILTRATION,
+                        dirStudio,
+                        depStudio,
+                        filtration.buildQuery(),
+                        orderByQuery
+                ),
+                new EmployeeMapper(),
+                params);
+    }
+
     public List<Employee> findAllByStudioID(Long studioID) {
         if (null == this.getJdbcTemplate()) {
             return null;
         }
-        return this.getJdbcTemplate().query(EmployeeQueries.QUERY_FIND_ALL_BY_STUDIO_ID,
+        return this.getJdbcTemplate().query(
+                String.format(EmployeeQueries.QUERY_FIND_ALL_BY_STUDIO_ID),
                 new EmployeeMapper(),
                 studioID, studioID);
     }

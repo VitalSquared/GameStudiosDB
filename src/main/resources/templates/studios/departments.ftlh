@@ -6,9 +6,14 @@
 <@c.page "Departments">
     <@header.header/>
     <br/>
+    <#if s.isAdmin || s.isGeneralDirector>
+        <#assign anyStudio = [['Any Studio' , -1]]>
+    <#else>
+        <#assign anyStudio = []>
+    </#if>
     <@f.filter url
         {
-            'studio': ['Search studio', 'selection'] + studios?sequence?map(x -> [x.name, x.studioID])
+            'studio': ['Search studio', 'selection'] + anyStudio + studios?sequence?map(x -> [x.name, x.studioID])
         }
         {
             'studio' : 'studio'

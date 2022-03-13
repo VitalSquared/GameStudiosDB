@@ -8,8 +8,8 @@ import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 import ru.nsu.spirin.gamestudios.model.entity.account.Role;
 import ru.nsu.spirin.gamestudios.repository.AccountRepository;
 import ru.nsu.spirin.gamestudios.repository.EmployeeRepository;
+import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +32,13 @@ public class EmployeeService {
 
     public List<Employee> getEmployees() {
         return this.employeeRepository.findAll();
+    }
+
+    public List<Employee> getEmployeesByStudioWithFiltration(Long studioID, String firstName, String lastName, String sortField, String sortDir) {
+        Filtration filtration = new Filtration();
+        filtration.addFilter("e.first_name", Filtration.FiltrationType.String, firstName);
+        filtration.addFilter("e.last_name", Filtration.FiltrationType.String, lastName);
+        return this.employeeRepository.findAllByStudioIDWithFiltration(studioID, filtration, sortField, sortDir);
     }
 
     public List<Employee> getEmployeesByStudio(Long studioID) {

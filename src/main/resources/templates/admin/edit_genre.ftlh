@@ -6,9 +6,10 @@
     <@header.header/>
     <br/>
 
-    <form method="POST" action="/admin_panel/genres/${genre.genreID}" enctype="multipart/form-data">
+    <form method="POST" action="/admin_panel/genres/${genreID}/edit" enctype="multipart/form-data">
         <label for="topic">Name: </label>
         <@spring.formInput "genre.name"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
         <input type="submit" value="Modify"/>
     </form>

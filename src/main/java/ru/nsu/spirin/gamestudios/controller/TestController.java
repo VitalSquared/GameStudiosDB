@@ -3,6 +3,7 @@ package ru.nsu.spirin.gamestudios.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import ru.nsu.spirin.gamestudios.service.GenreService;
 import ru.nsu.spirin.gamestudios.service.TestAppService;
 import ru.nsu.spirin.gamestudios.service.TestService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -50,8 +52,12 @@ public class TestController {
         return "/testings/new_testing";
     }
 
-    @RequestMapping(path = "",  method = RequestMethod.POST)
-    public String createTest(@ModelAttribute("test") Test test) {
+    @RequestMapping(path = "/new",  method = RequestMethod.POST)
+    public String createTest(@Valid @ModelAttribute("test") Test test, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "/testings/new_testing";
+        }
+
         test.setStatusID(0L);
         testService.newTest(test);
         return "redirect:/tests";
@@ -59,14 +65,23 @@ public class TestController {
 
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editTest(Model model, @PathVariable("id") Long testID) {
+        model.addAttribute("testID", testID);
         model.addAttribute("test", testService.getTestByID(testID));
         return "/testings/edit_testing";
     }
 
-    @RequestMapping(path = "/{id}/update",  method = RequestMethod.POST)
-    public String updateTest(@ModelAttribute("test") Test test,
-                         @PathVariable("id") Long id) {
-        testService.updateTest(id, test);
+    @RequestMapping(path = "/{id}/edit",  method = RequestMethod.POST)
+    public String updateTest(@Valid @ModelAttribute("test") Test test,
+                             BindingResult bindingResult,
+                             Model model,
+                             @PathVariable("id") Long testID) {
+        model.addAttribute("testID", testID);
+
+        if (bindingResult.hasErrors()) {
+            return "/testings/edit_testing";
+        }
+
+        testService.updateTest(testID, test);
         return "redirect:/tests/{id}";
     }
 

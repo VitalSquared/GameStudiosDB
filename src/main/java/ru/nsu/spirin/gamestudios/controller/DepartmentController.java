@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.nsu.spirin.gamestudios.model.entity.Department;
 import ru.nsu.spirin.gamestudios.model.entity.Employee;
@@ -15,7 +16,9 @@ import ru.nsu.spirin.gamestudios.service.DepartmentService;
 import ru.nsu.spirin.gamestudios.service.EmployeeService;
 import ru.nsu.spirin.gamestudios.service.StudioService;
 
+import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/departments")
@@ -38,7 +41,7 @@ public class DepartmentController {
 
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexDepartments(Model model, Principal principal,
-                                   @RequestParam(name = "studio", required = false, defaultValue = "0") String studio) {
+                                   @RequestParam(name = "studio", required = false, defaultValue = "-1") String studio) {
         User user = (User) ((Authentication) principal).getPrincipal();
         Account account = accountService.findAccountByEmail(user.getUsername());
         Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
@@ -55,9 +58,13 @@ public class DepartmentController {
             return "redirect:/departments?studio="+employee.getStudioID();
         }
 
+        List<Department> departmentList;
+        if (parsedStudioID == -1) departmentList = departmentService.getAllDepartments();
+        else departmentList = departmentService.getAllDepartmentsOfStudio(parsedStudioID);
+
         model.addAttribute("studio", studio);
         model.addAttribute("url", "/departments");
-        model.addAttribute("departments", departmentService.getAllDepartmentsOfStudio(parsedStudioID));
+        model.addAttribute("departments", departmentList);
         model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
         return "studios/departments";
     }
@@ -74,8 +81,20 @@ public class DepartmentController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(path = "", method = RequestMethod.POST)
-    public String create(@ModelAttribute("department") Department department) {
+    @RequestMapping(path = "/new", method = RequestMethod.POST)
+    public String createDepartment(@Valid @ModelAttribute("department") Department department,
+                                   BindingResult bindingResult,
+                                   Model model, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        Account account = accountService.findAccountByEmail(user.getUsername());
+        Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
+        model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
+        model.addAttribute("employees", employeeService.getEmployeesByDepartment(department.getDepartmentID()));
+
+        if (bindingResult.hasErrors()) {
+            return "/studios/new_department";
+        }
+
         departmentService.newDepartment(department);
         return "redirect:/departments";
     }
@@ -86,6 +105,7 @@ public class DepartmentController {
         User user = (User) ((Authentication) principal).getPrincipal();
         Account account = accountService.findAccountByEmail(user.getUsername());
         Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
+        model.addAttribute("departmentID", departmentID);
         model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
         model.addAttribute("department", departmentService.getDepartmentByID(departmentID));
         model.addAttribute("employees", employeeService.getEmployeesByDepartment(departmentID));
@@ -93,9 +113,23 @@ public class DepartmentController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(path = "/{id}", method = RequestMethod.POST)
-    public String update(@ModelAttribute("department") Department department, @PathVariable("id") Long id) {
-        departmentService.updateDepartment(id, department);
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.POST)
+    public String updateDepartment(@Valid @ModelAttribute("department") Department department,
+                                   BindingResult bindingResult,
+                                   Model model, Principal principal,
+                                   @PathVariable("id") Long departmentID) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        Account account = accountService.findAccountByEmail(user.getUsername());
+        Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
+        model.addAttribute("departmentID", departmentID);
+        model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
+        model.addAttribute("employees", employeeService.getEmployeesByDepartment(departmentID));
+
+        if (bindingResult.hasErrors()) {
+            return "/studios/edit_department";
+        }
+
+        departmentService.updateDepartment(departmentID, department);
         return "redirect:/departments";
     }
 }

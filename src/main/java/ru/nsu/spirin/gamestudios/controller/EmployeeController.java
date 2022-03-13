@@ -5,20 +5,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.nsu.spirin.gamestudios.model.entity.Employee;
 import ru.nsu.spirin.gamestudios.model.entity.account.Account;
+import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
 import ru.nsu.spirin.gamestudios.service.AccountService;
 import ru.nsu.spirin.gamestudios.service.CategoryService;
 import ru.nsu.spirin.gamestudios.service.DepartmentService;
 import ru.nsu.spirin.gamestudios.service.EmployeeService;
 import ru.nsu.spirin.gamestudios.service.StudioService;
 
+import javax.validation.Valid;
 import java.security.Principal;
 
 @Controller
@@ -43,9 +45,13 @@ public class EmployeeController {
         this.accountService = accountService;
     }
 
-    @GetMapping("")
+    @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexEmployees(Model model, Principal principal,
-                                 @RequestParam(name = "studio", required = false, defaultValue = "0") String studio) {
+                                 @RequestParam(name = "studio", required = false, defaultValue = "-1") String studio,
+                                 @RequestParam(name = "firstName", required = false, defaultValue = "") String firstName,
+                                 @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
+                                 @RequestParam(name = "sortField", required = false, defaultValue = "") String sortField,
+                                 @RequestParam(name = "sortDir", required = false, defaultValue = "") String sortDir) {
         User user = (User) ((Authentication) principal).getPrincipal();
         Account account = accountService.findAccountByEmail(user.getUsername());
         Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
@@ -63,14 +69,39 @@ public class EmployeeController {
         }
 
         model.addAttribute("studio", studio);
-        model.addAttribute("url", "/employees");
-        model.addAttribute("employees", employeeService.getEmployeesByStudio(parsedStudioID));
+        model.addAttribute("firstName", firstName);
+        model.addAttribute("lastName", lastName);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("nextSortDir", sortDir.isEmpty() ? "ASC" : "ASC".equals(sortDir) ? "DESC" : "");
+
+        model.addAttribute("idSortField", "employee_id");
+        model.addAttribute("firstNameSortField", "first_name");
+        model.addAttribute("lastNameSortField", "last_name");
+
+        model.addAttribute("employees", employeeService.getEmployeesByStudioWithFiltration(
+                parsedStudioID,
+                firstName,
+                lastName,
+                sortField,
+                sortDir
+            )
+        );
         model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
         model.addAttribute("accounts", accountService.getEmailsWithEmployeeIDs());
+
+        Filtration filtration = new Filtration();
+        filtration.addFilter("studio", null, studio);
+        filtration.addFilter("firstName", null, firstName);
+        filtration.addFilter("lastName", null, lastName);
+        String filters = filtration.buildPath();
+        model.addAttribute("filters", filters);
+        model.addAttribute("urlFilterless", "/employees");
+        model.addAttribute("urlFilter", "/employees?" + filters);
+
         return "studios/employees";
     }
 
-    @GetMapping("/new")
+    @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newEmployee(@ModelAttribute("employee") Employee employee,
                               @ModelAttribute("account") Account account,
                               Model model) {
@@ -80,15 +111,27 @@ public class EmployeeController {
         return "/studios/new_employee";
     }
 
-    @PostMapping("")
-    public String create(@ModelAttribute("employee") Employee employee,
-                         @ModelAttribute("account") Account account) {
+    @RequestMapping(path = "/new", method = RequestMethod.POST)
+    public String createEmployee(@Valid @ModelAttribute("employee") Employee employee,
+                                 BindingResult bindingResult1,
+                                 @Valid @ModelAttribute("account") Account account,
+                                 BindingResult bindingResult2,
+                                 Model model) {
+        model.addAttribute("studios", studioService.getAllStudios());
+        model.addAttribute("departments", departmentService.getAllDepartments());
+        model.addAttribute("categories", categoryService.getAllCategories());
+
+        if (bindingResult1.hasErrors() || bindingResult2.hasErrors()) {
+            return "/studios/new_employee";
+        }
+
         employeeService.newEmployee(employee, account);
         return "redirect:/employees";
     }
 
-    @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") Long employeeID) {
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
+    public String editEmployee(Model model, @PathVariable("id") Long employeeID) {
+        model.addAttribute("employeeID", employeeID);
         model.addAttribute("employee", employeeService.getEmployeeByID(employeeID));
         model.addAttribute("account", accountService.findAccountByEmployeeID(employeeID));
         model.addAttribute("studios", studioService.getAllStudios());
@@ -97,11 +140,23 @@ public class EmployeeController {
         return "/studios/edit_employee";
     }
 
-    @PostMapping("/{id}")
-    public String update(@ModelAttribute("employee") Employee employee,
-                         @ModelAttribute("account") Account account,
-                         @PathVariable("id") Long id) {
-        employeeService.updateEmployee(id, employee, account);
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.POST)
+    public String updateEmployee(@Valid @ModelAttribute("employee") Employee employee,
+                                 BindingResult bindingResult1,
+                                 @Valid @ModelAttribute("account") Account account,
+                                 BindingResult bindingResult2,
+                                 Model model,
+                                 @PathVariable("id") Long employeeID) {
+        model.addAttribute("employeeID", employeeID);
+        model.addAttribute("studios", studioService.getAllStudios());
+        model.addAttribute("departments", departmentService.getAllDepartments());
+        model.addAttribute("categories", categoryService.getAllCategories());
+
+        if (bindingResult1.hasErrors() || bindingResult2.hasErrors()) {
+            return "/studios/edit_employee";
+        }
+
+        employeeService.updateEmployee(employeeID, employee, account);
         return "redirect:/employees";
     }
 }

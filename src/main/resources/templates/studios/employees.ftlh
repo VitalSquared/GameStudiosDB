@@ -6,14 +6,43 @@
 <@c.page "Employees">
     <@header.header/>
     <br/>
-    <@f.filter url
+    <#if s.isAdmin || s.isGeneralDirector>
+        <#assign anyStudio = [['Any Studio' , -1]]>
+    <#else>
+        <#assign anyStudio = []>
+    </#if>
+    <#assign any_filters = (filters?string?length gt 0) />
+
+    <#if sortField == idSortField>
+        <#assign idSortDir = nextSortDir />
+    <#else>
+        <#assign idSortDir = "ASC"/>
+    </#if>
+
+    <#if sortField == firstNameSortField>
+        <#assign firstNameSortDir = nextSortDir />
+    <#else>
+        <#assign firstNameSortDir = "ASC"/>
+    </#if>
+
+    <#if sortField == lastNameSortField>
+        <#assign lastNameSortDir = nextSortDir />
+    <#else>
+        <#assign lastNameSortDir = "ASC"/>
+    </#if>
+
+    <@f.filter urlFilterless
         {
-            'studio': ['Search studio', 'selection'] + studios?sequence?map(x -> [x.name, x.studioID])
+            'studio': ['Search studio', 'selection'] + anyStudio + studios?sequence?map(x -> [x.name, x.studioID]),
+            'firstName' : ['First name', 'input'],
+            'lastName' : ['Last name', 'input']
         }
         {
-            'studio' : 'studio'
+            'studio' : 'studio',
+            'firstName' : 'firstName',
+            'lastName' : 'lastName'
         }
-        false
+        any_filters!false
     />
     <br/>
 
@@ -24,9 +53,15 @@
     <table class="table">
         <thead class="thead-dark">
         <tr>
-            <th scope="col">ID</th>
-            <th scope="col">First Name</th>
-            <th scope="col">Last Name</th>
+            <th scope="col">
+                <a href="${urlFilter}&sortField=${idSortField}&sortDir=${idSortDir}">ID</a>
+            </th>
+            <th scope="col">
+                <a href="${urlFilter}&sortField=${firstNameSortField}&sortDir=${firstNameSortDir}">First Name</a>
+            </th>
+            <th scope="col">
+                <a href="${urlFilter}&sortField=${lastNameSortField}&sortDir=${lastNameSortDir}">Last Name</a>
+            </th>
             <th scope="col">Studio ID</th>
             <th scope="col">Department ID</th>
             <th scope="col">Active</th>

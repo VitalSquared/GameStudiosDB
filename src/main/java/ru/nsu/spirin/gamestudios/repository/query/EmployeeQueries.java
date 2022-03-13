@@ -99,6 +99,24 @@ public class EmployeeQueries {
                 WHERE employee_id = ?;
             """;
 
+    public static final String QUERY_FIND_ALL_BY_STUDIO_ID_WITH_FILTRATION =
+            """
+                SELECT e.employee_id, e.first_name, e.last_name, e.birth_date,
+                            dev.category_id, dev.department_id, e.active,
+                            case when (dir.studio_id is not null) then
+                                dir.studio_id
+                            else
+                                dep.studio_id
+                            end as studio_id
+                FROM employee e LEFT JOIN director dir on e.employee_id = dir.employee_id
+                             LEFT JOIN (developer dev NATURAL JOIN department dep)
+                             on e.employee_id = dev.employee_id
+                WHERE e.employee_id != 0 AND (
+                    (dir.studio_id is not null AND %s) OR (dir.studio_id is null AND %s)
+                ) AND (%s)
+                %s;
+            """;
+
     public static final String QUERY_FIND_ALL_BY_STUDIO_ID =
             """
                 SELECT e.employee_id, e.first_name, e.last_name, e.birth_date,

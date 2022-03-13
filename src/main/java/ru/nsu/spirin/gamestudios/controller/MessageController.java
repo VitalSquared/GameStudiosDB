@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.spirin.gamestudios.model.entity.message.Attachment;
 import ru.nsu.spirin.gamestudios.model.entity.message.Message;
+import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
 import ru.nsu.spirin.gamestudios.service.MessageService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -44,12 +42,12 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @GetMapping("")
+    @RequestMapping(path = "", method = RequestMethod.GET)
     public String redirectMessages() {
         return "redirect:/messages/sent";
     }
 
-    @GetMapping("/sent")
+    @RequestMapping(path = "/sent", method = RequestMethod.GET)
     public String indexSentMessages(Model model, Principal principal,
                                     @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable,
                                     @RequestParam(name = "topic", required = false, defaultValue = "") String topic,
@@ -64,26 +62,16 @@ public class MessageController {
         model.addAttribute("url", "/messages/sent");
         model.addAttribute("numberOfUnread", messageService.getNumberOfUnreadMessages(user.getUsername()));
 
-        Map<String, String> filters = new HashMap<>();
-        filters.put("topic", topic);
-        filters.put("receiver", receiver);
-        filters.put("date", date);
-        StringBuilder filtersString = new StringBuilder();
-        boolean anyFilters = false;
-        for (var key : filters.keySet()) {
-            String filter = filters.get(key);
-            if (!filter.isEmpty()) {
-                if (anyFilters) filtersString.append("&").append(key).append("=").append(filter);
-                else filtersString.append(key).append("=").append(filter);
-                anyFilters = true;
-            }
-        }
-        model.addAttribute("filters", filtersString.toString());
+        Filtration filtration = new Filtration();
+        filtration.addFilter("topic", null, topic);
+        filtration.addFilter("receiver", null, receiver);
+        filtration.addFilter("date", null, date);
+        model.addAttribute("filters", filtration.buildPath());
 
         return "messages/sent";
     }
 
-    @GetMapping("/received")
+    @RequestMapping(path = "/received", method = RequestMethod.GET)
     public String indexReceivedMessages(Model model, Principal principal,
                                         @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable,
                                         @RequestParam(name = "topic", required = false, defaultValue = "") String topic,
@@ -101,28 +89,18 @@ public class MessageController {
         model.addAttribute("url", "/messages/received");
         model.addAttribute("numberOfUnread", messageService.getNumberOfUnreadMessages(user.getUsername()));
 
-        Map<String, String> filters = new HashMap<>();
-        filters.put("topic", topic);
-        filters.put("sender", sender);
-        filters.put("date", date);
-        filters.put("read", read.equals("1") || read.equals("2") ? read : "");
-        StringBuilder filtersString = new StringBuilder();
-        boolean anyFilters = false;
-        for (var key : filters.keySet()) {
-            String filter = filters.get(key);
-            if (!filter.isEmpty()) {
-                if (anyFilters) filtersString.append("&").append(key).append("=").append(filter);
-                else filtersString.append(key).append("=").append(filter);
-                anyFilters = true;
-            }
-        }
-        model.addAttribute("filters", filtersString.toString());
+        Filtration filtration = new Filtration();
+        filtration.addFilter("topic", null, topic);
+        filtration.addFilter("sender", null, sender);
+        filtration.addFilter("date", null, date);
+        filtration.addFilter("read", null, read.equals("1") || read.equals("2") ? read : "");
+        model.addAttribute("filters", filtration.buildPath());
 
         return "messages/received";
     }
 
-    @GetMapping("/{id}")
     @PreAuthorize("@messageService.canViewMessage(#messageID, #principal)")
+    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public String show(@PathVariable("id") Long messageID, Model model, Principal principal) {
         model.addAttribute("message", messageService.getMessageByID(messageID));
         User user = (User) ((Authentication) principal).getPrincipal();
@@ -130,9 +108,9 @@ public class MessageController {
         return "messages/message";
     }
 
-    @RequestMapping(value = "/{id}/download", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @PreAuthorize("@messageService.canViewMessage(#messageID, #principal)")
     @ResponseBody
+    @PreAuthorize("@messageService.canViewMessage(#messageID, #principal)")
+    @RequestMapping(value = "/{id}/download", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public InputStreamResource downloadFile(@PathVariable(value = "id") Long messageID,
                                             @RequestParam(value = "name") String fileName,
                                             @RequestParam(value = "id1") Long attID,
@@ -151,7 +129,7 @@ public class MessageController {
         throw new IOException("There was no file with given name in given message");
     }
 
-    @GetMapping("/new_message")
+    @RequestMapping(path = "/new_message", method = RequestMethod.GET)
     public String newMessage(@ModelAttribute("message") Message message, Model model, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
         model.addAttribute("numberOfUnread", messageService.getNumberOfUnreadMessages(user.getUsername()));
@@ -193,14 +171,14 @@ public class MessageController {
         return "redirect:/messages/sent";
     }
 
-    @GetMapping(value = "/delete_recv/{id}")
+    @RequestMapping(path = "/delete_recv/{id}", method = RequestMethod.GET)
     public String removeReceived(@PathVariable("id") Long messageID, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
         messageService.deleteReceivedMessage(messageID, user.getUsername());
         return "redirect:/messages/received";
     }
 
-    @GetMapping(value = "/delete_sent/{id}")
+    @RequestMapping(path = "/delete_sent/{id}", method = RequestMethod.GET)
     public String removeSent(@PathVariable("id") Long messageID) {
         messageService.deleteSentMessage(messageID);
         return "redirect:/messages/sent";

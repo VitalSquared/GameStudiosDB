@@ -2,18 +2,31 @@ package ru.nsu.spirin.gamestudios.model.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.sql.Date;
 
 @Data
 public class Employee {
     private Long employeeID;
+
+    @NotEmpty
     private String firstName;
+
+    @NotEmpty
     private String lastName;
+
+    @NotNull
     private Date birthDate;
+
     private Long categoryID;
+
     private Long studioID;
+
     private Long departmentID;
+
     private Boolean active;
+
 
     private String employeeType;
 

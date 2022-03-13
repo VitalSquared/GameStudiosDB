@@ -112,7 +112,7 @@
     <br/>
     Releases:
     <#if s.isAdmin || s.isGeneralDirector>
-        <a class="nav-link btn btn-primary" href="/games/${game.gameID}/add_release">Create release</a>
+        <a class="nav-link btn btn-primary" href="/games/${game.gameID}/new_release">Create release</a>
     </#if>
     <table class="table">
         <thead class="thead-dark">

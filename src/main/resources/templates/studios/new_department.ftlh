@@ -6,7 +6,7 @@
     <@header.header/>
     <br/>
 
-    <form method="POST" action="/departments" enctype="multipart/form-data">
+    <form method="POST" action="/departments/new" enctype="multipart/form-data">
         <label for="topic">Studio: </label>
         <#assign hash1 = {}>
         <#foreach studio in studios>
@@ -16,6 +16,7 @@
         <br/>
         <label for="topic">Name: </label>
         <@spring.formInput "department.name"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
         <label for="content">Head: </label>
         <#assign hash2 = { -1 : "None"}>

@@ -12,7 +12,7 @@ public class MessageQueries {
                             GROUP BY received.message_id
                         ) as received1
                      on message.message_id = received1.message_id) msg
-                WHERE msg.sender = ? %s;
+                WHERE msg.sender = ? AND %s;
             """;
 
     public static final String QUERY_FIND_ALL_SENT_BY_EMAIL =
@@ -25,7 +25,7 @@ public class MessageQueries {
                             GROUP BY received.message_id
                         ) as received1
                      on message.message_id = received1.message_id) msg
-                WHERE msg.sender = ? %s
+                WHERE msg.sender = ? AND %s
                 ORDER BY msg.date DESC
                 LIMIT ?
                 OFFSET ?;

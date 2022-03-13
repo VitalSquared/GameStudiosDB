@@ -9,7 +9,6 @@ import ru.nsu.spirin.gamestudios.model.entity.Studio;
 import ru.nsu.spirin.gamestudios.repository.query.StudioQueries;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -49,21 +48,21 @@ public class StudioRepository extends JdbcDaoSupport {
         return this.getJdbcTemplate().query(StudioQueries.QUERY_FIND_ALL, new StudioMapper());
     }
 
-    public void save(Studio studio) throws SQLException {
+    public void save(Studio studio) {
         if (null == this.getJdbcTemplate()) {
             return;
         }
         this.getJdbcTemplate().update(StudioQueries.QUERY_SAVE, studio.getName(), studio.getAddress());
     }
 
-    public void update(Long id, Studio studio) throws SQLException {
+    public void update(Long id, Studio studio) {
         if (null == this.getJdbcTemplate()) {
             return;
         }
         this.getJdbcTemplate().update(StudioQueries.QUERY_UPDATE, studio.getName(), studio.getAddress(), id);
     }
 
-    public void delete(Long studioID) throws SQLException {
+    public void delete(Long studioID) {
         if (null == this.getJdbcTemplate()) {
             return;
         }

@@ -5,14 +5,16 @@
 <@c.page "Modify Studio">
     <@header.header/>
     <br/>
-    <form method="POST" action="/studios/${studio.studioID}" enctype="multipart/form-data">
+    <form method="POST" action="/studios/${studioID}/edit" enctype="multipart/form-data">
         <label for="topic">Name: </label>
         <@spring.formInput "studio.name"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
         <label for="content">Address: </label>
         <@spring.formInput "studio.address"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
 
-        <input type="submit" value="Modify"/>
+        <input type="submit" value="Update"/>
     </form>
 </@c.page>

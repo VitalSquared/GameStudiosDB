@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,9 +19,8 @@ import ru.nsu.spirin.gamestudios.service.AccountService;
 import ru.nsu.spirin.gamestudios.service.EmployeeService;
 import ru.nsu.spirin.gamestudios.service.StudioService;
 
+import javax.validation.Valid;
 import java.security.Principal;
-import java.sql.SQLException;
-import java.util.List;
 
 @Controller
 @RequestMapping("/studios")
@@ -62,33 +62,43 @@ public class StudioController {
         return "studios/studios";
     }
 
-    @RequestMapping(path = "/new", method = RequestMethod.GET)
     @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newStudio(@ModelAttribute("studio") Studio studio) {
         return "/studios/new_studio";
     }
 
-    @RequestMapping(path = "", method = RequestMethod.POST)
     @PreAuthorize("hasRole('ADMIN')")
-    public String create(@ModelAttribute("studio") Studio studio) throws SQLException {
+    @RequestMapping(path = "/new", method = RequestMethod.POST)
+    public String create(@Valid @ModelAttribute("studio") Studio studio, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "/studios/new_studio";
+        }
         studioService.newStudio(studio);
         return "redirect:/studios";
     }
 
-    @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String edit(Model model, @PathVariable("id") Long studioID) {
+        model.addAttribute("studioID", studioID);
         model.addAttribute("studio", studioService.getStudioByID(studioID));
-        List<Employee> employeeList = employeeService.getEmployeesByStudio(studioID);
-        model.addAttribute("employeesCount", employeeList.size());
         return "/studios/edit_studio";
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.POST)
     @PreAuthorize("hasRole('ADMIN')")
-    public String update(@ModelAttribute("studio") Studio studio,
-                         @PathVariable("id") Long id) throws SQLException {
-        studioService.updateStudio(id, studio);
+    @RequestMapping(path = "/{id}/edit", method = RequestMethod.POST)
+    public String update(@Valid @ModelAttribute("studio") Studio studio,
+                         BindingResult bindingResult,
+                         Model model,
+                         @PathVariable("id") Long studioID) {
+        model.addAttribute("studioID", studioID);
+
+        if (bindingResult.hasErrors()) {
+            return "/studios/edit_studio";
+        }
+
+        studioService.updateStudio(studioID, studio);
         return "redirect:/studios";
     }
 

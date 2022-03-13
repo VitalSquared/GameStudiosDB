@@ -3,21 +3,25 @@
 
 <@c.page "New Game">
     <br/>
-    <form method="POST" action="/games" enctype="multipart/form-data">
+    <form method="POST" action="/games/new" enctype="multipart/form-data">
         <label for="startDate">Start Date: </label>
         <label for="startDate">
             <@spring.bind "game.startDate"/>
-            <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${game.startDate!}" placeholder="" />
+            <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${(game.startDate!.now)?string('YYYY-MM-dd')}" placeholder="" />
+            <@spring.showErrors "<br>" "color:red;"/>
         </label>
         <br/>
         <label for="devName">Dev Name: </label>
         <@spring.formInput "game.devName"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
         <label for="releaseName">Release Name: </label>
         <@spring.formInput "game.releaseName"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
         <label for="releaseName">Expenses: </label>
         <@spring.formInput "game.expenses"/>
+        <@spring.showErrors "<br>" "color:red;"/>
         <br/>
         <#assign studios_map = {}>
         <#foreach studio in studios>
