@@ -7,6 +7,11 @@
         <a class="nav-link btn btn-primary" href="/tests/new">Create new test</a>
     </#if>
 
+    <#assign statuses_map = {}>
+    <#foreach status in all_statuses>
+        <#assign statuses_map = statuses_map + { status.statusID?string : status.name }>
+    </#foreach>
+
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -16,7 +21,7 @@
             <th scope="col">Grand</th>
             <th scope="col">Min Studios Num</th>
             <th scope="col">Applications Deadline</th>
-            <th scope="col">Status ID</th>
+            <th scope="col">Status</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -29,7 +34,7 @@
                 <td>${test.grand}</td>
                 <td>${test.minStudiosNum}</td>
                 <td>${test.appsDeadline}</td>
-                <td>${test.statusID}</td>
+                <td>${statuses_map[test.statusID?string]}</td>
                 <td>
                     <#if s.isAdmin>
                         <a class="nav-link btn btn-primary" href="/tests/${test.testID}">View</a>

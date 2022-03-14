@@ -87,7 +87,9 @@ public class EmployeeController {
             )
         );
         model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
-        model.addAttribute("accounts", accountService.getEmailsWithEmployeeIDs());
+        model.addAttribute("all_accounts", accountService.getAllAccounts());
+        model.addAttribute("all_studios", studioService.getAllStudios());
+        model.addAttribute("all_departments", departmentService.getAllDepartments());
 
         Filtration filtration = new Filtration();
         filtration.addFilter("studio", null, studio);

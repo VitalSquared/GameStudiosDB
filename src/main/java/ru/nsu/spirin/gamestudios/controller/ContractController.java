@@ -13,6 +13,7 @@ import ru.nsu.spirin.gamestudios.model.entity.Contract;
 import ru.nsu.spirin.gamestudios.model.entity.Game;
 import ru.nsu.spirin.gamestudios.service.ContractService;
 import ru.nsu.spirin.gamestudios.service.GameService;
+import ru.nsu.spirin.gamestudios.service.StudioService;
 import ru.nsu.spirin.gamestudios.service.TestService;
 
 import javax.validation.Valid;
@@ -25,14 +26,17 @@ public class ContractController {
     private final ContractService contractService;
     private final TestService testService;
     private final GameService gameService;
+    private final StudioService studioService;
 
     @Autowired
     public ContractController(ContractService contractService,
                               TestService testService,
-                              GameService gameService) {
+                              GameService gameService,
+                              StudioService studioService) {
         this.contractService = contractService;
         this.testService = testService;
         this.gameService = gameService;
+        this.studioService = studioService;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
@@ -65,6 +69,7 @@ public class ContractController {
     public String viewContract(Model model, @PathVariable(name = "id") Long contractID) {
         model.addAttribute("games", gameService.getGamesByContractID(contractID));
         model.addAttribute("contract", contractService.getContractByID(contractID));
+        model.addAttribute("all_studios", studioService.getAllStudios());
         return "contracts/view_contract";
     }
 

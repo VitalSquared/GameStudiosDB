@@ -11,6 +11,17 @@
     <#else>
         <#assign anyStudio = []>
     </#if>
+
+    <#assign studios_map = {}>
+    <#foreach studio in all_studios>
+        <#assign studios_map = studios_map + { studio.studioID?string : studio.name }>
+    </#foreach>
+
+    <#assign employees_map = {}>
+    <#foreach employee in all_employees>
+        <#assign employees_map = employees_map + { employee.employeeID?string : employee.firstName + ' ' + employee.lastName }>
+    </#foreach>
+
     <@f.filter url
         {
             'studio': ['Search studio', 'selection'] + anyStudio + studios?sequence?map(x -> [x.name, x.studioID])
@@ -31,8 +42,8 @@
         <tr>
             <th scope="col">Department ID</th>
             <th scope="col">Name</th>
-            <th scope="col">Studio ID</th>
-            <th scope="col">Head ID</th>
+            <th scope="col">Studio</th>
+            <th scope="col">Head</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -41,8 +52,14 @@
             <tr>
                 <td>${department.departmentID}</td>
                 <td>${department.name}</td>
-                <td>${department.studioID}</td>
-                <td>${department.headID!'null'}</td>
+                <td>${studios_map[department.studioID?string]} (${department.studioID})</td>
+                <td>
+                    <#if (department.headID!-1) gt 0>
+                        ${employees_map[department.headID?string]} (${department.headID})
+                    <#else>
+                        None
+                    </#if>
+                </td>
                 <td>
                     <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
                         <a class="nav-link btn btn-primary" href="/departments/${department.departmentID}/edit">Edit</a>

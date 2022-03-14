@@ -66,6 +66,10 @@ public class DepartmentController {
         model.addAttribute("url", "/departments");
         model.addAttribute("departments", departmentList);
         model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
+
+        model.addAttribute("all_studios", studioService.getAllStudios());
+        model.addAttribute("all_employees", employeeService.getEmployees());
+
         return "studios/departments";
     }
 

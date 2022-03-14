@@ -31,6 +31,21 @@
         <#assign lastNameSortDir = "ASC"/>
     </#if>
 
+    <#assign accounts_map = {}>
+    <#foreach account in all_accounts>
+        <#assign accounts_map = accounts_map + { account.employeeID?string : account.email }>
+    </#foreach>
+
+    <#assign studios_map = {}>
+    <#foreach studio in all_studios>
+        <#assign studios_map = studios_map + { studio.studioID?string : studio.name }>
+    </#foreach>
+
+    <#assign departments_map = {}>
+    <#foreach department in all_departments>
+        <#assign departments_map = departments_map + { department.departmentID?string : department.name }>
+    </#foreach>
+
     <@f.filter urlFilterless
         {
             'studio': ['Search studio', 'selection'] + anyStudio + studios?sequence?map(x -> [x.name, x.studioID]),
@@ -62,8 +77,9 @@
             <th scope="col">
                 <a href="${urlFilter}&sortField=${lastNameSortField}&sortDir=${lastNameSortDir}">Last Name</a>
             </th>
-            <th scope="col">Studio ID</th>
-            <th scope="col">Department ID</th>
+            <th scope="col">Studio</th>
+            <th scope="col">Department</th>
+            <th scope="col">Email</th>
             <th scope="col">Active</th>
             <th scope="col"></th>
         </tr>
@@ -74,8 +90,15 @@
                 <td>${employee.employeeID}</td>
                 <td>${employee.firstName}</td>
                 <td>${employee.lastName}</td>
-                <td>${employee.studioID}</td>
-                <td>${employee.departmentID}</td>
+                <td>${studios_map[employee.studioID?string]} (${employee.studioID})</td>
+                <td>
+                    <#if employee.departmentID??>
+                        ${departments_map[employee.departmentID?string]} (${employee.departmentID})
+                    <#else>
+                        None
+                    </#if>
+                </td>
+                <td>${accounts_map[employee.employeeID?string]}</td>
                 <td>${employee.active?c}</td>
                 <td>
                     <#if s.isAdmin>

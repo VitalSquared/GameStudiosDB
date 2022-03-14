@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import ru.nsu.spirin.gamestudios.model.entity.Genre;
+import ru.nsu.spirin.gamestudios.model.entity.Studio;
 import ru.nsu.spirin.gamestudios.model.entity.Test;
-import ru.nsu.spirin.gamestudios.service.GenreService;
-import ru.nsu.spirin.gamestudios.service.TestAppService;
-import ru.nsu.spirin.gamestudios.service.TestService;
+import ru.nsu.spirin.gamestudios.model.entity.TestAppResult;
+import ru.nsu.spirin.gamestudios.service.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -23,18 +23,30 @@ public class TestController {
     private final TestService testService;
     private final TestAppService testAppService;
     private final GenreService genreService;
+    private final TestStatusService testStatusService;
+    private final TestAppResultService testAppResultService;
+    private final StudioService studioService;
 
     @Autowired
-    public TestController(TestService testService, TestAppService testAppService, GenreService genreService) {
+    public TestController(TestService testService,
+                          TestAppService testAppService,
+                          GenreService genreService,
+                          TestStatusService testStatusService,
+                          TestAppResultService testAppResultService,
+                          StudioService studioService) {
         this.testService = testService;
         this.testAppService = testAppService;
         this.genreService = genreService;
+        this.testStatusService = testStatusService;
+        this.testAppResultService = testAppResultService;
+        this.studioService = studioService;
     }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexTests(Model model) {
         List<Test> tests = testService.getAllTests();
         model.addAttribute("tests", tests);
+        model.addAttribute("all_statuses", testStatusService.getAllStatuses());
         return "testings/testings";
     }
 
@@ -44,6 +56,9 @@ public class TestController {
         model.addAttribute("test", testService.getTestByID(testID));
         model.addAttribute("apps", testAppService.getAppsForTest(testID));
         model.addAttribute("genres", genreService.getGenresByTestID(testID));
+        model.addAttribute("all_statuses", testStatusService.getAllStatuses());
+        model.addAttribute("all_results", testAppResultService.getAllResults());
+        model.addAttribute("all_studios", studioService.getAllStudios());
         return "testings/view_testing";
     }
 

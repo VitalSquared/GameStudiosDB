@@ -3,23 +3,34 @@
 <#import "../parts/security.ftlh" as s>
 
 <@c.page "Test Application">
+
+    <#assign results_map = {}>
+    <#foreach result in all_results>
+        <#assign results_map = results_map + { result.resultID?string : result.name }>
+    </#foreach>
+
+    <#assign studios_map = {}>
+    <#foreach studio in all_studios>
+        <#assign studios_map = studios_map + { studio.studioID?string : studio.name }>
+    </#foreach>
+
     <a class="btn btn-primary" href="/tests/${app.testID}">Back to test</a>
     <br/>
     <table class="table">
         <thead class="thead-dark">
         <tr>
             <th scope="col">ID</th>
-            <th scope="col">Studio ID</th>
+            <th scope="col">Studio</th>
             <th scope="col">Test ID</th>
-            <th scope="col">Result ID</th>
+            <th scope="col">Result</th>
         </tr>
         </thead>
         <tbody>
         <tr>
             <td>${app.appID}</td>
-            <td>${app.studioID}</td>
+            <td>${studios_map[app.studioID?string]}</td>
             <td>${app.testID}</td>
-            <td>${app.resultID}</td>
+            <td>${results_map[app.resultID?string]}</td>
         </tr>
         </tbody>
     </table>
@@ -43,7 +54,6 @@
                 <th scope="col">ID</th>
                 <th scope="col">First Name</th>
                 <th scope="col">Last Name</th>
-                <th scope="col">Department ID</th>
                 <th scope="col"></th>
             </tr>
             </thead>
@@ -53,7 +63,6 @@
                     <td>${employee.employeeID}</td>
                     <td>${employee.firstName}</td>
                     <td>${employee.lastName}</td>
-                    <td>${employee.departmentID}</td>
                     <td>
                         <#if test.statusID == 0 || test.statusID == 1>
                             <a class="nav-link btn btn-primary" href="/tests/apps/${app.appID}/remove_employee/${employee.employeeID}">
@@ -69,7 +78,7 @@
     </#if>
     <#if test.statusID == 2 || test.statusID == 3>
         <label>
-            Result: ${app.resultID}
+            Result: ${results_map[app.resultID?string]}
         </label>
     </#if>
     <#if test.statusID == 2 && (s.isAdmin || s.isGeneralDirector)>

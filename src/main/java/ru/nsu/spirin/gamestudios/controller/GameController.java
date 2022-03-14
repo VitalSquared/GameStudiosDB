@@ -55,6 +55,7 @@ public class GameController {
     public String indexGames(Model model) {
         List<Game> games = gameService.getAllGames();
         model.addAttribute("games", games);
+        model.addAttribute("all_studios", studioService.getAllStudios());
         return "games/games";
     }
 
@@ -65,6 +66,8 @@ public class GameController {
         model.addAttribute("releases", gameReleaseService.getReleasesByGameID(gameID));
         model.addAttribute("genres", genreService.getGenresByGameID(gameID));
         model.addAttribute("employees", employeeService.getEmployeesByGameID(gameID));
+        model.addAttribute("all_studios", studioService.getAllStudios());
+        model.addAttribute("all_platforms", platformService.getAllPlatforms());
         return "games/view_game";
     }
 

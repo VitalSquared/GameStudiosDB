@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import ru.nsu.spirin.gamestudios.model.entity.Employee;
 import ru.nsu.spirin.gamestudios.model.entity.TestApp;
-import ru.nsu.spirin.gamestudios.service.EmployeeService;
-import ru.nsu.spirin.gamestudios.service.TestAppService;
-import ru.nsu.spirin.gamestudios.service.TestService;
+import ru.nsu.spirin.gamestudios.service.*;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -19,16 +17,23 @@ import java.time.Instant;
 @Controller
 @RequestMapping("/tests")
 public class TestAppController {
-
     private final TestAppService testAppService;
     private final TestService testService;
     private final EmployeeService employeeService;
+    private final TestAppResultService testAppResultService;
+    private final StudioService studioService;
 
     @Autowired
-    public TestAppController(TestAppService testAppService, TestService testService, EmployeeService employeeService) {
+    public TestAppController(TestAppService testAppService,
+                             TestService testService,
+                             EmployeeService employeeService,
+                             TestAppResultService testAppResultService,
+                             StudioService studioService) {
         this.testAppService = testAppService;
         this.employeeService = employeeService;
         this.testService = testService;
+        this.testAppResultService = testAppResultService;
+        this.studioService = studioService;
     }
 
     @RequestMapping(path = "/apps/{id}", method = RequestMethod.GET)
@@ -38,6 +43,8 @@ public class TestAppController {
         model.addAttribute("test", testService.getTestByID(app.getTestID()));
         model.addAttribute("employees", employeeService.getEmployeesByTestApp(appID));
         model.addAttribute("curDate", Date.from(Instant.now()));
+        model.addAttribute("all_results", testAppResultService.getAllResults());
+        model.addAttribute("all_studios", studioService.getAllStudios());
         return "testings/view_testapp";
     }
 

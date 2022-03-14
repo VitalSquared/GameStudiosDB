@@ -44,4 +44,8 @@ public class AccountService {
         Account account = new Account(email, new BCryptPasswordEncoder(12).encode(password), null, null);
         this.accountRepository.update(email, account);
     }
+
+    public List<Account> getAllAccounts() {
+        return this.accountRepository.findAll();
+    }
 }

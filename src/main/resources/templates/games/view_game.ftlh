@@ -3,6 +3,16 @@
 <#import "../parts/security.ftlh" as s>
 
 <@c.page game.releaseName>
+    <#assign studios_map = {}>
+    <#foreach studio in all_studios>
+        <#assign studios_map = studios_map + { studio.studioID?string : studio.name }>
+    </#foreach>
+
+    <#assign platforms_map = {}>
+    <#foreach platform in all_platforms>
+        <#assign platforms_map = platforms_map + { platform.platformID?string : platform.name }>
+    </#foreach>
+
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -11,7 +21,7 @@
             <th scope="col">Dev Name</th>
             <th scope="col">Release Name</th>
             <th scope="col">Expenses</th>
-            <th scope="col">Studio ID</th>
+            <th scope="col">Studio</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -22,7 +32,7 @@
                 <td>${game.devName}</td>
                 <td>${game.releaseName}</td>
                 <td>${game.expenses}</td>
-                <td>${game.studioID}</td>
+                <td>${studios_map[game.studioID?string]} (${game.studioID})</td>
                 <td>
                     <#if s.isAdmin>
                         <a class="nav-link btn btn-primary" href="/games/${game.gameID}/edit">Edit</a>
@@ -67,7 +77,6 @@
             <th scope="col">ID</th>
             <th scope="col">First Name</th>
             <th scope="col">Last Name</th>
-            <th scope="col">Department ID</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -77,7 +86,6 @@
                 <td>${employee.employeeID}</td>
                 <td>${employee.firstName}</td>
                 <td>${employee.lastName}</td>
-                <td>${employee.departmentID}</td>
                 <td>
                     <#if s.isAdmin>
                         <a class="nav-link btn btn-primary" href="/games/${game.gameID}/remove_employee/${employee.employeeID}">Remove from game</a>
@@ -118,7 +126,7 @@
         <thead class="thead-dark">
         <tr>
             <th scope="col">Contract ID</th>
-            <th scope="col">Platform ID</th>
+            <th scope="col">Platform</th>
             <th scope="col">Release Date</th>
             <th scope="col">Percent</th>
             <th scope="col">Sold Count</th>
@@ -129,7 +137,7 @@
         <#foreach release in releases>
             <tr>
                 <td>${release.contractID}</td>
-                <td>${release.platformID}</td>
+                <td>${platforms_map[release.platformID?string]}</td>
                 <td>${release.releaseDate}</td>
                 <td>${release.cost}</td>
                 <td>${release.soldCount}</td>

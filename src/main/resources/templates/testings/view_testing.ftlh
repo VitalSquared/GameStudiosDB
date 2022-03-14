@@ -3,6 +3,22 @@
 <#import "../parts/security.ftlh" as s>
 
 <@c.page "Testing">
+
+    <#assign statuses_map = {}>
+    <#foreach status in all_statuses>
+        <#assign statuses_map = statuses_map + { status.statusID?string : status.name }>
+    </#foreach>
+
+    <#assign results_map = {}>
+    <#foreach result in all_results>
+        <#assign results_map = results_map + { result.resultID?string : result.name }>
+    </#foreach>
+
+    <#assign studios_map = {}>
+    <#foreach studio in all_studios>
+        <#assign studios_map = studios_map + { studio.studioID?string : studio.name }>
+    </#foreach>
+
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -12,7 +28,7 @@
             <th scope="col">Grand</th>
             <th scope="col">Min Studios Num</th>
             <th scope="col">Applications Deadline</th>
-            <th scope="col">Status ID</th>
+            <th scope="col">Status</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -24,7 +40,7 @@
             <td>${test.grand}</td>
             <td>${test.minStudiosNum}</td>
             <td>${test.appsDeadline}</td>
-            <td>${test.statusID}</td>
+            <td>${statuses_map[test.statusID?string]}</td>
             <td>
                 <#if s.isAdmin && test.statusID lt 3>
                     <a class="nav-link btn btn-primary" href="/tests/${test.testID}/edit">Edit</a>
@@ -82,8 +98,8 @@
             <thead class="thead-dark">
             <tr>
                 <th scope="col">ID</th>
-                <th scope="col">Studio ID</th>
-                <th scope="col">Result ID</th>
+                <th scope="col">Studio</th>
+                <th scope="col">Result</th>
                 <th scope="col"></th>
             </tr>
             </thead>
@@ -91,8 +107,8 @@
             <#foreach app in apps>
                 <tr>
                     <td>${app.appID}</td>
-                    <td>${app.studioID}</td>
-                    <td>${app.resultID}</td>
+                    <td>${studios_map[app.studioID?string]} (${app.studioID})</td>
+                    <td>${results_map[app.resultID?string]}</td>
                     <td>
                         <#if s.isAdmin>
                             <a class="nav-link btn btn-primary" href="/tests/apps/${app.appID}">View</a>
