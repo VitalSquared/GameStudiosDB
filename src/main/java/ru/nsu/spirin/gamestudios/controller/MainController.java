@@ -5,16 +5,21 @@ import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import ru.nsu.spirin.gamestudios.model.PasswordChangeStore;
 import ru.nsu.spirin.gamestudios.model.entity.Employee;
 import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 import ru.nsu.spirin.gamestudios.service.AccountService;
 import ru.nsu.spirin.gamestudios.service.EmployeeService;
 import ru.nsu.spirin.gamestudios.utils.WebUtils;
+
+import javax.validation.Valid;
 
 @Controller
 public class MainController {
@@ -57,14 +62,37 @@ public class MainController {
     }
 
     @RequestMapping(path = "/userInfo/change_password", method = RequestMethod.GET)
-    public String changePasswordGet(@ModelAttribute("account") Account account) {
+    public String changePasswordGet(@ModelAttribute("password") PasswordChangeStore passwordChangeStore) {
         return "myaccount/change_passwd";
     }
 
     @RequestMapping(path = "/userInfo/change_password", method = RequestMethod.POST)
-    public String changePasswordPost(@ModelAttribute("account") Account account, Principal principal) {
-        accountService.update(principal.getName(), account.getPasswordHash());
-        return "redirect:/myaccount";
+    public String changePasswordPost(@Valid @ModelAttribute("password") PasswordChangeStore passwordChangeStore,
+                                     BindingResult bindingResult,
+                                     Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        Account account = accountService.findAccountByEmail(user.getUsername());
+
+        if (passwordChangeStore.getOldPassword() != null && !passwordChangeStore.getOldPassword().isEmpty()) {
+            if (!(new BCryptPasswordEncoder(12).matches(passwordChangeStore.getOldPassword(), account.getPasswordHash()))) {
+                bindingResult.rejectValue("oldPassword", "error.oldPassword", "Old password mismatch!");
+            }
+        }
+
+        if (passwordChangeStore.getNewPassword() != null && passwordChangeStore.getNewPasswordRepeat() != null &&
+            !passwordChangeStore.getNewPassword().isEmpty() && !passwordChangeStore.getNewPasswordRepeat().isEmpty()) {
+            if (!passwordChangeStore.getNewPassword().equals(passwordChangeStore.getNewPasswordRepeat())) {
+                bindingResult.rejectValue("newPassword", "error.newPassword", "Different new and repeated passwords");
+                bindingResult.rejectValue("newPasswordRepeat", "error.newPassword", "Different new and repeated passwords");
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "myaccount/change_passwd";
+        }
+
+        accountService.update(user.getUsername(), passwordChangeStore.getNewPassword());
+        return "redirect:/userInfo";
     }
 
     @RequestMapping(path = "/403", method = RequestMethod.GET)

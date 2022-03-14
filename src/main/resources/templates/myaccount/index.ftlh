@@ -27,4 +27,6 @@
         </tr>
         </tbody>
     </table>
+    <br/>
+    <a class="nav-link btn btn-primary" href="/userInfo/change_password">Change password</a>
 </@c.page>
