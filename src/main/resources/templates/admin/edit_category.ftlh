@@ -5,12 +5,15 @@
 <@c.page "Edit Category">
     <@header.header/>
     <br/>
-
     <form method="POST" action="/admin_panel/categories/${categoryID}/edit" enctype="multipart/form-data">
-        <label for="topic">Name: </label>
-        <@spring.formInput "category.name"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
-        <input type="submit" value="Modify"/>
+        <div class="form-group row offset-1">
+            <label for="topic">Name: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "category.name", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
+        <input type="submit" class="btn btn-primary offset-1" value="Update"/>
     </form>
 </@c.page>

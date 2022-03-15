@@ -12,9 +12,13 @@
     </#foreach>
 
     <form method="POST" action="/admin_panel/categories/${categoryID}/delete" enctype="multipart/form-data">
-        <label for="topic">Replace With: </label>
-        <@spring.formSingleSelect "new_category.newCategoryID" categories_map/>
-        <br/>
-        <input type="submit" value="Delete '${category.name}'"/>
+        <div class="form-group row offset-1">
+            <label for="topic">Replace With: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "new_category.newCategoryID", categories_map, "class=\"form-control\""/>
+            </div>
+        </div>
+
+        <input type="submit" class="btn btn-primary offset-1" value="Delete '${category.name}'"/>
     </form>
 </@c.page>

@@ -1,6 +1,7 @@
 package ru.nsu.spirin.gamestudios.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -45,6 +46,7 @@ public class EmployeeController {
         this.accountService = accountService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexEmployees(Model model, Principal principal,
                                  @RequestParam(name = "studio", required = false, defaultValue = "-1") String studio,
@@ -104,6 +106,7 @@ public class EmployeeController {
         return "studios/employees";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newEmployee(@ModelAttribute("employee") Employee employee,
                               @ModelAttribute("account") Account account,
@@ -114,6 +117,7 @@ public class EmployeeController {
         return "/studios/new_employee";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.POST)
     public String createEmployee(@Valid @ModelAttribute("employee") Employee employee,
                                  BindingResult bindingResult1,
@@ -132,6 +136,7 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editEmployee(Model model, @PathVariable("id") Long employeeID) {
         model.addAttribute("employeeID", employeeID);
@@ -143,6 +148,7 @@ public class EmployeeController {
         return "/studios/edit_employee";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.POST)
     public String updateEmployee(@Valid @ModelAttribute("employee") Employee employee,
                                  BindingResult bindingResult1,
@@ -163,6 +169,7 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
     public String deleteEmployee(@PathVariable("id") Long employeeID) {
         this.employeeService.deleteEmployee(employeeID);

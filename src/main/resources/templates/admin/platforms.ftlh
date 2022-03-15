@@ -7,18 +7,17 @@
     <@header.header/>
     <br/>
 
-    <#if s.isAdmin>
-        <a class="nav-link btn btn-primary" href="/admin_panel/platforms/new">Create new platform</a>
-    </#if>
-
     <table class="table">
         <thead class="thead-dark">
         <tr>
             <th scope="col">Platform ID</th>
             <th scope="col">Name</th>
             <th scope="col">Percent</th>
-            <th scope="col"></th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin>
+                    <a class="nav-link btn btn-primary" href="/admin_panel/platforms/new">Create new platform</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -29,12 +28,9 @@
                 <td>${platform.percent}</td>
                 <td>
                     <#if s.isAdmin>
-                        <a class="nav-link btn btn-primary" href="/admin_panel/platforms/${platform.platformID}/edit">Edit</a>
-                    </#if>
-                </td>
-                <td>
-                    <#if s.isAdmin>
-                        <a class="nav-link btn btn-primary" href="/admin_panel/platforms/${platform.platformID}/delete">Delete</a>
+                        <a class="btn btn-primary" href="/admin_panel/platforms/${platform.platformID}/edit">Edit</a>
+                        &emsp;
+                        <a class="btn btn-primary" href="/admin_panel/platforms/${platform.platformID}/delete">Delete</a>
                     </#if>
                 </td>
             </tr>

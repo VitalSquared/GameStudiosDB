@@ -38,6 +38,7 @@ public class StudioController {
         this.accountService = accountService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexStudios(Model model, Principal principal,
                                @RequestParam(name = "studio", required = false, defaultValue = "0") String studioID) {
@@ -62,13 +63,13 @@ public class StudioController {
         return "studios/studios";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newStudio(@ModelAttribute("studio") Studio studio) {
         return "/studios/new_studio";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.POST)
     public String create(@Valid @ModelAttribute("studio") Studio studio, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -78,7 +79,7 @@ public class StudioController {
         return "redirect:/studios";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String edit(Model model, @PathVariable("id") Long studioID) {
         model.addAttribute("studioID", studioID);
@@ -87,7 +88,7 @@ public class StudioController {
         return "/studios/edit_studio";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.POST)
     public String update(@Valid @ModelAttribute("studio") Studio studio,
                          BindingResult bindingResult,

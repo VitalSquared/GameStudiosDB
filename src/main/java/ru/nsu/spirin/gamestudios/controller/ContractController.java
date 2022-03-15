@@ -39,7 +39,7 @@ public class ContractController {
         this.studioService = studioService;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexContracts(Model model) {
         List<Contract> contracts = contractService.getAllContracts();
@@ -64,7 +64,7 @@ public class ContractController {
         return "redirect:/contracts";
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public String viewContract(Model model, @PathVariable(name = "id") Long contractID) {
         model.addAttribute("games", gameService.getGamesByContractID(contractID));

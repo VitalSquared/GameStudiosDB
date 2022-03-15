@@ -5,20 +5,28 @@
 <@c.page "Edit Platform">
     <@header.header/>
     <br/>
-
     <form method="POST" action="/admin_panel/platforms/${platformID}/edit" enctype="multipart/form-data">
-        <label for="topic">Name: </label>
-        <@spring.formInput "platform.name"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
-        <label for="topic">Percent: </label>
+        <div class="form-group row offset-1">
+            <label for="topic">Name: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "platform.name", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
         <#assign values = {} />
         <#foreach value in 0..100>
             <#assign values = values + { value : value + "%" }>
         </#foreach>
-        <@spring.formSingleSelect "platform.percent", values/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
-        <input type="submit" value="Modify"/>
+
+        <div class="form-group row offset-1">
+            <label for="topic">Percent: </label>
+            <div class="col-sm-auto">
+                <@spring.formSingleSelect "platform.percent", values, "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
+        <input type="submit" class="btn btn-primary offset-1" value="Update"/>
     </form>
 </@c.page>

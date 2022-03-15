@@ -47,6 +47,7 @@ public class MessageController {
         return "redirect:/messages/sent";
     }
 
+    @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN')")
     @RequestMapping(path = "/sent", method = RequestMethod.GET)
     public String indexSentMessages(Model model, Principal principal,
                                     @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable,
@@ -71,6 +72,7 @@ public class MessageController {
         return "messages/sent";
     }
 
+    @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN')")
     @RequestMapping(path = "/received", method = RequestMethod.GET)
     public String indexReceivedMessages(Model model, Principal principal,
                                         @PageableDefault(sort = { "date" }, direction = Sort.Direction.DESC) Pageable pageable,
@@ -99,7 +101,7 @@ public class MessageController {
         return "messages/received";
     }
 
-    @PreAuthorize("@messageService.canViewMessage(#messageID, #principal)")
+    @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN') && @messageService.canViewMessage(#messageID, #principal)")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public String show(@PathVariable("id") Long messageID, Model model, Principal principal) {
         model.addAttribute("message", messageService.getMessageByID(messageID));
@@ -109,7 +111,7 @@ public class MessageController {
     }
 
     @ResponseBody
-    @PreAuthorize("@messageService.canViewMessage(#messageID, #principal)")
+    @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN') && @messageService.canViewMessage(#messageID, #principal)")
     @RequestMapping(value = "/{id}/download", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public InputStreamResource downloadFile(@PathVariable(value = "id") Long messageID,
                                             @RequestParam(value = "name") String fileName,
@@ -129,6 +131,7 @@ public class MessageController {
         throw new IOException("There was no file with given name in given message");
     }
 
+    @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN')")
     @RequestMapping(path = "/new_message", method = RequestMethod.GET)
     public String newMessage(@ModelAttribute("message") Message message, Model model, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
@@ -136,6 +139,7 @@ public class MessageController {
         return "messages/new_message";
     }
 
+    @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN')")
     @RequestMapping(method = RequestMethod.POST)
     public String create(@ModelAttribute("message") Message message,
                          BindingResult bindingResult,
@@ -153,7 +157,7 @@ public class MessageController {
         int idx = 0;
         for (var file : files) {
             if (file != null) {
-                if (file.getOriginalFilename().isEmpty() || file.getBytes().length == 0) {
+                if (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty() || file.getBytes().length == 0) {
                     continue;
                 }
 
@@ -171,6 +175,7 @@ public class MessageController {
         return "redirect:/messages/sent";
     }
 
+    @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN') && @messageService.canViewMessage(#messageID, #principal)")
     @RequestMapping(path = "/delete_recv/{id}", method = RequestMethod.GET)
     public String removeReceived(@PathVariable("id") Long messageID, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
@@ -178,6 +183,7 @@ public class MessageController {
         return "redirect:/messages/received";
     }
 
+    @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN') && @messageService.canViewMessage(#messageID, #principal)")
     @RequestMapping(path = "/delete_sent/{id}", method = RequestMethod.GET)
     public String removeSent(@PathVariable("id") Long messageID) {
         messageService.deleteSentMessage(messageID);

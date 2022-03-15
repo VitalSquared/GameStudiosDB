@@ -1,6 +1,7 @@
 package ru.nsu.spirin.gamestudios.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -51,6 +52,7 @@ public class GameController {
         this.platformService = platformService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexGames(Model model) {
         List<Game> games = gameService.getAllGames();
@@ -59,6 +61,7 @@ public class GameController {
         return "games/games";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public String viewGame(Model model, @PathVariable(name = "id") Long gameID) {
         model.addAttribute("game", gameService.getGameByID(gameID));
@@ -71,12 +74,14 @@ public class GameController {
         return "games/view_game";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newGame(@ModelAttribute("game") Game game, Model model) {
         model.addAttribute("studios", studioService.getAllStudios());
         return "/games/new_game";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.POST)
     public String createGame(@Valid @ModelAttribute("game") Game game, BindingResult bindingResult, Model model) {
         model.addAttribute("studios", studioService.getAllStudios());
@@ -89,6 +94,7 @@ public class GameController {
         return "redirect:/games";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editGame(Model model, @PathVariable("id") Long gameID) {
         model.addAttribute("gameID", gameID);
@@ -96,6 +102,7 @@ public class GameController {
         return "/games/edit_game";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.POST)
     public String updateGame(@Valid @ModelAttribute("game") Game game,
                              BindingResult bindingResult,
@@ -111,12 +118,14 @@ public class GameController {
         return "redirect:/games/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
     public String deleteGame(@PathVariable("id") Long gameID) {
         gameService.deleteGame(gameID);
         return "redirect:/games";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/add_genre", method = RequestMethod.GET)
     public String addGenreGet(@ModelAttribute("genre") Genre genre, Model model,
                               @PathVariable(name = "id") Long gameID) {
@@ -125,6 +134,7 @@ public class GameController {
         return "/games/add_genre";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/genre", method = RequestMethod.POST)
     public String addGenrePost(@ModelAttribute("game") Genre genre,
                               @PathVariable(name = "id") Long gameID) {
@@ -132,6 +142,7 @@ public class GameController {
         return "redirect:/games/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/remove_genre/{id1}", method = RequestMethod.GET)
     public String removeGenreGet(@PathVariable(name = "id") Long gameID,
                                  @PathVariable(name = "id1") Long genreID) {
@@ -139,6 +150,7 @@ public class GameController {
         return "redirect:/games/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/add_employee", method = RequestMethod.GET)
     public String addEmployeeGet(@ModelAttribute("employee") Employee employee, Model model,
                                  @PathVariable(name = "id") Long gameID) {
@@ -148,6 +160,7 @@ public class GameController {
         return "/games/add_employee";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/employee", method = RequestMethod.POST)
     public String addEmployeePost(@ModelAttribute("employee") Employee employee,
                                @PathVariable(name = "id") Long gameID) {
@@ -155,6 +168,7 @@ public class GameController {
         return "redirect:/games/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/remove_employee/{id1}", method = RequestMethod.GET)
     public String removeEmployeeGet(@PathVariable(name = "id") Long gameID,
                                     @PathVariable(name = "id1") Long employeeID) {
@@ -162,6 +176,7 @@ public class GameController {
         return "redirect:/games/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/new_release", method = RequestMethod.GET)
     public String addReleaseGet(@ModelAttribute("release") GameRelease release, Model model,
                                 @PathVariable(name = "id") Long gameID) {
@@ -171,6 +186,7 @@ public class GameController {
         return "/games/new_release";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/new_release", method = RequestMethod.POST)
     public String addReleasePost(@Valid @ModelAttribute("release") GameRelease release,
                                  BindingResult bindingResult,
@@ -188,6 +204,7 @@ public class GameController {
         return "redirect:/games/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit_release/{id1}", method = RequestMethod.GET)
     public String editRelease(Model model, @PathVariable("id") Long gameID, @PathVariable("id1") Long platformID) {
         model.addAttribute("release", gameReleaseService.getReleaseByGameAndPlatform(gameID, platformID));
@@ -196,6 +213,7 @@ public class GameController {
         return "/games/edit_release";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit_release/{id1}", method = RequestMethod.POST)
     public String updateRelease(@Valid @ModelAttribute("release") GameRelease release,
                                 BindingResult bindingResult, Model model,
@@ -211,6 +229,7 @@ public class GameController {
         return "redirect:/games/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/delete_release/{id1}", method = RequestMethod.GET)
     public String removeRelease(@PathVariable("id") Long gameID, @PathVariable("id1") Long platformID) {
         gameReleaseService.deleteRelease(gameID, platformID);

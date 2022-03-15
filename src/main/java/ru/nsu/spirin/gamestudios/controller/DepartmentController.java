@@ -39,6 +39,7 @@ public class DepartmentController {
         this.accountService = accountService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexDepartments(Model model, Principal principal,
                                    @RequestParam(name = "studio", required = false, defaultValue = "-1") String studio) {
@@ -46,7 +47,7 @@ public class DepartmentController {
         Account account = accountService.findAccountByEmail(user.getUsername());
         Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
 
-        Long parsedStudioID;
+        long parsedStudioID;
         try {
             parsedStudioID = Long.parseLong(studio);
         }
@@ -73,7 +74,7 @@ public class DepartmentController {
         return "studios/departments";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newDepartment(@ModelAttribute("department") Department department, Model model, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
@@ -84,7 +85,7 @@ public class DepartmentController {
         return "/studios/new_department";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.POST)
     public String createDepartment(@Valid @ModelAttribute("department") Department department,
                                    BindingResult bindingResult,
@@ -103,7 +104,7 @@ public class DepartmentController {
         return "redirect:/departments";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editDepartment(Model model, @PathVariable("id") Long departmentID, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
@@ -116,7 +117,7 @@ public class DepartmentController {
         return "/studios/edit_department";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.POST)
     public String updateDepartment(@Valid @ModelAttribute("department") Department department,
                                    BindingResult bindingResult,

@@ -1,6 +1,7 @@
 package ru.nsu.spirin.gamestudios.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,6 +43,7 @@ public class TestController {
         this.studioService = studioService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexTests(Model model) {
         List<Test> tests = testService.getAllTests();
@@ -50,6 +52,7 @@ public class TestController {
         return "testings/testings";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public String viewTest(Model model,
                            @PathVariable(name = "id") Long testID) {
@@ -62,11 +65,13 @@ public class TestController {
         return "testings/view_testing";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newTest(@ModelAttribute("test") Test test) {
         return "/testings/new_testing";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/new",  method = RequestMethod.POST)
     public String createTest(@Valid @ModelAttribute("test") Test test, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -78,6 +83,7 @@ public class TestController {
         return "redirect:/tests";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editTest(Model model, @PathVariable("id") Long testID) {
         model.addAttribute("testID", testID);
@@ -85,6 +91,7 @@ public class TestController {
         return "/testings/edit_testing";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit",  method = RequestMethod.POST)
     public String updateTest(@Valid @ModelAttribute("test") Test test,
                              BindingResult bindingResult,
@@ -100,36 +107,42 @@ public class TestController {
         return "redirect:/tests/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/start_test", method = RequestMethod.GET)
     public String startTest(@PathVariable("id") Long id) {
         testService.startTest(id);
         return "redirect:/tests/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/finish_test", method = RequestMethod.GET)
     public String finishTest(@PathVariable("id") Long id) {
         testService.finishTest(id);
         return "redirect:/tests/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/results_test", method = RequestMethod.GET)
     public String resultsReadyTest(@PathVariable("id") Long id) {
         testService.resultsReadyTest(id);
         return "redirect:/tests/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/cancel_test", method = RequestMethod.GET)
     public String cancelTest(@PathVariable("id") Long id) {
         testService.cancelTest(id);
         return "redirect:/tests/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/delete_test", method = RequestMethod.GET)
     public String deleteTest(@PathVariable("id") Long id) {
         testService.deleteTest(id);
         return "redirect:/tests";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/add_genre", method = RequestMethod.GET)
     public String addGenreGet(@ModelAttribute("genre") Genre genre, Model model,
                               @PathVariable(name = "id") Long testID) {
@@ -138,6 +151,7 @@ public class TestController {
         return "/testings/add_genre";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/genre", method = RequestMethod.POST)
     public String addGenrePost(@ModelAttribute("genre") Genre genre,
                                @PathVariable(name = "id") Long testID) {
@@ -145,6 +159,7 @@ public class TestController {
         return "redirect:/tests/{id}";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/remove_genre/{id1}", method = RequestMethod.GET)
     public String removeGenreGet(@PathVariable(name = "id") Long testID,
                                  @PathVariable(name = "id1") Long genreID) {
