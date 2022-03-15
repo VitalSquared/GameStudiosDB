@@ -23,6 +23,7 @@
             <th scope="col">Expenses</th>
             <th scope="col">Studio</th>
             <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -36,6 +37,11 @@
                 <td>
                     <#if s.isAdmin>
                         <a class="nav-link btn btn-primary" href="/games/${game.gameID}/edit">Edit</a>
+                    </#if>
+                </td>
+                <td>
+                    <#if s.isAdmin>
+                        <a class="nav-link btn btn-primary" href="/games/${game.gameID}/delete">Delete</a>
                     </#if>
                 </td>
             </tr>
@@ -131,6 +137,7 @@
             <th scope="col">Percent</th>
             <th scope="col">Sold Count</th>
             <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -144,6 +151,11 @@
                 <td>
                     <#if s.isAdmin>
                         <a class="nav-link btn btn-primary" href="/games/${game.gameID}/edit_release/${release.platformID}">Edit</a>
+                    </#if>
+                </td>
+                <td>
+                    <#if s.isAdmin>
+                        <a class="nav-link btn btn-primary" href="/games/${game.gameID}/delete_release/${release.platformID}">Delete</a>
                     </#if>
                 </td>
             </tr>

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.nsu.spirin.gamestudios.model.entity.Employee;
 import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 import ru.nsu.spirin.gamestudios.model.entity.account.Role;
-import ru.nsu.spirin.gamestudios.repository.AccountRepository;
-import ru.nsu.spirin.gamestudios.repository.EmployeeRepository;
+import ru.nsu.spirin.gamestudios.model.entity.message.Message;
+import ru.nsu.spirin.gamestudios.repository.*;
 import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
 
 import java.util.ArrayList;
@@ -17,11 +17,19 @@ import java.util.List;
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final AccountRepository accountRepository;
+    private final MessageRepository messageRepository;
+    private final DepartmentRepository departmentRepository;
+    private final GameRepository gameRepository;
+    private final TestAppRepository testAppRepository;
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository, AccountRepository accountRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, AccountRepository accountRepository, MessageRepository messageRepository, DepartmentRepository departmentRepository, GameRepository gameRepository, TestAppRepository testAppRepository) {
         this.employeeRepository = employeeRepository;
         this.accountRepository = accountRepository;
+        this.messageRepository = messageRepository;
+        this.departmentRepository = departmentRepository;
+        this.gameRepository = gameRepository;
+        this.testAppRepository = testAppRepository;
     }
 
     public Employee getEmployeeByID(Long employeeID) {
@@ -107,5 +115,19 @@ public class EmployeeService {
                 studioID != 0 ? List.of(Role.ROLE_STUDIO_DIRECTOR, Role.ROLE_DEVELOPER) :   //studio director
                         employeeID != 0 ? List.of(Role.ROLE_GENERAL_DIRECTOR, Role.ROLE_STUDIO_DIRECTOR, Role.ROLE_DEVELOPER) : //general director
                                 List.of(Role.ROLE_ADMIN, Role.ROLE_GENERAL_DIRECTOR, Role.ROLE_STUDIO_DIRECTOR, Role.ROLE_DEVELOPER);    //admin
+    }
+
+    public void deleteEmployee(Long employeeID) {
+        Account account = this.accountRepository.findByEmployeeID(employeeID);
+        List<Long> allSent = this.messageRepository.findAllSentMessagesByEmailSimple(account.getEmail());
+        for (var sent : allSent) {
+            this.messageRepository.deleteAllReceivedMessagesByMessageID(sent);
+        }
+        this.messageRepository.deleteAllSentMessagesByAccount(account.getEmail());
+        this.accountRepository.deleteByEmployeeID(employeeID);
+        this.gameRepository.deleteAllGameEmployeeByEmployeeID(employeeID);
+        this.testAppRepository.deleteAllAppEmployeeByEmployeeID(employeeID);
+        this.departmentRepository.updateDepartmentsHead(employeeID);
+        this.employeeRepository.delete(employeeID);
     }
 }

@@ -90,6 +90,7 @@ public class EmployeeController {
         model.addAttribute("all_accounts", accountService.getAllAccounts());
         model.addAttribute("all_studios", studioService.getAllStudios());
         model.addAttribute("all_departments", departmentService.getAllDepartments());
+        model.addAttribute("all_categories", categoryService.getAllCategories());
 
         Filtration filtration = new Filtration();
         filtration.addFilter("studio", null, studio);
@@ -159,6 +160,12 @@ public class EmployeeController {
         }
 
         employeeService.updateEmployee(employeeID, employee, account);
+        return "redirect:/employees";
+    }
+
+    @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
+    public String deleteEmployee(@PathVariable("id") Long employeeID) {
+        this.employeeService.deleteEmployee(employeeID);
         return "redirect:/employees";
     }
 }

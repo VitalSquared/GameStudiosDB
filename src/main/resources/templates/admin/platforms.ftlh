@@ -18,6 +18,7 @@
             <th scope="col">Name</th>
             <th scope="col">Percent</th>
             <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -29,6 +30,11 @@
                 <td>
                     <#if s.isAdmin>
                         <a class="nav-link btn btn-primary" href="/admin_panel/platforms/${platform.platformID}/edit">Edit</a>
+                    </#if>
+                </td>
+                <td>
+                    <#if s.isAdmin>
+                        <a class="nav-link btn btn-primary" href="/admin_panel/platforms/${platform.platformID}/delete">Delete</a>
                     </#if>
                 </td>
             </tr>

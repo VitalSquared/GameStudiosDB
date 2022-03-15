@@ -59,4 +59,32 @@ public class GameReleaseRepository extends JdbcDaoSupport {
                 platformID
         );
     }
+
+    public void delete(Long gameID, Long platformID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GameReleaseQueries.QUERY_DELETE, gameID, platformID);
+    }
+
+    public void deleteAllByContractID(Long contractID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GameReleaseQueries.QUERY_DELETE_ALL_BY_CONTRACT_ID, contractID);
+    }
+
+    public void deleteAllByGameID(Long gameID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GameReleaseQueries.QUERY_DELETE_ALL_BY_GAME_ID, gameID);
+    }
+
+    public void deleteAllByPlatformID(Long platformID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GameReleaseQueries.QUERY_DELETE_ALL_BY_PLATFORM_ID, platformID);
+    }
 }

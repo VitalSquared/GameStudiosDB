@@ -33,4 +33,16 @@ public class AccountQueries {
                 SET email = ?, passwd_hash = ?
                 WHERE email = ?;
             """;
+
+    public static final String QUERY_DELETE =
+            """
+                DELETE FROM account
+                WHERE email = ?;
+            """;
+
+    public static final String QUERY_DELETE_BY_EMPLOYEE_ID =
+            """
+                DELETE FROM account
+                WHERE employee_id = ?;
+            """;;
 }

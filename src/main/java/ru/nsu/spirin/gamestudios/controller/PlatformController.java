@@ -73,4 +73,11 @@ public class PlatformController {
         platformService.updatePlatform(platformID, platform);
         return "redirect:/admin_panel/platforms";
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
+    public String deletePlatform(@PathVariable("id") Long platformID) {
+        platformService.deletePlatform(platformID);
+        return "redirect:/admin_panel/platforms";
+    }
 }

@@ -75,4 +75,11 @@ public class TestAppRepository extends JdbcDaoSupport {
         }
         this.getJdbcTemplate().update(TestAppQueries.QUERY_DELETE_APP, appID);
     }
+
+    public void deleteAllAppEmployeeByEmployeeID(Long employeeID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(TestAppQueries.QUERY_DELETE_ALL_APP_EMPLOYEE_BY_EMPLOYEE_ID, employeeID);
+    }
 }

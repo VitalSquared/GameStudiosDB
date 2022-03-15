@@ -28,6 +28,14 @@ public class DepartmentRepository extends JdbcDaoSupport {
         return this.getJdbcTemplate().queryForObject(DepartmentQueries.QUERY_FIND_BY_ID, new DepartmentMapper(), departmentID);
     }
 
+    public Department findRootDepartmentByStudioID(Long studioID) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
+        return this.getJdbcTemplate().queryForObject(DepartmentQueries.QUERY_FIND_ROOT_DEPARTMENT_BY_STUDIO_ID,
+                new DepartmentMapper(), studioID);
+    }
+
     public List<Department> findAllByStudioID(Long studioID) {
         if (null == this.getJdbcTemplate()) {
             return null;
@@ -54,5 +62,19 @@ public class DepartmentRepository extends JdbcDaoSupport {
             return;
         }
         this.getJdbcTemplate().update(DepartmentQueries.QUERY_UPDATE, department.getName(), department.getHeadID(), departmentID);
+    }
+
+    public void delete(Long departmentID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(DepartmentQueries.QUERY_DELETE, departmentID);
+    }
+
+    public void updateDepartmentsHead(Long employeeID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(DepartmentQueries.QUERY_UPDATE_DEPARTMENTS_HEAD, employeeID);
     }
 }

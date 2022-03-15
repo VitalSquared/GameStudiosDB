@@ -14,6 +14,13 @@ public class GameQueries {
                 WHERE contract_id = ?;
             """;
 
+    public static final String QUERY_FIND_ALL_BY_STUDIO_ID =
+            """
+                SELECT *
+                FROM game
+                WHERE studio_id = ?;
+            """;
+
     public static final String QUERY_FIND_BY_ID =
             """
                 SELECT *
@@ -34,6 +41,12 @@ public class GameQueries {
                 WHERE game_id = ?;
             """;
 
+    public static final String QUERY_DELETE =
+            """
+                DELETE FROM game
+                WHERE game_id = ?;
+            """;
+
     public static final String QUERY_SAVE_GAME_GENRE =
             """
                 INSERT INTO game__genre (game_id, genre_id) VALUES
@@ -46,6 +59,18 @@ public class GameQueries {
                 WHERE game_id = ? AND genre_id = ?;
             """;
 
+    public static final String QUERY_DELETE_ALL_GAME_GENRE =
+            """
+                DELETE FROM game__genre
+                WHERE game_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_GAME_GENRE_BY_GENRE_ID =
+            """
+                DELETE FROM game__genre
+                WHERE genre_id = ?;
+            """;
+
     public static final String QUERY_SAVE_GAME_EMPLOYEE =
             """
                 INSERT INTO game__employee (game_id, employee_id) VALUES
@@ -56,5 +81,17 @@ public class GameQueries {
             """
                 DELETE FROM game__employee
                 WHERE game_id = ? AND employee_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_GAME_EMPLOYEE_BY_EMPLOYEE_ID =
+            """
+                DELETE FROM game__employee
+                WHERE employee_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_GAME_EMPLOYEE_BY_GAME_ID =
+            """
+                DELETE FROM game__employee
+                WHERE game_id = ?;
             """;
 }

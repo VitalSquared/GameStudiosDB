@@ -27,4 +27,10 @@ public class GenreQueries {
                 SET name = ?
                 WHERE genre_id = ?;
             """;
+
+    public static final String QUERY_DELETE =
+            """
+                DELETE FROM genre
+                WHERE genre_id = ?;
+            """;
 }

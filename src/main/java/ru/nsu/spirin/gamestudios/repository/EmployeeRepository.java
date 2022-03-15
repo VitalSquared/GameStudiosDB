@@ -15,7 +15,9 @@ import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Transactional
@@ -165,6 +167,35 @@ public class EmployeeRepository extends JdbcDaoSupport {
         );
     }
 
+    public void updateDevelopersCategory(Long oldCategory, Long newCategory) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(EmployeeQueries.QUERY_UPDATE_DEVELOPER_CATEGORY,
+                newCategory,
+                oldCategory
+        );
+    }
+
+    public void updateDevelopersDepartment(Long oldDepartment, Long newDepartment) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(EmployeeQueries.QUERY_UPDATE_DEVELOPER_DEPARTMENT,
+                newDepartment,
+                oldDepartment
+        );
+    }
+
+    public void delete(Long employeeID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(EmployeeQueries.QUERY_DELETE_DIRECTOR, employeeID);
+        this.getJdbcTemplate().update(EmployeeQueries.QUERY_DELETE_DEVELOPER, employeeID);
+        this.getJdbcTemplate().update(EmployeeQueries.QUERY_DELETE_EMPLOYEE, employeeID);
+    }
+
     public void upsertDeveloper(Employee employee) {
         if (null == this.getJdbcTemplate()) {
             return;
@@ -201,5 +232,15 @@ public class EmployeeRepository extends JdbcDaoSupport {
             return;
         }
         this.getJdbcTemplate().update(EmployeeQueries.QUERY_DELETE_DIRECTOR, employeeID);
+    }
+
+    public List<Long> findAllDirectorsByStudioID(Long studioID) {
+        if (null == this.getJdbcTemplate()) {
+            return new ArrayList<>();
+        }
+        return this.getJdbcTemplate().query(EmployeeQueries.QUERY_FIND_ALL_DIRECTORS_BY_STUDIO_ID,
+                (rs, rowNum) -> rs.getLong(1),
+                studioID
+        );
     }
 }

@@ -40,6 +40,12 @@ public class TestAppQueries {
                 WHERE app_id = ?;
             """;
 
+    public static final String QUERY_DELETE_ALL_APP_EMPLOYEE_BY_EMPLOYEE_ID =
+            """
+                DELETE FROM test_app__employee
+                WHERE employee_id = ?;
+            """;
+
     public static final String QUERY_DELETE_PENDING_APPS =
             """
                 DELETE FROM test_app

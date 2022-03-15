@@ -27,4 +27,28 @@ public class GameReleaseQueries {
                 SET release_date = ?, cost = ?, sold_count = ?
                 WHERE game_id = ? AND platform_id = ?;
             """;
+
+    public static final String QUERY_DELETE =
+            """
+                DELETE FROM game__contract__platform
+                WHERE game_id = ? AND platform_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_BY_CONTRACT_ID =
+            """
+                DELETE FROM game__contract__platform
+                WHERE contract_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_BY_GAME_ID =
+            """
+                DELETE FROM game__contract__platform
+                WHERE game_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_BY_PLATFORM_ID =
+            """
+                DELETE FROM game__contract__platform
+                WHERE platform_id = ?;
+            """;
 }

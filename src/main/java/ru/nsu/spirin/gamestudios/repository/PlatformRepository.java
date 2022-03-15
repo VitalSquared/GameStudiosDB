@@ -47,4 +47,11 @@ public class PlatformRepository extends JdbcDaoSupport {
         }
         this.getJdbcTemplate().update(PlatformQueries.QUERY_UPDATE, platform.getName(), platform.getPercent(), platformID);
     }
+
+    public void delete(Long platformID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(PlatformQueries.QUERY_DELETE, platformID);
+    }
 }

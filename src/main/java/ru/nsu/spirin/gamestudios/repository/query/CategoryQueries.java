@@ -27,4 +27,10 @@ public class CategoryQueries {
                 SET name = ?
                 WHERE category_id = ?;
             """;
+
+    public static final String QUERY_DELETE =
+            """
+                DELETE FROM category
+                WHERE category_id = ?;
+            """;
 }

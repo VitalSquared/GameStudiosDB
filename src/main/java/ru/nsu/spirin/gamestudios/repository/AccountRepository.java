@@ -66,4 +66,18 @@ public class AccountRepository extends JdbcDaoSupport {
                 account.getEmail(), account.getPasswordHash(), id
         );
     }
+
+    public void delete(String id) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(AccountQueries.QUERY_DELETE, id);
+    }
+
+    public void deleteByEmployeeID(Long employeeID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(AccountQueries.QUERY_DELETE_BY_EMPLOYEE_ID, employeeID);
+    }
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.nsu.spirin.gamestudios.model.entity.Department;
 import ru.nsu.spirin.gamestudios.repository.DepartmentRepository;
+import ru.nsu.spirin.gamestudios.repository.EmployeeRepository;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -11,10 +12,12 @@ import java.util.List;
 @Service
 public class DepartmentService {
     private final DepartmentRepository departmentRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Autowired
-    public DepartmentService(DepartmentRepository departmentRepository) {
+    public DepartmentService(DepartmentRepository departmentRepository, EmployeeRepository employeeRepository) {
         this.departmentRepository = departmentRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     public Department getDepartmentByID(Long departmentID) {
@@ -43,5 +46,12 @@ public class DepartmentService {
         }
         department.setHeadID(department.getHeadID() == -1 ? null : department.getHeadID());
         this.departmentRepository.update(departmentID, department);
+    }
+
+    public void deleteDepartment(Long departmentID) {
+        Department department = this.departmentRepository.findByID(departmentID);
+        Department rootDepartment = this.departmentRepository.findRootDepartmentByStudioID(department.getStudioID());
+        this.employeeRepository.updateDevelopersDepartment(departmentID, rootDepartment.getDepartmentID());
+        this.departmentRepository.delete(departmentID);
     }
 }

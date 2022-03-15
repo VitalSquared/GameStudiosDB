@@ -136,4 +136,11 @@ public class DepartmentController {
         departmentService.updateDepartment(departmentID, department);
         return "redirect:/departments";
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
+    public String deleteDepartment(@PathVariable("id") Long departmentID) {
+        departmentService.deleteDepartment(departmentID);
+        return "redirect:/departments";
+    }
 }

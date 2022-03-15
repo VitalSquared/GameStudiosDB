@@ -4,16 +4,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ru.nsu.spirin.gamestudios.model.entity.Category;
 import ru.nsu.spirin.gamestudios.repository.CategoryRepository;
+import ru.nsu.spirin.gamestudios.repository.EmployeeRepository;
 
 import java.util.List;
 
 @Controller
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository,
+                           EmployeeRepository employeeRepository) {
         this.categoryRepository = categoryRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     public List<Category> getAllCategories() {
@@ -36,5 +40,10 @@ public class CategoryService {
             return;
         }
         this.categoryRepository.update(categoryID, category);
+    }
+
+    public void deleteCategory(Long categoryID, Long replaceWith) {
+        this.employeeRepository.updateDevelopersCategory(categoryID, replaceWith);
+        this.categoryRepository.delete(categoryID);
     }
 }

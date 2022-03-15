@@ -120,4 +120,11 @@ public class ContractController {
         contractService.updateContract(contractID, contract);
         return "redirect:/contracts/{id}";
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
+    public String deleteContract(@PathVariable("id") Long contractID) {
+        contractService.deleteContract(contractID);
+        return "redirect:/contracts";
+    }
 }

@@ -83,6 +83,7 @@ public class StudioController {
     public String edit(Model model, @PathVariable("id") Long studioID) {
         model.addAttribute("studioID", studioID);
         model.addAttribute("studio", studioService.getStudioByID(studioID));
+        model.addAttribute("anyReferences", studioService.isStudioReferenced(studioID));
         return "/studios/edit_studio";
     }
 
@@ -102,17 +103,10 @@ public class StudioController {
         return "redirect:/studios";
     }
 
-    /*@GetMapping(value = "/studios/{id}/delete")
     @PreAuthorize("hasRole('ADMIN')")
-    public String deleteStudio(@PathVariable("id") Long studioID, Model model, Principal principal) throws SQLException {
-        if (studioID == 0) {
-            return "redirect:/studios";
-        }
-        List<Employee> employeeList = employeeDAO.getEmployeesByStudio(studioID);
-        if (employeeList.size() > 0) {
-            return "redirect:/studios";
-        }
-        studioDAO.removeStudio(studioID);
+    @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
+    public String deleteStudio(@PathVariable("id") Long studioID) {
+        studioService.deleteStudio(studioID);
         return "redirect:/studios";
-    }*/
+    }
 }

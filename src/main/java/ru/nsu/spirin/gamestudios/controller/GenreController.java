@@ -72,4 +72,11 @@ public class GenreController {
         genreService.updateGenre(genreID, genre);
         return "redirect:/admin_panel/genres";
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
+    public String deleteGenre(@PathVariable("id") Long genreID) {
+        genreService.deleteGenre(genreID);
+        return "redirect:/admin_panel/genres";
+    }
 }

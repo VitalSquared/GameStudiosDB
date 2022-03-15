@@ -46,6 +46,11 @@
         <#assign departments_map = departments_map + { department.departmentID?string : department.name }>
     </#foreach>
 
+    <#assign categories_map = {}>
+    <#foreach category in all_categories>
+        <#assign categories_map = categories_map + { category.categoryID?string : category.name }>
+    </#foreach>
+
     <@f.filter urlFilterless
         {
             'studio': ['Search studio', 'selection'] + anyStudio + studios?sequence?map(x -> [x.name, x.studioID]),
@@ -79,8 +84,10 @@
             </th>
             <th scope="col">Studio</th>
             <th scope="col">Department</th>
+            <th scope="col">Category</th>
             <th scope="col">Email</th>
             <th scope="col">Active</th>
+            <th scope="col"></th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -98,11 +105,23 @@
                         None
                     </#if>
                 </td>
+                <td>
+                    <#if (employee.categoryID!-1) gt -1>
+                        ${categories_map[employee.categoryID?string]}
+                    <#else>
+                        None
+                    </#if>
+                </td>
                 <td>${accounts_map[employee.employeeID?string]}</td>
                 <td>${employee.active?c}</td>
                 <td>
                     <#if s.isAdmin>
                         <a class="nav-link btn btn-primary" href="/employees/${employee.employeeID}/edit">Edit</a>
+                    </#if>
+                </td>
+                <td>
+                    <#if s.isAdmin>
+                        <a class="nav-link btn btn-primary" href="/employees/${employee.employeeID}/delete">Delete</a>
                     </#if>
                 </td>
             </tr>

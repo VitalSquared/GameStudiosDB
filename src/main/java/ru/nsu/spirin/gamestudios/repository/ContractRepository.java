@@ -48,6 +48,13 @@ public class ContractRepository extends JdbcDaoSupport {
         this.getJdbcTemplate().update(ContractQueries.QUERY_UPDATE, contract.getDate(), contract.getPercent(), contractID);
     }
 
+    public void delete(Long contractID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(ContractQueries.QUERY_DELETE, contractID);
+    }
+
     public List<Contract> findAllByGameID(Long gameID) {
         if (null == this.getJdbcTemplate()) {
             return null;
@@ -67,5 +74,19 @@ public class ContractRepository extends JdbcDaoSupport {
             return;
         }
         this.getJdbcTemplate().update(ContractQueries.QUERY_DELETE_GAME_CONTRACT, gameID, contractID);
+    }
+
+    public void deleteAllGameContract(Long contractID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(ContractQueries.QUERY_DELETE_ALL_GAME_CONTRACT, contractID);
+    }
+
+    public void deleteAllGameContractByGameID(Long gameID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(ContractQueries.QUERY_DELETE_ALL_GAME_CONTRACT_BY_GAME_ID, gameID);
     }
 }

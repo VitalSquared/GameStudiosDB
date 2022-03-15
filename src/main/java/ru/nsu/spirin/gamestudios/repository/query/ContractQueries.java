@@ -27,6 +27,12 @@ public class ContractQueries {
                 WHERE contract_id = ?;
             """;
 
+    public static final String QUERY_DELETE =
+            """
+                DELETE FROM contract
+                WHERE contract_id = ?;
+            """;
+
     public static final String QUERY_FIND_ALL_BY_GAME_ID =
             """
                 SELECT c.contract_id, c.percent, c.date, c.test_id
@@ -44,5 +50,17 @@ public class ContractQueries {
             """
                 DELETE FROM contract__game
                 WHERE game_id = ? AND contract_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_GAME_CONTRACT =
+            """
+                DELETE FROM contract__game
+                WHERE contract_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_GAME_CONTRACT_BY_GAME_ID =
+            """
+                DELETE FROM contract__game
+                WHERE game_id = ?;
             """;
 }

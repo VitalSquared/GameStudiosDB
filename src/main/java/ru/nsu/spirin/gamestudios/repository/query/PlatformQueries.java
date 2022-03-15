@@ -27,4 +27,10 @@ public class PlatformQueries {
                 SET name = ?, percent = ?
                 WHERE platform_id = ?;
             """;
+
+    public static final String QUERY_DELETE =
+            """
+                DELETE FROM platform
+                WHERE platform_id = ?;
+            """;
 }

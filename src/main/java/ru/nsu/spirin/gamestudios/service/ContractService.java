@@ -4,16 +4,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.nsu.spirin.gamestudios.model.entity.Contract;
 import ru.nsu.spirin.gamestudios.repository.ContractRepository;
+import ru.nsu.spirin.gamestudios.repository.GameReleaseRepository;
 
 import java.util.List;
 
 @Service
 public class ContractService {
     private final ContractRepository contractRepository;
+    private final GameReleaseRepository gameReleaseRepository;
 
     @Autowired
-    public ContractService(ContractRepository contractRepository) {
+    public ContractService(ContractRepository contractRepository,
+                           GameReleaseRepository gameReleaseRepository) {
         this.contractRepository = contractRepository;
+        this.gameReleaseRepository = gameReleaseRepository;
     }
 
     public List<Contract> getAllContracts() {
@@ -50,5 +54,11 @@ public class ContractService {
 
     public void removeGameFromContract(Long contractID, Long gameID) {
         this.contractRepository.deleteGameContract(contractID, gameID);
+    }
+
+    public void deleteContract(Long contractID) {
+        this.gameReleaseRepository.deleteAllByContractID(contractID);
+        this.contractRepository.deleteAllGameContract(contractID);
+        this.contractRepository.delete(contractID);
     }
 }

@@ -2,19 +2,28 @@ package ru.nsu.spirin.gamestudios.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.nsu.spirin.gamestudios.model.entity.Department;
 import ru.nsu.spirin.gamestudios.model.entity.Studio;
+import ru.nsu.spirin.gamestudios.repository.DepartmentRepository;
+import ru.nsu.spirin.gamestudios.repository.EmployeeRepository;
+import ru.nsu.spirin.gamestudios.repository.GameRepository;
 import ru.nsu.spirin.gamestudios.repository.StudioRepository;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Service
 public class StudioService {
     private final StudioRepository studioRepository;
+    private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
+    private final GameRepository gameRepository;
 
     @Autowired
-    public StudioService(StudioRepository studioRepository) {
+    public StudioService(StudioRepository studioRepository, EmployeeRepository employeeRepository, DepartmentRepository departmentRepository, GameRepository gameRepository) {
         this.studioRepository = studioRepository;
+        this.employeeRepository = employeeRepository;
+        this.departmentRepository = departmentRepository;
+        this.gameRepository = gameRepository;
     }
 
     public Studio getStudioByID(Long studioID) {
@@ -43,7 +52,22 @@ public class StudioService {
         this.studioRepository.update(id, studio);
     }
 
-    public void removeStudio(Long studioID) throws SQLException {
+    public boolean isStudioReferenced(Long studioID) {
+        int size1 = this.employeeRepository.findAllDirectorsByStudioID(studioID).size();
+        int size2 = this.gameRepository.findAllByStudioID(studioID).size();
+        if (size1 > 0 || size2 > 0) {
+            return true;
+        }
+        List<Department> departmentList = this.departmentRepository.findAllByStudioID(studioID);
+        return (departmentList.size() > 1) || (departmentList.size() != 0 && !departmentList.get(0).getIsRoot());
+    }
+
+    public void deleteStudio(Long studioID) {
+        if (isStudioReferenced(studioID)) {
+            return;
+        }
+        Department rootDepartment = this.departmentRepository.findRootDepartmentByStudioID(studioID);
+        this.departmentRepository.delete(rootDepartment.getDepartmentID());
         this.studioRepository.delete(studioID);
     }
 }

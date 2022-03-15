@@ -5,14 +5,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+import ru.nsu.spirin.gamestudios.model.ReplaceCategoryStore;
 import ru.nsu.spirin.gamestudios.model.entity.Category;
 import ru.nsu.spirin.gamestudios.service.CategoryService;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin_panel/categories")
@@ -70,6 +71,29 @@ public class CategoryController {
         }
 
         categoryService.updateCategory(categoryID, category);
+        return "redirect:/admin_panel/categories";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
+    public String deleteCategoryGet(@ModelAttribute("new_category") ReplaceCategoryStore newCategory,
+                                    @PathVariable("id") Long categoryID,
+                                    Model model) {
+        model.addAttribute("categoryID", categoryID);
+        model.addAttribute("category", this.categoryService.getCategoryByID(categoryID));
+        List<Category> categoryList = this.categoryService.getAllCategories()
+                .stream()
+                .filter(x -> !Objects.equals(x.getCategoryID(), categoryID))
+                .collect(Collectors.toList());
+        model.addAttribute("remaining_categories", categoryList);
+        return "/admin/delete_category";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(path = "/{id}/delete", method = RequestMethod.POST)
+    public String deleteCategoryPost(@ModelAttribute("new_category") ReplaceCategoryStore newCategory,
+                                       @PathVariable("id") Long categoryID) {
+        categoryService.deleteCategory(categoryID, newCategory.getNewCategoryID());
         return "redirect:/admin_panel/categories";
     }
 }

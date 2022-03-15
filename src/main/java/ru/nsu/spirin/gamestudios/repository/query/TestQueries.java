@@ -59,6 +59,12 @@ public class TestQueries {
                 WHERE test_id = ?;
             """;
 
+    public static final String QUERY_DELETE_ALL_TEST_GENRE_BY_GENRE_ID =
+            """
+                DELETE from test__genre
+                WHERE genre_id = ?;
+            """;
+
     public static final String QUERY_DELETE =
             """
                 DELETE FROM test

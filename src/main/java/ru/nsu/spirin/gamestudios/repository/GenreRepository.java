@@ -47,6 +47,13 @@ public class GenreRepository extends JdbcDaoSupport {
         this.getJdbcTemplate().update(GenreQueries.QUERY_UPDATE, genre.getName(), genreID);
     }
 
+    public void delete(Long genreID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GenreQueries.QUERY_DELETE, genreID);
+    }
+
     public List<Genre> getGenresByGameID(Long gameID) {
         String sql = """
                         SELECT genre_id, name

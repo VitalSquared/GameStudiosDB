@@ -17,6 +17,7 @@
             <th scope="col">Genre ID</th>
             <th scope="col">Name</th>
             <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -27,6 +28,11 @@
                 <td>
                     <#if s.isAdmin>
                         <a class="nav-link btn btn-primary" href="/admin_panel/genres/${genre.genreID}/edit">Edit</a>
+                    </#if>
+                </td>
+                <td>
+                    <#if s.isAdmin>
+                        <a class="nav-link btn btn-primary" href="/admin_panel/genres/${genre.genreID}/delete">Delete</a>
                     </#if>
                 </td>
             </tr>

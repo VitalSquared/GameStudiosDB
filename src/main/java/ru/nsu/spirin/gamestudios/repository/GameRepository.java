@@ -10,6 +10,7 @@ import ru.nsu.spirin.gamestudios.repository.query.GameQueries;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Transactional
@@ -32,6 +33,13 @@ public class GameRepository extends JdbcDaoSupport {
             return null;
         }
         return this.getJdbcTemplate().query(GameQueries.QUERY_FIND_ALL_BY_CONTRACT_ID, new GameMapper(), contractID);
+    }
+
+    public List<Game> findAllByStudioID(Long studioID) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
+        return this.getJdbcTemplate().query(GameQueries.QUERY_FIND_ALL_BY_STUDIO_ID, new GameMapper(), studioID);
     }
 
     public Game findByID(Long gameID) {
@@ -66,6 +74,13 @@ public class GameRepository extends JdbcDaoSupport {
         );
     }
 
+    public void delete(Long gameID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GameQueries.QUERY_DELETE, gameID);
+    }
+
     public void saveGameGenre(Long gameID, Long genreID) {
         if (null == this.getJdbcTemplate()) {
             return;
@@ -80,6 +95,20 @@ public class GameRepository extends JdbcDaoSupport {
         this.getJdbcTemplate().update(GameQueries.QUERY_DELETE_GAME_GENRE, gameID, genreID);
     }
 
+    public void deleteAllGameGenre(Long gameID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GameQueries.QUERY_DELETE_ALL_GAME_GENRE, gameID);
+    }
+
+    public void deleteAllGameGenreByGenreID(Long genreID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GameQueries.QUERY_DELETE_ALL_GAME_GENRE_BY_GENRE_ID, genreID);
+    }
+
     public void saveGameEmployee(Long gameID, Long employeeID) {
         if (null == this.getJdbcTemplate()) {
             return;
@@ -92,5 +121,19 @@ public class GameRepository extends JdbcDaoSupport {
             return;
         }
         this.getJdbcTemplate().update(GameQueries.QUERY_DELETE_GAME_EMPLOYEE, gameID, employeeID);
+    }
+
+    public void deleteAllGameEmployeeByEmployeeID(Long employeeID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GameQueries.QUERY_DELETE_ALL_GAME_EMPLOYEE_BY_EMPLOYEE_ID, employeeID);
+    }
+
+    public void deleteAllGameEmployeeByGameID(Long gameID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(GameQueries.QUERY_DELETE_ALL_GAME_EMPLOYEE_BY_GAME_ID, gameID);
     }
 }

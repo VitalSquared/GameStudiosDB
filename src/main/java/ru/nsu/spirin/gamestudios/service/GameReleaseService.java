@@ -31,4 +31,8 @@ public class GameReleaseService {
     public void updateRelease(Long gameID, Long platformID, GameRelease release) {
         this.gameReleaseRepository.update(gameID, platformID, release);
     }
+
+    public void deleteRelease(Long gameID, Long platformID) {
+        this.gameReleaseRepository.delete(gameID, platformID);
+    }
 }

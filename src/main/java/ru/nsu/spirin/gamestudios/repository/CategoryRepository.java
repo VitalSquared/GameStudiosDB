@@ -47,4 +47,11 @@ public class CategoryRepository extends JdbcDaoSupport {
         }
         this.getJdbcTemplate().update(CategoryQueries.QUERY_UPDATE, category.getName(), categoryID);
     }
+
+    public void delete(Long categoryID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(CategoryQueries.QUERY_DELETE, categoryID);
+    }
 }

@@ -31,6 +31,13 @@ public class MessageQueries {
                 OFFSET ?;
             """;
 
+    public static final String QUERY_FIND_ALL_SENT_BY_EMAIL_SIMPLE =
+            """
+                SELECT message_id
+                FROM message
+                WHERE sender = ?;
+            """;
+
     public static final String QUERY_COUNT_TOTAL_RECEIVED_BY_EMAIL =
             """
                 WITH received1 AS (
@@ -150,9 +157,27 @@ public class MessageQueries {
                 WHERE message_id = ? AND receiver = ?;
             """;
 
+    public static final String QUERY_DELETE_ALL_RECEIVED_BY_ID =
+            """
+                DELETE FROM received_message
+                WHERE message_id = ?;
+            """;
+
     public static final String QUERY_DELETE_SENT_MESSAGE =
             """
                 DELETE FROM message
                 WHERE message_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_SENT_BY_ACCOUNT =
+            """
+                DELETE FROM message
+                WHERE sender = ?;
+            """;
+
+    public static final String QUERY_DELETE_ALL_RECEIVED_BY_ACCOUNT =
+            """
+                DELETE FROM received_message
+                WHERE receiver = ?
             """;
 }

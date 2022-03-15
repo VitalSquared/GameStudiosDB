@@ -89,11 +89,18 @@ public class TestRepository extends JdbcDaoSupport {
         this.getJdbcTemplate().update(TestQueries.QUERY_DELETE_TEST_GENRE, testID, genreID);
     }
 
-    public void deleteAllTestGenre(Long id) {
+    public void deleteAllTestGenre(Long testID) {
         if (null == this.getJdbcTemplate()) {
             return;
         }
-        this.getJdbcTemplate().update(TestQueries.QUERY_DELETE_ALL_TEST_GENRE, id);
+        this.getJdbcTemplate().update(TestQueries.QUERY_DELETE_ALL_TEST_GENRE, testID);
+    }
+
+    public void deleteAllTestGenreByGenreID(Long genreID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(TestQueries.QUERY_DELETE_ALL_TEST_GENRE_BY_GENRE_ID, genreID);
     }
 
     public void delete(Long id) {

@@ -87,6 +87,26 @@ public class EmployeeQueries {
                 SET studio_id = ?;
             """;
 
+    public static final String QUERY_UPDATE_DEVELOPER_CATEGORY =
+            """
+                UPDATE developer
+                SET category_id = ?
+                WHERE category_id = ?;
+            """;
+
+    public static final String QUERY_UPDATE_DEVELOPER_DEPARTMENT =
+            """
+                UPDATE developer
+                SET department_id = ?
+                WHERE department_id = ?;
+            """;
+
+    public static final String QUERY_DELETE_EMPLOYEE =
+            """
+                DELETE FROM employee
+                WHERE employee_id = ?;
+            """;
+
     public static final String QUERY_DELETE_DEVELOPER =
             """
                 DELETE FROM developer
@@ -115,6 +135,13 @@ public class EmployeeQueries {
                     (dir.studio_id is not null AND %s) OR (dir.studio_id is null AND %s)
                 ) AND (%s)
                 %s;
+            """;
+
+    public static final String QUERY_FIND_ALL_DIRECTORS_BY_STUDIO_ID =
+            """
+                SELECT employee_id
+                FROM director
+                WHERE studio_id = ?;
             """;
 
     public static final String QUERY_FIND_ALL_BY_STUDIO_ID =

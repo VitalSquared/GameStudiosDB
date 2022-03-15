@@ -3,6 +3,7 @@ package ru.nsu.spirin.gamestudios.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.nsu.spirin.gamestudios.model.entity.Platform;
+import ru.nsu.spirin.gamestudios.repository.GameReleaseRepository;
 import ru.nsu.spirin.gamestudios.repository.PlatformRepository;
 
 import java.util.List;
@@ -10,10 +11,12 @@ import java.util.List;
 @Service
 public class PlatformService {
     private final PlatformRepository platformRepository;
+    private final GameReleaseRepository gameReleaseRepository;
 
     @Autowired
-    public PlatformService(PlatformRepository platformRepository) {
+    public PlatformService(PlatformRepository platformRepository, GameReleaseRepository gameReleaseRepository) {
         this.platformRepository = platformRepository;
+        this.gameReleaseRepository = gameReleaseRepository;
     }
 
     public List<Platform> getAllPlatforms() {
@@ -36,5 +39,10 @@ public class PlatformService {
             return;
         }
         this.platformRepository.update(platformID, platform);
+    }
+
+    public void deletePlatform(Long platformID) {
+        this.gameReleaseRepository.deleteAllByPlatformID(platformID);
+        this.platformRepository.delete(platformID);
     }
 }

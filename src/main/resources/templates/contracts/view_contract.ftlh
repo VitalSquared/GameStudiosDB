@@ -16,6 +16,7 @@
             <th scope="col">Percent</th>
             <th scope="col">Test ID</th>
             <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -25,8 +26,13 @@
             <td>${contract.percent}</td>
             <td>${contract.testID}</td>
             <td>
-                <#if s.isAdmin>
+                <#if s.isAdmin || s.isGeneralDirector>
                     <a class="nav-link btn btn-primary" href="/contracts/${contract.contractID}/edit">Edit</a>
+                </#if>
+            </td>
+            <td>
+                <#if s.isAdmin>
+                    <a class="nav-link btn btn-primary" href="/contracts/${contract.contractID}/delete">Delete</a>
                 </#if>
             </td>
         </tr>

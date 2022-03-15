@@ -45,6 +45,7 @@
             <th scope="col">Studio</th>
             <th scope="col">Head</th>
             <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -63,6 +64,11 @@
                 <td>
                     <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
                         <a class="nav-link btn btn-primary" href="/departments/${department.departmentID}/edit">Edit</a>
+                    </#if>
+                </td>
+                <td>
+                    <#if s.isAdmin && !department.isRoot>
+                        <a class="nav-link btn btn-primary" href="/departments/${department.departmentID}/delete">Delete</a>
                     </#if>
                 </td>
             </tr>

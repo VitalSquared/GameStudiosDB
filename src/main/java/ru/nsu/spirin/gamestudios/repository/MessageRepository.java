@@ -50,6 +50,17 @@ public class MessageRepository extends JdbcDaoSupport {
         return new PageImpl<>(messages, pageable, total);
     }
 
+    public List<Long> findAllSentMessagesByEmailSimple(String email) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
+        return this.getJdbcTemplate().query(
+                MessageQueries.QUERY_FIND_ALL_SENT_BY_EMAIL_SIMPLE,
+                (rs, rowNum) -> rs.getLong(1),
+                email
+        );
+    }
+
     public Page<Message> findAllReceivedMessagesByUsername(String email, Filtration filtration, Pageable pageable) {
         if (null == this.getJdbcTemplate()) {
             return null;
@@ -149,10 +160,31 @@ public class MessageRepository extends JdbcDaoSupport {
         this.getJdbcTemplate().update(MessageQueries.QUERY_DELETE_RECEIVED_MESSAGE, messageID, receiver);
     }
 
+    public void deleteAllReceivedMessagesByMessageID(Long messageID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(MessageQueries.QUERY_DELETE_ALL_RECEIVED_BY_ID, messageID);
+    }
+
     public void deleteSentMessage(Long messageID) {
         if (null == this.getJdbcTemplate()) {
             return;
         }
         this.getJdbcTemplate().update(MessageQueries.QUERY_DELETE_SENT_MESSAGE, messageID);
+    }
+
+    public void deleteAllSentMessagesByAccount(String accountID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(MessageQueries.QUERY_DELETE_ALL_SENT_BY_ACCOUNT, accountID);
+    }
+
+    public void deleteAllReceivedMessagesByAccount(String accountID) {
+        if (null == this.getJdbcTemplate()) {
+            return;
+        }
+        this.getJdbcTemplate().update(MessageQueries.QUERY_DELETE_ALL_RECEIVED_BY_ACCOUNT, accountID);
     }
 }

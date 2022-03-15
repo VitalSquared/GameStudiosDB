@@ -111,6 +111,12 @@ public class GameController {
         return "redirect:/games/{id}";
     }
 
+    @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
+    public String deleteGame(@PathVariable("id") Long gameID) {
+        gameService.deleteGame(gameID);
+        return "redirect:/games";
+    }
+
     @RequestMapping(path = "/{id}/add_genre", method = RequestMethod.GET)
     public String addGenreGet(@ModelAttribute("genre") Genre genre, Model model,
                               @PathVariable(name = "id") Long gameID) {
@@ -202,6 +208,12 @@ public class GameController {
         }
 
         gameReleaseService.updateRelease(gameID, platformID, release);
+        return "redirect:/games/{id}";
+    }
+
+    @RequestMapping(path = "/{id}/delete_release/{id1}", method = RequestMethod.GET)
+    public String removeRelease(@PathVariable("id") Long gameID, @PathVariable("id1") Long platformID) {
+        gameReleaseService.deleteRelease(gameID, platformID);
         return "redirect:/games/{id}";
     }
 }
