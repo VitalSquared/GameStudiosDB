@@ -7,7 +7,7 @@
     <br/>
 
     <#if s.isAdmin>
-        <a class="nav-link btn btn-primary" href="/studios/new">Create new studio</a>
+        <a class="btn btn-primary" href="/studios/new">Create new studio</a>
     </#if>
 
     <div class="accordion" id="studiosAccordion">
@@ -31,7 +31,7 @@
                     <div>
                         Address: ${studio.getAddress()}
                         <#if s.isAdmin>
-                            <a class="nav-link btn btn-primary" href="/studios/${studio.getStudioID()}/edit">Edit</a>
+                            <a class="btn btn-primary" href="/studios/${studio.getStudioID()}/edit">Edit</a>
                         </#if>
                     </div>
                 </div>

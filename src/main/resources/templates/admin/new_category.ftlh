@@ -7,8 +7,8 @@
     <br/>
 
     <form method="POST" action="/admin_panel/categories/new" enctype="multipart/form-data">
-        <div class="form-group row offset-1">
-            <label for="topic">Name: </label>
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="topic" style="width: 100px;">Name: </label>
             <div class="col-sm-5">
                 <@spring.formInput "category.name", "class=\"form-control\""/>
                 <@spring.showErrors "<br>" "color:red;"/>

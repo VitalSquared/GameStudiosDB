@@ -3,10 +3,7 @@
 <#import "../parts/security.ftlh" as s>
 
 <@c.page "Testings">
-    <#if s.isAdmin || s.isGeneralDirector>
-        <a class="nav-link btn btn-primary" href="/tests/new">Create new test</a>
-    </#if>
-
+    <br/>
     <#assign statuses_map = {}>
     <#foreach status in all_statuses>
         <#assign statuses_map = statuses_map + { status.statusID?string : status.name }>
@@ -22,7 +19,11 @@
             <th scope="col">Min Studios Num</th>
             <th scope="col">Applications Deadline</th>
             <th scope="col">Status</th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin || s.isGeneralDirector>
+                    <a class="nav-link btn btn-primary" href="/tests/new">Create new test</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>

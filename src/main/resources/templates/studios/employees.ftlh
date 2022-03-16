@@ -66,10 +66,6 @@
     />
     <br/>
 
-    <#if s.isAdmin>
-        <a class="nav-link btn btn-primary" href="/employees/new">Create new employee</a>
-    </#if>
-
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -88,7 +84,11 @@
             <th scope="col">Email</th>
             <th scope="col">Active</th>
             <th scope="col"></th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
+                    <a class="nav-link btn btn-primary" href="/employees/new">Create new employee</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -115,7 +115,7 @@
                 <td>${accounts_map[employee.employeeID?string]}</td>
                 <td>${employee.active?c}</td>
                 <td>
-                    <#if s.isAdmin>
+                    <#if s.isAdmin || s.isGeneralDirector || (s.isStudioDirector && employee.categoryID!-1 gt -1)>
                         <a class="nav-link btn btn-primary" href="/employees/${employee.employeeID}/edit">Edit</a>
                     </#if>
                 </td>

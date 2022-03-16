@@ -3,9 +3,7 @@
 <#import "../parts/security.ftlh" as s>
 
 <@c.page "Contracts">
-    <#if s.isAdmin || s.isGeneralDirector>
-        <a class="nav-link btn btn-primary" href="/contracts/new">Create new contract</a>
-    </#if>
+
 
     <table class="table">
         <thead class="thead-dark">
@@ -14,7 +12,11 @@
             <th scope="col">Date</th>
             <th scope="col">Percent</th>
             <th scope="col">Test ID</th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin || s.isGeneralDirector>
+                    <a class="nav-link btn btn-primary" href="/contracts/new">Create new contract</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>

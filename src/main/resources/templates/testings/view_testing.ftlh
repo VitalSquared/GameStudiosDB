@@ -68,15 +68,16 @@
     </#if>
     <br/>
     <#if test.statusID != 4>
-        Genres:
-        <#if (s.isAdmin || s.isGeneralDirector) && test.statusID != 3>
-            <a class="nav-link btn btn-primary" href="/tests/${test.testID}/add_genre">Add genre</a>
-        </#if>
+        <h1>Genres:</h1>
         <table class="table">
             <thead class="thead-dark">
             <tr>
                 <th scope="col">Name</th>
-                <th scope="col"></th>
+                <th scope="col">
+                    <#if (s.isAdmin || s.isGeneralDirector) && test.statusID != 3>
+                        <a class="nav-link btn btn-primary" href="/tests/${test.testID}/add_genre">Add genre</a>
+                    </#if>
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -93,7 +94,8 @@
             </tbody>
         </table>
         <br/>
-        List of applications:
+
+        <h1>List of applications:</h1>
         <table class="table">
             <thead class="thead-dark">
             <tr>

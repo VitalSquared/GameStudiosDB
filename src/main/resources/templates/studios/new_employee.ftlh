@@ -6,32 +6,53 @@
     <@header.header/>
     <br/>
     <form method="POST" action="/employees/new" enctype="multipart/form-data">
-        <label for="first_name">First Name: </label>
-        <@spring.formInput "employee.firstName"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
-        <label for="last_name">Last Name: </label>
-        <@spring.formInput "employee.lastName"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
-        <label for="birth_date">Birth Date: </label>
-        <label for="birthday">
-            <@spring.bind "employee.birthDate"/>
-            <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${(employee.birthDate!.now)?string('YYYY-MM-dd')}" placeholder="" />
-            <@spring.showErrors "<br>" "color:red;"/>
-        </label>
-        <br/>
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="first_name" style="width: 100px;">First Name: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "employee.firstName", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="last_name" style="width: 100px;">Last Name: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "employee.lastName", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="birth_date" style="width: 100px;">Birth Date: </label>
+            <div class="col-sm-5">
+                <label for="birthday">
+                    <@spring.bind "employee.birthDate"/>
+                    <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${(employee.birthDate!.now)?string('YYYY-MM-dd')}" placeholder="" />
+                    <@spring.showErrors "<br>" "color:red;"/>
+                </label>
+            </div>
+        </div>
+
         <#assign studios_map = {}>
         <#foreach studio in studios>
             <#assign studios_map = studios_map + { studio.studioID : studio.name }>
         </#foreach>
-        <label for="studio">Studio: </label>
-        <@spring.formSingleSelect "employee.studioID", studios_map "class=\"studioSelect\""/>
-        <br/>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="studio" style="width: 100px;">Studio: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "employee.studioID", studios_map "class=\"studioSelect form-control\""/>
+            </div>
+        </div>
+
         <#assign employee_type_map = { "developer" : "Developer" , "director" : "Director" }>
-        <label for="employeeType">Employee Type: </label>
-        <@spring.formSingleSelect "employee.employeeType", employee_type_map, "class=\"employeeTypeSelect\""/>
-        <br/>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="employeeType" style="width: 100px;">Employee Type: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "employee.employeeType", employee_type_map, "class=\"employeeTypeSelect form-control\""/>
+            </div>
+        </div>
 
         <#assign departments_map = {}>
         <#foreach department in departments>
@@ -43,26 +64,39 @@
         <#foreach category in categories>
             <#assign categories_map = categories_map + { category.categoryID : category.name }>
         </#foreach>
-        <div class="employeeTypeDisable">
-             <label for="department" class="departmentDisable">Department: </label>
-            <@formSingleSelect "employee.departmentID", departments_map,  "class=\"departmentSelectDisable\""/>
-            <br/>
-        </div>
-        <div class="employeeTypeDisable">
-            <label for="category">Category: </label>
-            <@spring.formSingleSelect "employee.categoryID", categories_map/>
-            <br/>
+
+        <div class="form-group row offset-1 employeeTypeDisable" style="align-items: center;">
+            <label for="department" class="departmentDisable" style="width: 100px;">Department: </label>
+            <div class="col-sm-5">
+                <@formSingleSelect "employee.departmentID", departments_map,  "class=\"departmentSelectDisable form-control\""/>
+            </div>
         </div>
 
-        <label for="first_name">Email: </label>
-        <@spring.formInput "account.email"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
+        <div class="form-group row offset-1 employeeTypeDisable" style="align-items: center;">
+            <label for="category" style="width: 100px;">Category: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "employee.categoryID", categories_map, "class=\"form-control\""/>
+            </div>
+        </div>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="first_name" style="width: 100px;">Email: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "account.email", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
         <#assign actives_map = {"true" : "Active", "false" : "Inactive"}>
-        <label for="active">Active: </label>
-        <@spring.formSingleSelect "employee.active", actives_map/>
-        <br/>
-        <input type="submit" value="Create"/>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="active" style="width: 100px;">Active: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "employee.active", actives_map, "class=\"form-control\""/>
+            </div>
+        </div>
+
+        <input type="submit" class="btn btn-primary offset-1" value="Create"/>
     </form>
 </@c.page>
 

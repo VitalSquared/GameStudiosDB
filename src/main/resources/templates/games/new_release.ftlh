@@ -8,31 +8,53 @@
         <#foreach contract in contracts>
             <#assign contracts_map = contracts_map + { contract.contractID : '#' + contract.contractID}>
         </#foreach>
-        <label for="contractID">Contract: </label>
-        <@spring.formSingleSelect "release.contractID", contracts_map/>
-        <br/>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="contractID" style="width: 100px;">Contract: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "release.contractID", contracts_map, "class=\"form-control\""/>
+            </div>
+        </div>
+
         <#assign platforms_map = {}>
         <#foreach platform in platforms>
             <#assign platforms_map = platforms_map + { platform.platformID : platform.name}>
         </#foreach>
-        <label for="platformID">Platform: </label>
-        <@spring.formSingleSelect "release.platformID", platforms_map/>
-        <br/>
-        <label for="date">Release Date: </label>
-        <label for="date">
-            <@spring.bind "release.releaseDate"/>
-            <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${(release.releaseDate!.now)?string('YYYY-MM-dd')}" placeholder="" />
-            <@spring.showErrors "<br>" "color:red;"/>
-        </label>
-        <br/>
-        <label for="cost">Cost: </label>
-        <@spring.formInput "release.cost"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
-        <label for="soldCount">Sold Count: </label>
-        <@spring.formInput "release.soldCount"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
-        <input type="submit" value="Create"/>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="platformID" style="width: 100px;">Platform: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "release.platformID", platforms_map, "class=\"form-control\""/>
+            </div>
+        </div>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="date" style="width: 100px;">Release Date: </label>
+            <div class="col-sm-5">
+                <label for="date">
+                    <@spring.bind "release.releaseDate"/>
+                    <input type="text" class="form-control" id="birthday" name="${spring.status.expression}" value="${(release.releaseDate!.now)?string('YYYY-MM-dd')}" placeholder="" />
+                    <@spring.showErrors "<br>" "color:red;"/>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="cost" style="width: 100px;">Cost: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "release.cost", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="soldCount" style="width: 100px;">Sold Count: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "release.soldCount", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
+        <input type="submit" class="btn btn-primary offset-1" value="Create"/>
     </form>
 </@c.page>

@@ -3,10 +3,7 @@
 <#import "../parts/security.ftlh" as s>
 
 <@c.page "Games">
-    <#if s.isAdmin || s.isGeneralDirector>
-        <a class="nav-link btn btn-primary" href="/games/new">Create new game</a>
-    </#if>
-
+    <br/>
     <#assign studios_map = {}>
     <#foreach studio in all_studios>
         <#assign studios_map = studios_map + { studio.studioID?string : studio.name }>
@@ -21,7 +18,11 @@
             <th scope="col">Release Name</th>
             <th scope="col">Expenses</th>
             <th scope="col">Studio</th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
+                    <a class="nav-link btn btn-primary" href="/games/new">Create new game</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -34,9 +35,7 @@
                 <td>${game.expenses}</td>
                 <td>${studios_map[game.studioID?string]} (${game.studioID})</td>
                 <td>
-                    <#if s.isAdmin>
-                        <a class="nav-link btn btn-primary" href="/games/${game.gameID}">View</a>
-                    </#if>
+                    <a class="nav-link btn btn-primary" href="/games/${game.gameID}">View</a>
                 </td>
             </tr>
         </#foreach>

@@ -7,16 +7,23 @@
     <@header.header/>
     <br/>
     <form method="POST" action="/studios/${studioID}/edit" enctype="multipart/form-data">
-        <label for="topic">Name: </label>
-        <@spring.formInput "studio.name"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
-        <label for="content">Address: </label>
-        <@spring.formInput "studio.address"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="topic" style="width: 100px;">Name: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "studio.name", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
 
-        <input type="submit" value="Update"/>
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="content" style="width: 100px;">Address: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "studio.address", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
+        <input type="submit" class="btn btn-primary offset-1" value="Update"/>
     </form>
 
     <br/>

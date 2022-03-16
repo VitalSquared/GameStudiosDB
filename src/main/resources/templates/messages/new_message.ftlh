@@ -4,25 +4,38 @@
 
 <@c.page "New Message">
 <@header.header numberOfUnread/>
-
+<br/>
 <form method="POST" action="/messages" enctype="multipart/form-data">
-    <label for="receivers">Send to: </label>
-    <@spring.formInput "message.receiversString"/>
-    <br/>
-    <label for="topic">Topic: </label>
-    <@spring.formInput "message.topic"/>
-    <br/>
-    <label for="content"></label>
-    <@spring.formTextarea "message.content"/>
-    <br/>
+    <div class="form-group row offset-1">
+        <label for="receivers">Send to: </label>
+        <div class="col-sm-5">
+            <@spring.formInput "message.receiversString", "class=\"form-control\""/>
+        </div>
+    </div>
+
+    <div class="form-group row offset-1">
+        <label for="topic">Topic: </label>
+        <div class="col-sm-5">
+            <@spring.formInput "message.topic", "class=\"form-control\""/>
+        </div>
+    </div>
+
+    <div class="form-group row offset-1">
+        <label for="content"></label>
+        <div class="col-sm-10">
+            <@spring.formTextarea "message.content", "class=\"form-control\" style=\"height: 300px;\""/>
+        </div>
+    </div>
 
     <#foreach idx in [1, 2, 3, 4, 5]>
-        <div>
+        <div class="form-group row offset-1">
             <label>Add attachment ${idx}: </label>
-            <input type="file" name="file"/>
+            <div class="col-sm-5 custom-file">
+                <input type="file" name="file" class="form-control" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01"/>
+            </div>
         </div>
     </#foreach>
-    <br/>
-    <input type="submit" value="Send!"/>
+
+    <input type="submit" class="btn btn-primary offset-1" value="Send!"/>
 </form>
 </@c.page>

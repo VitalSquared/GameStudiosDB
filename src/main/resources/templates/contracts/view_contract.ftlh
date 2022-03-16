@@ -39,10 +39,7 @@
         </tbody>
     </table>
     <br/>
-    Games:
-    <#if s.isAdmin || s.isGeneralDirector>
-        <a class="nav-link btn btn-primary" href="/contracts/${contract.contractID}/add_game">Add Game</a>
-    </#if>
+    <h1>Games:</h1>
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -52,7 +49,11 @@
             <th scope="col">Release Name</th>
             <th scope="col">Expenses</th>
             <th scope="col">Studio</th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin || s.isGeneralDirector>
+                    <a class="nav-link btn btn-primary" href="/contracts/${contract.contractID}/add_game">Add Game</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>

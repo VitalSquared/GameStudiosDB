@@ -7,24 +7,38 @@
     <br/>
 
     <form method="POST" action="/departments/${departmentID}/edit" enctype="multipart/form-data">
-        <label for="topic">Studio: </label>
         <#assign hash1 = {}>
         <#foreach studio in studios>
             <#assign hash1 = hash1 + { studio.studioID : studio.name }>
         </#foreach>
-        <@spring.formSingleSelect "department.studioID", hash1, "disabled"/>
-        <br/>
-        <label for="topic">Name: </label>
-        <@spring.formInput "department.name"/>
-        <@spring.showErrors "<br>" "color:red;"/>
-        <br/>
-        <label for="content">Head: </label>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="topic" style="width: 100px;">Studio: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "department.studioID", hash1, "class=\"form-control\" disabled"/>
+            </div>
+        </div>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="topic" style="width: 100px;">Name: </label>
+            <div class="col-sm-5">
+                <@spring.formInput "department.name", "class=\"form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
+            </div>
+        </div>
+
         <#assign hash2 = { -1 : "None"}>
         <#foreach employee in employees>
             <#assign hash2 = hash2 + { employee.employeeID : employee.firstName + ' ' + employee.lastName }>
         </#foreach>
-        <@spring.formSingleSelect "department.headID", hash2/>
-        <br/>
-        <input type="submit" value="Modify"/>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="content" style="width: 100px;">Head: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "department.headID", hash2, "class=\"form-control\""/>
+            </div>
+        </div>
+
+        <input type="submit" class="btn btn-primary offset-1" value="Modify"/>
     </form>
 </@c.page>

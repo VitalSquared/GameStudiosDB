@@ -33,10 +33,6 @@
     />
     <br/>
 
-    <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
-        <a class="nav-link btn btn-primary" href="/departments/new">Create new department</a>
-    </#if>
-
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -45,7 +41,11 @@
             <th scope="col">Studio</th>
             <th scope="col">Head</th>
             <th scope="col"></th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
+                    <a class="nav-link btn btn-primary" href="/departments/new">Create new department</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>

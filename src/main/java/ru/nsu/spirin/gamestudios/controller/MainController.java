@@ -31,12 +31,4 @@ public class MainController {
         model.addAttribute("title", "Logout");
         return "redirect:/login";
     }
-
-    /*
-    @RequestMapping(path = "/403", method = RequestMethod.GET)
-    public String accessDenied(Model model) {
-        String message = "You do not have permission to access this page!";
-        model.addAttribute("message", message);
-        return "errorPage";
-    }*/
 }

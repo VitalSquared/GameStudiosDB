@@ -35,7 +35,7 @@
                 <td>${game.expenses}</td>
                 <td>${studios_map[game.studioID?string]} (${game.studioID})</td>
                 <td>
-                    <#if s.isAdmin>
+                    <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
                         <a class="nav-link btn btn-primary" href="/games/${game.gameID}/edit">Edit</a>
                     </#if>
                 </td>
@@ -48,15 +48,17 @@
         </tbody>
     </table>
     <br/>
-    Genres:
-    <#if s.isAdmin || s.isGeneralDirector>
-        <a class="nav-link btn btn-primary" href="/games/${game.gameID}/add_genre">Add genre</a>
-    </#if>
+
+    <h1>Genres:</h1>
     <table class="table">
         <thead class="thead-dark">
         <tr>
             <th scope="col">Name</th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
+                    <a class="nav-link btn btn-primary" href="/games/${game.gameID}/add_genre">Add genre</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -64,7 +66,7 @@
             <tr>
                 <td>${genre.name}</td>
                 <td>
-                    <#if s.isAdmin>
+                    <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
                         <a class="nav-link btn btn-primary" href="/games/${game.gameID}/remove_genre/${genre.genreID}">Remove from game</a>
                     </#if>
                 </td>
@@ -73,17 +75,19 @@
         </tbody>
     </table>
     <br/>
-    Employees:
-    <#if s.isAdmin || s.isGeneralDirector>
-        <a class="nav-link btn btn-primary" href="/games/${game.gameID}/add_employee">Add employee</a>
-    </#if>
+
+    <h1>Employees:</h1>
     <table class="table">
         <thead class="thead-dark">
         <tr>
             <th scope="col">ID</th>
             <th scope="col">First Name</th>
             <th scope="col">Last Name</th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
+                    <a class="nav-link btn btn-primary" href="/games/${game.gameID}/add_employee">Add employee</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -93,7 +97,7 @@
                 <td>${employee.firstName}</td>
                 <td>${employee.lastName}</td>
                 <td>
-                    <#if s.isAdmin>
+                    <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
                         <a class="nav-link btn btn-primary" href="/games/${game.gameID}/remove_employee/${employee.employeeID}">Remove from game</a>
                     </#if>
                 </td>
@@ -102,7 +106,8 @@
         </tbody>
     </table>
     <br/>
-    Contracts:
+
+    <h1>Contracts:</h1>
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -124,10 +129,8 @@
         </tbody>
     </table>
     <br/>
-    Releases:
-    <#if s.isAdmin || s.isGeneralDirector>
-        <a class="nav-link btn btn-primary" href="/games/${game.gameID}/new_release">Create release</a>
-    </#if>
+
+    <h1>Releases:</h1>
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -137,7 +140,11 @@
             <th scope="col">Percent</th>
             <th scope="col">Sold Count</th>
             <th scope="col"></th>
-            <th scope="col"></th>
+            <th scope="col">
+                <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
+                    <a class="nav-link btn btn-primary" href="/games/${game.gameID}/new_release">Create release</a>
+                </#if>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -149,12 +156,12 @@
                 <td>${release.cost}</td>
                 <td>${release.soldCount}</td>
                 <td>
-                    <#if s.isAdmin>
+                    <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
                         <a class="nav-link btn btn-primary" href="/games/${game.gameID}/edit_release/${release.platformID}">Edit</a>
                     </#if>
                 </td>
                 <td>
-                    <#if s.isAdmin>
+                    <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
                         <a class="nav-link btn btn-primary" href="/games/${game.gameID}/delete_release/${release.platformID}">Delete</a>
                     </#if>
                 </td>

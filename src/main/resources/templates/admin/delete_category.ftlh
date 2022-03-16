@@ -12,8 +12,8 @@
     </#foreach>
 
     <form method="POST" action="/admin_panel/categories/${categoryID}/delete" enctype="multipart/form-data">
-        <div class="form-group row offset-1">
-            <label for="topic">Replace With: </label>
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="topic" style="width: 100px;">Replace With: </label>
             <div class="col-sm-5">
                 <@spring.formSingleSelect "new_category.newCategoryID", categories_map, "class=\"form-control\""/>
             </div>

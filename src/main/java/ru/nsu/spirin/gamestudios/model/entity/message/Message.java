@@ -43,7 +43,10 @@ public class Message {
     public void convertReceivers() {
         receivers = new ArrayList<>();
         for (var receiver : receiversString.split(",")) {
-            receivers.add(receiver.trim());
+            String entry = receiver.trim();
+            if (!entry.isEmpty()) {
+                receivers.add(receiver.trim());
+            }
         }
     }
 }

@@ -8,9 +8,14 @@
         <#foreach genre in genres>
             <#assign genres_map = genres_map + { genre.genreID : genre.name }>
         </#foreach>
-        <label for="genreID">Genre: </label>
-        <@spring.formSingleSelect "genre.genreID", genres_map/>
-        <br/>
-        <input type="submit" value="Add"/>
+
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="genreID" style="width: 100px;">Genre: </label>
+            <div class="col-sm-5">
+                <@spring.formSingleSelect "genre.genreID", genres_map, "class=\"form-control\""/>
+            </div>
+        </div>
+
+        <input type="submit" class="btn btn-primary offset-1" value="Add"/>
     </form>
 </@c.page>

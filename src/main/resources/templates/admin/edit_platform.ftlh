@@ -6,8 +6,8 @@
     <@header.header/>
     <br/>
     <form method="POST" action="/admin_panel/platforms/${platformID}/edit" enctype="multipart/form-data">
-        <div class="form-group row offset-1">
-            <label for="topic">Name: </label>
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="topic" style="width: 100px;">Name: </label>
             <div class="col-sm-5">
                 <@spring.formInput "platform.name", "class=\"form-control\""/>
                 <@spring.showErrors "<br>" "color:red;"/>
@@ -19,8 +19,8 @@
             <#assign values = values + { value : value + "%" }>
         </#foreach>
 
-        <div class="form-group row offset-1">
-            <label for="topic">Percent: </label>
+        <div class="form-group row offset-1" style="align-items: center;">
+            <label for="topic" style="width: 100px;">Percent: </label>
             <div class="col-sm-auto">
                 <@spring.formSingleSelect "platform.percent", values, "class=\"form-control\""/>
                 <@spring.showErrors "<br>" "color:red;"/>
