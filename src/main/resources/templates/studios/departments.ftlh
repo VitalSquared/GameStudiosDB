@@ -12,6 +12,18 @@
         <#assign anyStudio = []>
     </#if>
 
+    <#if sortField == idSortField>
+        <#assign idSortDir = nextSortDir />
+    <#else>
+        <#assign idSortDir = "ASC"/>
+    </#if>
+
+    <#if sortField == nameSortField>
+        <#assign nameSortDir = nextSortDir />
+    <#else>
+        <#assign nameSortDir = "ASC"/>
+    </#if>
+
     <#assign studios_map = {}>
     <#foreach studio in all_studios>
         <#assign studios_map = studios_map + { studio.studioID?string : studio.name }>
@@ -36,8 +48,12 @@
     <table class="table">
         <thead class="thead-dark">
         <tr>
-            <th scope="col">Department ID</th>
-            <th scope="col">Name</th>
+            <th scope="col">
+                <a href="${urlFilter}&sortField=${idSortField}&sortDir=${idSortDir}">ID</a>
+            </th>
+            <th scope="col">
+                <a href="${urlFilter}&sortField=${nameSortField}&sortDir=${nameSortDir}">Name</a>
+            </th>
             <th scope="col">Studio</th>
             <th scope="col">Head</th>
             <th scope="col"></th>

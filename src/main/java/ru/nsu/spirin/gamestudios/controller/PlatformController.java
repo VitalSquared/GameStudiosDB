@@ -28,7 +28,7 @@ public class PlatformController {
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexPlatforms(Model model) {
-        List<Platform> platforms = platformService.getAllPlatforms();
+        List<Platform> platforms = this.platformService.getAllPlatforms();
         model.addAttribute("platforms", platforms);
         model.addAttribute("url", "/admin_panel/platforms");
         return "admin/platforms";
@@ -46,7 +46,7 @@ public class PlatformController {
         if (bindingResult.hasErrors()) {
             return "admin/new_platform";
         }
-        platformService.createNewPlatform(platform);
+        this.platformService.createNewPlatform(platform);
         return "redirect:/admin_panel/platforms";
     }
 
@@ -54,7 +54,7 @@ public class PlatformController {
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editPlatform(Model model, @PathVariable("id") Long platformID) {
         model.addAttribute("platformID", platformID);
-        model.addAttribute("platform", platformService.getPlatformByID(platformID));
+        model.addAttribute("platform", this.platformService.getPlatformByID(platformID));
         return "/admin/edit_platform";
     }
 
@@ -70,14 +70,14 @@ public class PlatformController {
             return "admin/edit_platform";
         }
 
-        platformService.updatePlatform(platformID, platform);
+        this.platformService.updatePlatform(platformID, platform);
         return "redirect:/admin_panel/platforms";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
     public String deletePlatform(@PathVariable("id") Long platformID) {
-        platformService.deletePlatform(platformID);
+        this.platformService.deletePlatform(platformID);
         return "redirect:/admin_panel/platforms";
     }
 }

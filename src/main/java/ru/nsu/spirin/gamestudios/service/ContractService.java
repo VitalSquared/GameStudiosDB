@@ -3,25 +3,43 @@ package ru.nsu.spirin.gamestudios.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.nsu.spirin.gamestudios.model.entity.Contract;
+import ru.nsu.spirin.gamestudios.model.entity.TestApp;
 import ru.nsu.spirin.gamestudios.repository.ContractRepository;
 import ru.nsu.spirin.gamestudios.repository.GameReleaseRepository;
+import ru.nsu.spirin.gamestudios.repository.TestAppRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ContractService {
     private final ContractRepository contractRepository;
     private final GameReleaseRepository gameReleaseRepository;
+    private final TestAppRepository testAppRepository;
 
     @Autowired
     public ContractService(ContractRepository contractRepository,
-                           GameReleaseRepository gameReleaseRepository) {
+                           GameReleaseRepository gameReleaseRepository,
+                           TestAppRepository testAppRepository) {
         this.contractRepository = contractRepository;
         this.gameReleaseRepository = gameReleaseRepository;
+        this.testAppRepository = testAppRepository;
     }
 
     public List<Contract> getAllContracts() {
         return this.contractRepository.findAll();
+    }
+
+    public List<Contract> getAllContractsByStudioID(Long studioID) {
+        List<Contract> all = this.contractRepository.findAll();
+        List<Contract> studioContracts = new ArrayList<>();
+        for (var contract : all) {
+            TestApp app = this.testAppRepository.findByTestIDAndStudioID(contract.getTestID(), studioID);
+            if (app != null && app.getResultID() == 3L) {
+                studioContracts.add(contract);
+            }
+        }
+        return studioContracts;
     }
 
     public Contract getContractByID(Long contractID) {

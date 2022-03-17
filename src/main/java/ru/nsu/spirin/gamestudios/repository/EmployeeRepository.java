@@ -17,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 @Transactional
@@ -93,7 +92,7 @@ public class EmployeeRepository extends JdbcDaoSupport {
             return null;
         }
         return this.getJdbcTemplate().query(
-                String.format(EmployeeQueries.QUERY_FIND_ALL_BY_STUDIO_ID),
+                EmployeeQueries.QUERY_FIND_ALL_BY_STUDIO_ID,
                 new EmployeeMapper(),
                 studioID, studioID);
     }

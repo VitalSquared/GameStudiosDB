@@ -10,7 +10,8 @@ public class Filtration {
         String,
         DoubleDate,
         SingleDate,
-        Boolean
+        Boolean,
+        Integer
     }
 
     private final Map<String, FiltrationType> types;
@@ -34,18 +35,13 @@ public class Filtration {
                 sb.append(" AND ");
             }
             switch (types.get(key)) {
-                case String -> {
-                    sb.append(queryString(key, this.values.get(key)));
-                }
-                case DoubleDate -> {
-                    sb.append(queryDoubleDate(key, this.values.get(key)));
-                }
+                case String -> sb.append(queryString(key, this.values.get(key)));
+                case DoubleDate -> sb.append(queryDoubleDate(key, this.values.get(key)));
                 case SingleDate -> {
 
                 }
-                case Boolean -> {
-                    sb.append(queryBoolean(key, this.values.get(key)));
-                }
+                case Boolean -> sb.append(queryBoolean(key, this.values.get(key)));
+                case Integer -> sb.append(queryInteger(key, this.values.get(key)));
             }
             anyFiltersAlready = true;
         }
@@ -89,12 +85,21 @@ public class Filtration {
     }
 
     private String queryBoolean(String fieldName, String value) {
-        int readValue = 0;
+        int intValue = 0;
         try {
-            readValue = Integer.parseInt(value);
-            if (readValue < 0 || readValue > 2) readValue = 0;
+            intValue = Integer.parseInt(value);
+            if (intValue < 0 || intValue > 2) intValue = 0;
         }
         catch (Exception ignored) {}
-        return readValue == 0 ? " TRUE " : readValue == 1 ? " " + fieldName+ " = TRUE " : " " + fieldName + " = FALSE ";
+        return intValue == 0 ? " TRUE " : intValue == 1 ? " " + fieldName+ " = TRUE " : " " + fieldName + " = FALSE ";
+    }
+
+    private String queryInteger(String fieldName, String value) {
+        int intValue = -1;
+        try {
+            intValue = Integer.parseInt(value);
+        }
+        catch (Exception ignored) {}
+        return intValue == -1 ? " TRUE " : " " + fieldName + " = " + intValue;
     }
 }

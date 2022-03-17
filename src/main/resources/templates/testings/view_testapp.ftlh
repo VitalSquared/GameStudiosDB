@@ -23,6 +23,7 @@
             <th scope="col">Studio</th>
             <th scope="col">Test ID</th>
             <th scope="col">Result</th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -31,6 +32,11 @@
             <td>${studios_map[app.studioID?string]}</td>
             <td>${app.testID}</td>
             <td>${results_map[app.resultID?string]}</td>
+            <td>
+                <#if s.isAdmin>
+                    <a class="btn btn-primary" href="/tests/apps/${app.appID}/decline">Delete</a>
+                </#if>
+            </td>
         </tr>
         </tbody>
     </table>

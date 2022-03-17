@@ -55,13 +55,13 @@ public class MessageController {
                                     @RequestParam(name = "receiver", required = false, defaultValue = "") String receiver,
                                     @RequestParam(name = "date", required = false, defaultValue = "") String date) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        var messages = messageService.getSentMessagesByUsername(user.getUsername(), topic, receiver, date, pageable);
+        var messages = this.messageService.getSentMessagesByUsername(user.getUsername(), topic, receiver, date, pageable);
         model.addAttribute("page", messages);
         model.addAttribute("topic", topic);
         model.addAttribute("receiver", receiver);
         model.addAttribute("date", date);
         model.addAttribute("url", "/messages/sent");
-        model.addAttribute("numberOfUnread", messageService.getNumberOfUnreadMessages(user.getUsername()));
+        model.addAttribute("numberOfUnread", this.messageService.getNumberOfUnreadMessages(user.getUsername()));
 
         Filtration filtration = new Filtration();
         filtration.addFilter("topic", null, topic);
@@ -81,7 +81,7 @@ public class MessageController {
                                         @RequestParam(name = "sender", required = false, defaultValue = "") String sender,
                                         @RequestParam(name = "read", required = false, defaultValue = "") String read) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        var messages = messageService.getReceivedMessagesByUsername(user.getUsername(),
+        var messages = this.messageService.getReceivedMessagesByUsername(user.getUsername(),
                 topic, date, sender, read, pageable);
         model.addAttribute("page", messages);
         model.addAttribute("topic", topic);
@@ -89,7 +89,7 @@ public class MessageController {
         model.addAttribute("sender", sender);
         model.addAttribute("read", read);
         model.addAttribute("url", "/messages/received");
-        model.addAttribute("numberOfUnread", messageService.getNumberOfUnreadMessages(user.getUsername()));
+        model.addAttribute("numberOfUnread", this.messageService.getNumberOfUnreadMessages(user.getUsername()));
 
         Filtration filtration = new Filtration();
         filtration.addFilter("topic", null, topic);
@@ -104,9 +104,9 @@ public class MessageController {
     @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN') && @messageService.canViewMessage(#messageID, #principal)")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public String show(@PathVariable("id") Long messageID, Model model, Principal principal) {
-        model.addAttribute("message", messageService.getMessageByID(messageID));
+        model.addAttribute("message", this.messageService.getMessageByID(messageID));
         User user = (User) ((Authentication) principal).getPrincipal();
-        messageService.readMessage(messageID, user.getUsername());
+        this.messageService.readMessage(messageID, user.getUsername());
         return "messages/message";
     }
 
@@ -118,7 +118,7 @@ public class MessageController {
                                             @RequestParam(value = "id1") Long attID,
                                             Principal principal,
                                             HttpServletResponse response) throws IOException {
-        Message message = messageService.getMessageByID(messageID);
+        Message message = this.messageService.getMessageByID(messageID);
         Optional<Attachment> attachment = message.getAttachments()
                 .stream()
                 .filter(att -> att.getName().equals(fileName) && att.getID() == attID)
@@ -135,7 +135,7 @@ public class MessageController {
     @RequestMapping(path = "/new_message", method = RequestMethod.GET)
     public String newMessage(@ModelAttribute("message") Message message, Model model, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        model.addAttribute("numberOfUnread", messageService.getNumberOfUnreadMessages(user.getUsername()));
+        model.addAttribute("numberOfUnread", this.messageService.getNumberOfUnreadMessages(user.getUsername()));
         return "messages/new_message";
     }
 
@@ -171,7 +171,7 @@ public class MessageController {
             }
         }
 
-        messageService.newMessage(message);
+        this.messageService.newMessage(message);
         return "redirect:/messages/sent";
     }
 
@@ -179,14 +179,14 @@ public class MessageController {
     @RequestMapping(path = "/delete_recv/{id}", method = RequestMethod.GET)
     public String removeReceived(@PathVariable("id") Long messageID, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        messageService.deleteReceivedMessage(messageID, user.getUsername());
+        this.messageService.deleteReceivedMessage(messageID, user.getUsername());
         return "redirect:/messages/received";
     }
 
     @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN') && @messageService.canViewMessage(#messageID, #principal)")
     @RequestMapping(path = "/delete_sent/{id}", method = RequestMethod.GET)
     public String removeSent(@PathVariable("id") Long messageID) {
-        messageService.deleteSentMessage(messageID);
+        this.messageService.deleteSentMessage(messageID);
         return "redirect:/messages/sent";
     }
 }

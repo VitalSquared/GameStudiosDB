@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.nsu.spirin.gamestudios.model.entity.Department;
 import ru.nsu.spirin.gamestudios.model.entity.Studio;
-import ru.nsu.spirin.gamestudios.repository.DepartmentRepository;
-import ru.nsu.spirin.gamestudios.repository.EmployeeRepository;
-import ru.nsu.spirin.gamestudios.repository.GameRepository;
-import ru.nsu.spirin.gamestudios.repository.StudioRepository;
+import ru.nsu.spirin.gamestudios.repository.*;
 
 import java.util.List;
 
@@ -17,13 +14,15 @@ public class StudioService {
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final GameRepository gameRepository;
+    private final TestAppRepository testAppRepository;
 
     @Autowired
-    public StudioService(StudioRepository studioRepository, EmployeeRepository employeeRepository, DepartmentRepository departmentRepository, GameRepository gameRepository) {
+    public StudioService(StudioRepository studioRepository, EmployeeRepository employeeRepository, DepartmentRepository departmentRepository, GameRepository gameRepository, TestAppRepository testAppRepository) {
         this.studioRepository = studioRepository;
         this.employeeRepository = employeeRepository;
         this.departmentRepository = departmentRepository;
         this.gameRepository = gameRepository;
+        this.testAppRepository = testAppRepository;
     }
 
     public Studio getStudioByID(Long studioID) {
@@ -55,7 +54,8 @@ public class StudioService {
     public boolean isStudioReferenced(Long studioID) {
         int size1 = this.employeeRepository.findAllDirectorsByStudioID(studioID).size();
         int size2 = this.gameRepository.findAllByStudioID(studioID).size();
-        if (size1 > 0 || size2 > 0) {
+        int size3 = this.testAppRepository.findAllByStudioID(studioID).size();
+        if (size1 > 0 || size2 > 0 || size3 > 0) {
             return true;
         }
         List<Department> departmentList = this.departmentRepository.findAllByStudioID(studioID);

@@ -175,11 +175,12 @@ public class EmployeeQueries {
                      e.studio_id, e.active
                 FROM (employee NATURAL JOIN
                         (
-                            SELECT dev.category_id, dev.department_id, dev.studio_id
-                            FROM (developer NATURAL JOIN department) dev
+                            SELECT dev.category_id, dev.department_id, dep.studio_id
+                            FROM (developer dev CROSS JOIN department dep)
+                            WHERE dev.department_id = ? AND dev.department_id = dep.department_id
                         ) as dev1
                 ) e
-                WHERE e.employee_id != 0 AND e.department_id = ?;
+                WHERE e.employee_id != 0;
             """;
 
     public static final String QUERY_FIND_ALL_BY_TEST_APP_ID =

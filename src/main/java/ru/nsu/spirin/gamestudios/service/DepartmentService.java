@@ -6,7 +6,6 @@ import ru.nsu.spirin.gamestudios.model.entity.Department;
 import ru.nsu.spirin.gamestudios.repository.DepartmentRepository;
 import ru.nsu.spirin.gamestudios.repository.EmployeeRepository;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -24,8 +23,12 @@ public class DepartmentService {
         return this.departmentRepository.findByID(departmentID);
     }
 
-    public List<Department> getAllDepartmentsOfStudio(Long studioID) {
-        return this.departmentRepository.findAllByStudioID(studioID);
+    public List<Department> getAllDepartmentsOfStudio(Long studioID, String sortField, String sortDir) {
+        return this.departmentRepository.findAllByStudioIDSorted(studioID, sortField, sortDir);
+    }
+
+    public List<Department> getAllDepartmentsSorted(String sortField, String sortDir) {
+        return this.departmentRepository.findAllSorted(sortField, sortDir);
     }
 
     public List<Department> getAllDepartments() {

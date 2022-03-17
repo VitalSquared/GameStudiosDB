@@ -42,10 +42,18 @@ public class EmployeeService {
         return this.employeeRepository.findAll();
     }
 
-    public List<Employee> getEmployeesByStudioWithFiltration(Long studioID, String firstName, String lastName, String sortField, String sortDir) {
+    public List<Employee> getEmployeesByStudioWithFiltration(Long studioID,
+                                                             String firstName,
+                                                             String lastName,
+                                                             String category,
+                                                             String birthDate,
+                                                             String sortField,
+                                                             String sortDir) {
         Filtration filtration = new Filtration();
         filtration.addFilter("e.first_name", Filtration.FiltrationType.String, firstName);
         filtration.addFilter("e.last_name", Filtration.FiltrationType.String, lastName);
+        filtration.addFilter("dev.category_id", Filtration.FiltrationType.Integer, category);
+        filtration.addFilter("e.birth_date", Filtration.FiltrationType.DoubleDate, birthDate);
         return this.employeeRepository.findAllByStudioIDWithFiltration(studioID, filtration, sortField, sortDir);
     }
 

@@ -54,7 +54,10 @@ public class GenreRepository extends JdbcDaoSupport {
         this.getJdbcTemplate().update(GenreQueries.QUERY_DELETE, genreID);
     }
 
-    public List<Genre> getGenresByGameID(Long gameID) {
+    public List<Genre> findAllByGameID(Long gameID) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
         String sql = """
                         SELECT genre_id, name
                         FROM genre NATURAL JOIN game__genre
@@ -64,7 +67,10 @@ public class GenreRepository extends JdbcDaoSupport {
         return this.getJdbcTemplate().query(sql, new GenreMapper(), gameID);
     }
 
-    public List<Genre> getGenresByTestID(Long testID) {
+    public List<Genre> findAllByTestID(Long testID) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
         String sql = """
                         SELECT genre_id, name
                         FROM genre NATURAL JOIN test__genre

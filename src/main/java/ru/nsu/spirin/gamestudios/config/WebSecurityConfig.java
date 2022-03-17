@@ -15,7 +15,6 @@ import ru.nsu.spirin.gamestudios.service.UserDetailsServiceImpl;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
     private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
@@ -23,29 +22,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.userDetailsService = userDetailsService;
     }
 
-    //@Bean
-    public PasswordEncoder  passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(this.userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
 
-        // This pages do not require login
         http.authorizeRequests().antMatchers("/", "/login", "/logout").permitAll();
 
-        // When the user has logged in as XX.
-        // But access a page that requires role YY,
-        // AccessDeniedException will be thrown.
-        //http.authorizeRequests().and().exceptionHandling().accessDeniedPage("/403");
-
-        // Config for Login Form
         http.authorizeRequests().and().formLogin()
                 .loginProcessingUrl("/j_spring_security_check")
                 .loginPage("/login")

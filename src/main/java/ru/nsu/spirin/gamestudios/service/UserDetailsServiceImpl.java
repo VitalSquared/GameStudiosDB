@@ -33,7 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("User " + email + " was not found in the database");
         }
 
-        List<Role> roles = employeeService.getEmployeeRoles(account.getEmployeeID());
+        List<Role> roles = this.employeeService.getEmployeeRoles(account.getEmployeeID());
         List<GrantedAuthority> authorities = new ArrayList<>();
         for (var role : roles) {
             authorities.add(new SimpleGrantedAuthority(role.toString()));

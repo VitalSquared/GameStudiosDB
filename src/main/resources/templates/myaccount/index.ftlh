@@ -10,7 +10,9 @@
             <th scope="col">First Name</th>
             <th scope="col">Last Name</th>
             <th scope="col">Studio ID</th>
-            <th scope="col">Department ID</th>
+            <#if employee.departmentID??>
+                <th scope="col">Department ID</th>
+            </#if>
             <th scope="col">Active</th>
             <th scope="col">User Name</th>
         </tr>
@@ -21,7 +23,9 @@
             <td>${employee.firstName}</td>
             <td>${employee.lastName}</td>
             <td>${employee.studioID}</td>
-            <td>${employee.departmentID}</td>
+            <#if employee.departmentID??>
+                <td>${employee.departmentID}</td>
+            </#if>
             <td>${employee.active?c}</td>
             <td>${account.email}</td>
         </tr>

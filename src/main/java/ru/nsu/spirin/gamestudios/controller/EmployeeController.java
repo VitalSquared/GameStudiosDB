@@ -52,11 +52,13 @@ public class EmployeeController {
                                  @RequestParam(name = "studio", required = false, defaultValue = "-1") String studio,
                                  @RequestParam(name = "firstName", required = false, defaultValue = "") String firstName,
                                  @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
+                                 @RequestParam(name = "category", required = false, defaultValue = "") String category,
+                                 @RequestParam(name = "birthDate", required = false, defaultValue = "") String birthDate,
                                  @RequestParam(name = "sortField", required = false, defaultValue = "") String sortField,
                                  @RequestParam(name = "sortDir", required = false, defaultValue = "") String sortDir) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        Account account = accountService.findAccountByEmail(user.getUsername());
-        Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
+        Account account = this.accountService.findAccountByEmail(user.getUsername());
+        Employee employee = this.employeeService.getEmployeeByID(account.getEmployeeID());
 
         Long parsedStudioID;
         try {
@@ -73,31 +75,38 @@ public class EmployeeController {
         model.addAttribute("studio", studio);
         model.addAttribute("firstName", firstName);
         model.addAttribute("lastName", lastName);
+        model.addAttribute("category", category);
+        model.addAttribute("birthDate", birthDate);
         model.addAttribute("sortField", sortField);
         model.addAttribute("nextSortDir", sortDir.isEmpty() ? "ASC" : "ASC".equals(sortDir) ? "DESC" : "");
 
         model.addAttribute("idSortField", "employee_id");
         model.addAttribute("firstNameSortField", "first_name");
         model.addAttribute("lastNameSortField", "last_name");
+        model.addAttribute("birthDateSortField", "birth_date");
 
-        model.addAttribute("employees", employeeService.getEmployeesByStudioWithFiltration(
+        model.addAttribute("employees", this.employeeService.getEmployeesByStudioWithFiltration(
                 parsedStudioID,
                 firstName,
                 lastName,
+                category,
+                birthDate,
                 sortField,
                 sortDir
             )
         );
-        model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
-        model.addAttribute("all_accounts", accountService.getAllAccounts());
-        model.addAttribute("all_studios", studioService.getAllStudios());
-        model.addAttribute("all_departments", departmentService.getAllDepartments());
-        model.addAttribute("all_categories", categoryService.getAllCategories());
+        model.addAttribute("studios", this.studioService.getStudiosListByID(employee.getStudioID()));
+        model.addAttribute("all_accounts", this.accountService.getAllAccounts());
+        model.addAttribute("all_studios", this.studioService.getAllStudios());
+        model.addAttribute("all_departments", this.departmentService.getAllDepartments());
+        model.addAttribute("all_categories", this.categoryService.getAllCategories());
 
         Filtration filtration = new Filtration();
         filtration.addFilter("studio", null, studio);
         filtration.addFilter("firstName", null, firstName);
         filtration.addFilter("lastName", null, lastName);
+        filtration.addFilter("category", null, category);
+        filtration.addFilter("birthDate", null, birthDate);
         String filters = filtration.buildPath();
         model.addAttribute("filters", filters);
         model.addAttribute("urlFilterless", "/employees");
@@ -111,9 +120,9 @@ public class EmployeeController {
     public String newEmployee(@ModelAttribute("employee") Employee employee,
                               @ModelAttribute("account") Account account,
                               Model model) {
-        model.addAttribute("studios", studioService.getAllStudios());
-        model.addAttribute("departments", departmentService.getAllDepartments());
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("studios", this.studioService.getAllStudios());
+        model.addAttribute("departments", this.departmentService.getAllDepartments());
+        model.addAttribute("categories", this.categoryService.getAllCategories());
         return "/studios/new_employee";
     }
 
@@ -124,15 +133,15 @@ public class EmployeeController {
                                  @Valid @ModelAttribute("account") Account account,
                                  BindingResult bindingResult2,
                                  Model model) {
-        model.addAttribute("studios", studioService.getAllStudios());
-        model.addAttribute("departments", departmentService.getAllDepartments());
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("studios", this.studioService.getAllStudios());
+        model.addAttribute("departments", this.departmentService.getAllDepartments());
+        model.addAttribute("categories", this.categoryService.getAllCategories());
 
         if (bindingResult1.hasErrors() || bindingResult2.hasErrors()) {
             return "/studios/new_employee";
         }
 
-        employeeService.newEmployee(employee, account);
+        this.employeeService.newEmployee(employee, account);
         return "redirect:/employees";
     }
 
@@ -140,11 +149,11 @@ public class EmployeeController {
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editEmployee(Model model, @PathVariable("id") Long employeeID) {
         model.addAttribute("employeeID", employeeID);
-        model.addAttribute("employee", employeeService.getEmployeeByID(employeeID));
-        model.addAttribute("account", accountService.findAccountByEmployeeID(employeeID));
-        model.addAttribute("studios", studioService.getAllStudios());
-        model.addAttribute("departments", departmentService.getAllDepartments());
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("employee", this.employeeService.getEmployeeByID(employeeID));
+        model.addAttribute("account", this.accountService.findAccountByEmployeeID(employeeID));
+        model.addAttribute("studios", this.studioService.getAllStudios());
+        model.addAttribute("departments", this.departmentService.getAllDepartments());
+        model.addAttribute("categories", this.categoryService.getAllCategories());
         return "/studios/edit_employee";
     }
 
@@ -157,15 +166,15 @@ public class EmployeeController {
                                  Model model,
                                  @PathVariable("id") Long employeeID) {
         model.addAttribute("employeeID", employeeID);
-        model.addAttribute("studios", studioService.getAllStudios());
-        model.addAttribute("departments", departmentService.getAllDepartments());
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("studios", this.studioService.getAllStudios());
+        model.addAttribute("departments", this.departmentService.getAllDepartments());
+        model.addAttribute("categories", this.categoryService.getAllCategories());
 
         if (bindingResult1.hasErrors() || bindingResult2.hasErrors()) {
             return "/studios/edit_employee";
         }
 
-        employeeService.updateEmployee(employeeID, employee, account);
+        this.employeeService.updateEmployee(employeeID, employee, account);
         return "redirect:/employees";
     }
 

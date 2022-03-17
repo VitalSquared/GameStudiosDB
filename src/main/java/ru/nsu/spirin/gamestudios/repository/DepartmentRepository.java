@@ -9,7 +9,6 @@ import ru.nsu.spirin.gamestudios.model.entity.Department;
 import ru.nsu.spirin.gamestudios.repository.query.DepartmentQueries;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -43,11 +42,44 @@ public class DepartmentRepository extends JdbcDaoSupport {
         return this.getJdbcTemplate().query(DepartmentQueries.QUERY_FIND_ALL_BY_STUDIO_ID, new DepartmentMapper(), studioID);
     }
 
+    public List<Department> findAllByStudioIDSorted(Long studioID, String sortField, String sortDir) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
+        String orderByQuery = "";
+        if (null != sortField && !sortField.isEmpty() && sortDir != null && !sortDir.isEmpty()) {
+            String dir = sortDir.equalsIgnoreCase("ASC") ? "ASC" : sortDir.equalsIgnoreCase("DESC") ? "DESC" : "";
+            if (!dir.isEmpty()) {
+                orderByQuery = "ORDER BY " + sortField + " " + dir;
+            }
+        }
+        return this.getJdbcTemplate().query(
+                String.format(DepartmentQueries.QUERY_FIND_ALL_BY_STUDIO_ID_SORTED, orderByQuery),
+                new DepartmentMapper(),
+                studioID);
+    }
+
     public List<Department> findAll() {
         if (null == this.getJdbcTemplate()) {
             return null;
         }
         return this.getJdbcTemplate().query(DepartmentQueries.QUERY_FIND_ALL, new DepartmentMapper());
+    }
+
+    public List<Department> findAllSorted(String sortField, String sortDir) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
+        String orderByQuery = "";
+        if (null != sortField && !sortField.isEmpty() && sortDir != null && !sortDir.isEmpty()) {
+            String dir = sortDir.equalsIgnoreCase("ASC") ? "ASC" : sortDir.equalsIgnoreCase("DESC") ? "DESC" : "";
+            if (!dir.isEmpty()) {
+                orderByQuery = "ORDER BY " + sortField + " " + dir;
+            }
+        }
+        return this.getJdbcTemplate().query(
+                String.format(DepartmentQueries.QUERY_FIND_ALL_SORTED, orderByQuery),
+                new DepartmentMapper());
     }
 
     public void save(Department department) {

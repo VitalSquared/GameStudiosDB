@@ -15,7 +15,6 @@ public class Account {
 
     private Boolean active;
 
-
     private String passwordResetState;
 
     public Account(String email, String passwordHash, Long employeeID, Boolean active) {

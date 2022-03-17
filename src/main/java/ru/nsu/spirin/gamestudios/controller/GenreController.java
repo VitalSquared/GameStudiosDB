@@ -14,7 +14,6 @@ import ru.nsu.spirin.gamestudios.service.GenreService;
 
 import javax.validation.Valid;
 
-
 @Controller
 @RequestMapping("/admin_panel/genres")
 public class GenreController {
@@ -28,7 +27,7 @@ public class GenreController {
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexGenres(Model model) {
-        model.addAttribute("genres", genreService.getAllGenres());
+        model.addAttribute("genres", this.genreService.getAllGenres());
         model.addAttribute("url", "/admin_panel/genres");
         return "admin/genres";
     }
@@ -45,7 +44,7 @@ public class GenreController {
         if (bindingResult.hasErrors()) {
             return "admin/new_genre";
         }
-        genreService.createNewGenre(genre);
+        this.genreService.createNewGenre(genre);
         return "redirect:/admin_panel/genres";
     }
 
@@ -53,7 +52,7 @@ public class GenreController {
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editGenre(Model model, @PathVariable("id") Long genreID) {
         model.addAttribute("genreID", genreID);
-        model.addAttribute("genre", genreService.getGenreByID(genreID));
+        model.addAttribute("genre", this.genreService.getGenreByID(genreID));
         return "/admin/edit_genre";
     }
 
@@ -69,14 +68,14 @@ public class GenreController {
             return "admin/edit_genre";
         }
 
-        genreService.updateGenre(genreID, genre);
+        this.genreService.updateGenre(genreID, genre);
         return "redirect:/admin_panel/genres";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
     public String deleteGenre(@PathVariable("id") Long genreID) {
-        genreService.deleteGenre(genreID);
+        this.genreService.deleteGenre(genreID);
         return "redirect:/admin_panel/genres";
     }
 }

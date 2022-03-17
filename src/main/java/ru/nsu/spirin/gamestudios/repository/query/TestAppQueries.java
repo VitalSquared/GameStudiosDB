@@ -8,11 +8,25 @@ public class TestAppQueries {
                 WHERE test_id = ?;
             """;
 
+    public static final String QUERY_FIND_ALL_BY_STUDIO_ID =
+            """
+                SELECT *
+                FROM test_app
+                WHERE studio_id = ?;
+            """;
+
     public static final String QUERY_FIND_BY_ID =
             """
                 SELECT *
                 FROM test_app
                 WHERE app_id = ?;
+            """;
+
+    public static final String QUERY_FIND_BY_TEST_ID_AND_STUDIO_ID =
+            """
+                SELECT *
+                FROM test_app
+                WHERE test_id = ? AND studio_id = ?;
             """;
 
     public static final String QUERY_UPDATE_RESULT =

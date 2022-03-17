@@ -30,21 +30,6 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
-<!--
-<script>
-    $(".dropdown-menu a").click(function(){
-        $(".btn:first-child").text($(this).text());
-        $(".btn:first-child").val($(this).text());
-    });
-</script>
--->
-
-<script type="text/javascript">
-    $(function() {
-        $('input[id="daterange"]').daterangepicker();
-    });
-</script>
-
 <script type="text/javascript">
     $(function() {
         $('input[id="birthday"]').daterangepicker({
@@ -59,15 +44,17 @@
     });
 </script>
 
-
-
 <script type="text/javascript">
     $(function() {
-
         $('input[id="datefilter"]').daterangepicker({
+            showDropdowns: true,
             autoUpdateInput: false,
+            linkedCalendars: false,
+            minYear: 1901,
             locale: {
-                cancelLabel: 'Clear'
+                cancelLabel: 'Clear',
+                format: "YYYY-MM-DD",
+                separator: "_-_"
             }
         });
 
@@ -75,10 +62,18 @@
             $(this).val(picker.startDate.format('YYYY-MM-DD') + '_-_' + picker.endDate.format('YYYY-MM-DD'));
         });
 
+        $('input[id="datefilter"]').on('show.daterangepicker', function(ev, picker) {
+            let text = $(this).val();
+            if (text !== '') {
+                let dates = text.split('_-_');
+                picker.setStartDate(dates[0]);
+                picker.setEndDate(dates[1]);
+            }
+        });
+
         $('input[id="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
             $(this).val('');
         });
-
     });
 </script>
 

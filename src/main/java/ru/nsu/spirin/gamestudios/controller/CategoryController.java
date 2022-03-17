@@ -28,7 +28,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public String indexCategories(Model model) {
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("categories", this.categoryService.getAllCategories());
         model.addAttribute("url", "/admin_panel/categories");
         return "admin/categories";
     }
@@ -45,7 +45,7 @@ public class CategoryController {
         if (bindingResult.hasErrors()) {
             return "admin/new_category";
         }
-        categoryService.createNewCategory(category);
+        this.categoryService.createNewCategory(category);
         return "redirect:/admin_panel/categories";
     }
 
@@ -54,7 +54,7 @@ public class CategoryController {
     public String editCategory(Model model,
                                @PathVariable("id") Long categoryID) {
         model.addAttribute("categoryID", categoryID);
-        model.addAttribute("category", categoryService.getCategoryByID(categoryID));
+        model.addAttribute("category", this.categoryService.getCategoryByID(categoryID));
         return "/admin/edit_category";
     }
 
@@ -70,7 +70,7 @@ public class CategoryController {
             return "admin/edit_category";
         }
 
-        categoryService.updateCategory(categoryID, category);
+        this.categoryService.updateCategory(categoryID, category);
         return "redirect:/admin_panel/categories";
     }
 
@@ -93,7 +93,7 @@ public class CategoryController {
     @RequestMapping(path = "/{id}/delete", method = RequestMethod.POST)
     public String deleteCategoryPost(@ModelAttribute("new_category") ReplaceCategoryStore newCategory,
                                        @PathVariable("id") Long categoryID) {
-        categoryService.deleteCategory(categoryID, newCategory.getNewCategoryID());
+        this.categoryService.deleteCategory(categoryID, newCategory.getNewCategoryID());
         return "redirect:/admin_panel/categories";
     }
 }

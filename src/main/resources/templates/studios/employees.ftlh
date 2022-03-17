@@ -11,6 +11,9 @@
     <#else>
         <#assign anyStudio = []>
     </#if>
+
+    <#assign anyCategory = [['Any Category' , -1]]>
+
     <#assign any_filters = (filters?string?length gt 0) />
 
     <#if sortField == idSortField>
@@ -29,6 +32,12 @@
         <#assign lastNameSortDir = nextSortDir />
     <#else>
         <#assign lastNameSortDir = "ASC"/>
+    </#if>
+
+    <#if sortField == birthDateSortField>
+        <#assign birthDateSortDir = nextSortDir />
+    <#else>
+        <#assign birthDateSortDir = "ASC"/>
     </#if>
 
     <#assign accounts_map = {}>
@@ -55,12 +64,16 @@
         {
             'studio': ['Search studio', 'selection'] + anyStudio + studios?sequence?map(x -> [x.name, x.studioID]),
             'firstName' : ['First name', 'input'],
-            'lastName' : ['Last name', 'input']
+            'lastName' : ['Last name', 'input'],
+            'category' : ['Category', 'selection'] + anyCategory + all_categories?sequence?map(x -> [x.name, x.categoryID]),
+            'birthDate' : ['Birth Date', 'date']
         }
         {
             'studio' : 'studio',
             'firstName' : 'firstName',
-            'lastName' : 'lastName'
+            'lastName' : 'lastName',
+            'category' : 'category',
+            'birthDate' : 'birthDate'
         }
         any_filters!false
     />
@@ -78,12 +91,14 @@
             <th scope="col">
                 <a href="${urlFilter}&sortField=${lastNameSortField}&sortDir=${lastNameSortDir}">Last Name</a>
             </th>
+            <th scope="col">
+                <a href="${urlFilter}&sortField=${birthDateSortField}&sortDir=${birthDateSortDir}">Birth Date</a>
+            </th>
             <th scope="col">Studio</th>
             <th scope="col">Department</th>
             <th scope="col">Category</th>
             <th scope="col">Email</th>
             <th scope="col">Active</th>
-            <th scope="col"></th>
             <th scope="col">
                 <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
                     <a class="nav-link btn btn-primary" href="/employees/new">Create new employee</a>
@@ -97,9 +112,10 @@
                 <td>${employee.employeeID}</td>
                 <td>${employee.firstName}</td>
                 <td>${employee.lastName}</td>
+                <td>${employee.birthDate}</td>
                 <td>${studios_map[employee.studioID?string]} (${employee.studioID})</td>
                 <td>
-                    <#if employee.departmentID??>
+                    <#if (employee.departmentID!-1) gt -1>
                         ${departments_map[employee.departmentID?string]} (${employee.departmentID})
                     <#else>
                         None
@@ -116,12 +132,10 @@
                 <td>${employee.active?c}</td>
                 <td>
                     <#if s.isAdmin || s.isGeneralDirector || (s.isStudioDirector && employee.categoryID!-1 gt -1)>
-                        <a class="nav-link btn btn-primary" href="/employees/${employee.employeeID}/edit">Edit</a>
+                        <a class="btn btn-primary" href="/employees/${employee.employeeID}/edit">Edit</a>
                     </#if>
-                </td>
-                <td>
                     <#if s.isAdmin>
-                        <a class="nav-link btn btn-primary" href="/employees/${employee.employeeID}/delete">Delete</a>
+                        <a class="btn btn-primary" href="/employees/${employee.employeeID}/delete">Delete</a>
                     </#if>
                 </td>
             </tr>

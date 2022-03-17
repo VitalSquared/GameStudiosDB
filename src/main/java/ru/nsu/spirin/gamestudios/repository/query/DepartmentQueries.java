@@ -7,6 +7,13 @@ public class DepartmentQueries {
                 FROM department;
             """;
 
+    public static final String QUERY_FIND_ALL_SORTED =
+            """
+                SELECT *
+                FROM department
+                %s;
+            """;
+
     public static final String QUERY_FIND_BY_ID =
             """
                 SELECT *
@@ -45,6 +52,14 @@ public class DepartmentQueries {
                 SELECT *
                 FROM department
                 WHERE studio_id = ?;
+            """;
+
+    public static final String QUERY_FIND_ALL_BY_STUDIO_ID_SORTED =
+            """
+                SELECT *
+                FROM department
+                WHERE studio_id = ?
+                %s;
             """;
 
     public static final String QUERY_UPDATE_DEPARTMENTS_HEAD =

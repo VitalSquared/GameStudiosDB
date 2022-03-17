@@ -31,7 +31,7 @@ public class GenreService {
     }
 
     public List<Genre> getGenresByGameID(Long gameID) {
-        return this.genreRepository.getGenresByGameID(gameID);
+        return this.genreRepository.findAllByGameID(gameID);
     }
 
     public void createNewGenre(Genre genre) {
@@ -49,7 +49,7 @@ public class GenreService {
     }
 
     public List<Genre> getGenresByTestID(Long testID) {
-        return this.genreRepository.getGenresByTestID(testID);
+        return this.genreRepository.findAllByTestID(testID);
     }
 
     public void deleteGenre(Long genreID) {

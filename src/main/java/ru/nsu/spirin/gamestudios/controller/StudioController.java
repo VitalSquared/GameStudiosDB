@@ -43,8 +43,8 @@ public class StudioController {
     public String indexStudios(Model model, Principal principal,
                                @RequestParam(name = "studio", required = false, defaultValue = "0") String studioID) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        Account account = accountService.findAccountByEmail(user.getUsername());
-        Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
+        Account account = this.accountService.findAccountByEmail(user.getUsername());
+        Employee employee = this.employeeService.getEmployeeByID(account.getEmployeeID());
 
         Long parsedStudioID;
         try {
@@ -58,8 +58,8 @@ public class StudioController {
             return "redirect:/studios?studio="+employee.getStudioID();
         }
 
-        model.addAttribute("myStudio", studioService.getStudioByID(employee.getStudioID()));
-        model.addAttribute("studios", studioService.getStudiosListByID(parsedStudioID));
+        model.addAttribute("myStudio", this.studioService.getStudioByID(employee.getStudioID()));
+        model.addAttribute("studios", this.studioService.getStudiosListByID(parsedStudioID));
         return "studios/studios";
     }
 
@@ -75,7 +75,7 @@ public class StudioController {
         if (bindingResult.hasErrors()) {
             return "/studios/new_studio";
         }
-        studioService.newStudio(studio);
+        this.studioService.newStudio(studio);
         return "redirect:/studios";
     }
 
@@ -83,8 +83,8 @@ public class StudioController {
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String edit(Model model, @PathVariable("id") Long studioID) {
         model.addAttribute("studioID", studioID);
-        model.addAttribute("studio", studioService.getStudioByID(studioID));
-        model.addAttribute("anyReferences", studioService.isStudioReferenced(studioID));
+        model.addAttribute("studio", this.studioService.getStudioByID(studioID));
+        model.addAttribute("anyReferences", this.studioService.isStudioReferenced(studioID));
         return "/studios/edit_studio";
     }
 
@@ -100,14 +100,14 @@ public class StudioController {
             return "/studios/edit_studio";
         }
 
-        studioService.updateStudio(studioID, studio);
+        this.studioService.updateStudio(studioID, studio);
         return "redirect:/studios";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
     public String deleteStudio(@PathVariable("id") Long studioID) {
-        studioService.deleteStudio(studioID);
+        this.studioService.deleteStudio(studioID);
         return "redirect:/studios";
     }
 }

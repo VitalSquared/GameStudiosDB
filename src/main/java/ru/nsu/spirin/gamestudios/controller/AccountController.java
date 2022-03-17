@@ -35,8 +35,8 @@ public class AccountController {
     @RequestMapping(path = "/userInfo", method = RequestMethod.GET)
     public String userInfo(Model model, Principal principal) {
         String userName = principal.getName();
-        Account account = accountService.findAccountByEmail(userName);
-        Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
+        Account account = this.accountService.findAccountByEmail(userName);
+        Employee employee = this.employeeService.getEmployeeByID(account.getEmployeeID());
         model.addAttribute("employee", employee);
         model.addAttribute("account", account);
         return "myaccount/index";
@@ -54,7 +54,7 @@ public class AccountController {
                                      BindingResult bindingResult,
                                      Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        Account account = accountService.findAccountByEmail(user.getUsername());
+        Account account = this.accountService.findAccountByEmail(user.getUsername());
 
         if (passwordChangeStore.getOldPassword() != null && !passwordChangeStore.getOldPassword().isEmpty()) {
             if (!(new BCryptPasswordEncoder(12).matches(passwordChangeStore.getOldPassword(), account.getPasswordHash()))) {
@@ -74,7 +74,7 @@ public class AccountController {
             return "myaccount/change_passwd";
         }
 
-        accountService.update(user.getUsername(), passwordChangeStore.getNewPassword());
+        this.accountService.update(user.getUsername(), passwordChangeStore.getNewPassword());
         return "redirect:/userInfo";
     }
 }

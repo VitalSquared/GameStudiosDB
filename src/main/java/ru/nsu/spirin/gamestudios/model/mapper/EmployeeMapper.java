@@ -14,10 +14,13 @@ public class EmployeeMapper implements RowMapper<Employee> {
         String firstName = rs.getString("first_name");
         String lastName = rs.getString("last_name");
         Date birthDate = rs.getDate("birth_date");
-        Long categoryID = rs.getLong("category_id");
+        Object categoryIDObject = rs.getObject("category_id");
         Long studioID = rs.getLong("studio_id");
-        Long departmentID = rs.getLong("department_id");
+        Object departmentIDObject = rs.getObject("department_id");
         Boolean active = rs.getBoolean("active");
+
+        Long categoryID = categoryIDObject == null ? null : (Long)categoryIDObject;
+        Long departmentID = departmentIDObject == null ? null : (Long)departmentIDObject;
 
         return new Employee(employeeID, firstName, lastName, birthDate, categoryID, studioID, departmentID, active);
     }

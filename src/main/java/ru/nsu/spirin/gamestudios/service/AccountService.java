@@ -31,15 +31,6 @@ public class AccountService {
         return this.accountRepository.findByEmployeeID(employeeID);
     }
 
-    public Map<Long, String> getEmailsWithEmployeeIDs() {
-        Map<Long, String> map = new HashMap<>();
-        List<Account> accounts = findAllAccounts();
-        for (var account : accounts) {
-            map.put(account.getEmployeeID(), account.getEmail());
-        }
-        return map;
-    }
-
     public void update(String email, String password) {
         Account account = new Account(email, new BCryptPasswordEncoder(12).encode(password), null, null);
         this.accountRepository.update(email, account);

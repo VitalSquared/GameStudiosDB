@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import ru.nsu.spirin.gamestudios.model.entity.Contract;
+import ru.nsu.spirin.gamestudios.model.entity.Employee;
 import ru.nsu.spirin.gamestudios.model.entity.Game;
-import ru.nsu.spirin.gamestudios.service.ContractService;
-import ru.nsu.spirin.gamestudios.service.GameService;
-import ru.nsu.spirin.gamestudios.service.StudioService;
-import ru.nsu.spirin.gamestudios.service.TestService;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
+import ru.nsu.spirin.gamestudios.service.*;
 
 import javax.validation.Valid;
-import java.sql.SQLException;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -27,22 +26,38 @@ public class ContractController {
     private final TestService testService;
     private final GameService gameService;
     private final StudioService studioService;
+    private final AccountService accountService;
+    private final EmployeeService employeeService;
 
     @Autowired
     public ContractController(ContractService contractService,
                               TestService testService,
                               GameService gameService,
-                              StudioService studioService) {
+                              StudioService studioService,
+                              AccountService accountService,
+                              EmployeeService employeeService) {
         this.contractService = contractService;
         this.testService = testService;
         this.gameService = gameService;
         this.studioService = studioService;
+        this.accountService = accountService;
+        this.employeeService = employeeService;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "", method = RequestMethod.GET)
-    public String indexContracts(Model model) {
-        List<Contract> contracts = contractService.getAllContracts();
+    public String indexContracts(Model model, Principal principal) {
+        String userName = principal.getName();
+        Account account = this.accountService.findAccountByEmail(userName);
+        Employee employee = this.employeeService.getEmployeeByID(account.getEmployeeID());
+
+        List<Contract> contracts = this.contractService.getAllContracts();
+        /*if (employee.getStudioID() == 0) {
+            contracts = this.contractService.getAllContracts();
+        }
+        else {
+            contracts = this.contractService.getAllContractsByStudioID(employee.getStudioID());
+        }*/
         model.addAttribute("contracts", contracts);
         return "contracts/contracts";
     }
@@ -50,7 +65,7 @@ public class ContractController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newContract(@ModelAttribute("contract") Contract contract, Model model) {
-        model.addAttribute("tests", testService.getResultedTests());
+        model.addAttribute("tests", this.testService.getResultedTests());
         return "/contracts/new_contract";
     }
 
@@ -60,16 +75,16 @@ public class ContractController {
         if (bindingResult.hasErrors()) {
             return "/contracts/new_contract";
         }
-        contractService.createNewContract(contract);
+        this.contractService.createNewContract(contract);
         return "redirect:/contracts";
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public String viewContract(Model model, @PathVariable(name = "id") Long contractID) {
-        model.addAttribute("games", gameService.getGamesByContractID(contractID));
-        model.addAttribute("contract", contractService.getContractByID(contractID));
-        model.addAttribute("all_studios", studioService.getAllStudios());
+        model.addAttribute("games", this.gameService.getGamesByContractID(contractID));
+        model.addAttribute("contract", this.contractService.getContractByID(contractID));
+        model.addAttribute("all_studios", this.studioService.getAllStudios());
         return "contracts/view_contract";
     }
 
@@ -77,7 +92,7 @@ public class ContractController {
     @RequestMapping(path = "/{id}/add_game", method = RequestMethod.GET)
     public String addGameGet(@ModelAttribute("game") Game game, Model model,
                              @PathVariable(name = "id") Long contractID) {
-        model.addAttribute("games", gameService.getAllGames());
+        model.addAttribute("games", this.gameService.getAllGames());
         model.addAttribute("contractID", contractID);
         return "/contracts/add_game";
     }
@@ -85,7 +100,7 @@ public class ContractController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR')")
     @RequestMapping(path = "/{id}/game", method = RequestMethod.POST)
     public String addGamePost(@ModelAttribute("game") Game game, @PathVariable(name = "id") Long contractID) {
-        contractService.addGameToContract(contractID, game.getGameID());
+        this.contractService.addGameToContract(contractID, game.getGameID());
         return "redirect:/contracts/{id}";
     }
 
@@ -93,7 +108,7 @@ public class ContractController {
     @RequestMapping(path = "/{id}/remove_game/{id1}", method = RequestMethod.GET)
     public String removeGameGet(@PathVariable(name = "id") Long contractID,
                                 @PathVariable(name = "id1") Long gameID) {
-        contractService.removeGameFromContract(contractID, gameID);
+        this.contractService.removeGameFromContract(contractID, gameID);
         return "redirect:/contracts/{id}";
     }
 
@@ -101,7 +116,7 @@ public class ContractController {
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editContract(Model model, @PathVariable("id") Long contractID) {
         model.addAttribute("contractID", contractID);
-        model.addAttribute("contract", contractService.getContractByID(contractID));
+        model.addAttribute("contract", this.contractService.getContractByID(contractID));
         return "/contracts/edit_contract";
     }
 
@@ -117,14 +132,14 @@ public class ContractController {
             return "/contracts/edit_contract";
         }
 
-        contractService.updateContract(contractID, contract);
+        this.contractService.updateContract(contractID, contract);
         return "redirect:/contracts/{id}";
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @RequestMapping(path = "/{id}/delete", method = RequestMethod.GET)
     public String deleteContract(@PathVariable("id") Long contractID) {
-        contractService.deleteContract(contractID);
+        this.contractService.deleteContract(contractID);
         return "redirect:/contracts";
     }
 }

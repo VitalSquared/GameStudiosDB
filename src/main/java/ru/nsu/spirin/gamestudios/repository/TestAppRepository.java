@@ -27,11 +27,29 @@ public class TestAppRepository extends JdbcDaoSupport {
         return this.getJdbcTemplate().query(TestAppQueries.QUERY_FIND_ALL_BY_GAME_ID, new TestAppMapper(), testID);
     }
 
+    public List<TestApp> findAllByStudioID(Long studioID) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
+        return this.getJdbcTemplate().query(TestAppQueries.QUERY_FIND_ALL_BY_STUDIO_ID, new TestAppMapper(), studioID);
+    }
+
     public TestApp findByID(Long appID) {
         if (null == this.getJdbcTemplate()) {
             return null;
         }
         return this.getJdbcTemplate().queryForObject(TestAppQueries.QUERY_FIND_BY_ID, new TestAppMapper(), appID);
+    }
+
+    public TestApp findByTestIDAndStudioID(Long testID, Long studioID) {
+        if (null == this.getJdbcTemplate()) {
+            return null;
+        }
+        return this.getJdbcTemplate().queryForObject(
+                TestAppQueries.QUERY_FIND_BY_TEST_ID_AND_STUDIO_ID,
+                new TestAppMapper(),
+                testID, studioID
+        );
     }
 
     public void updateResult(Long appID, Long resultID) {
