@@ -19,12 +19,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 import ru.nsu.spirin.gamestudios.model.entity.message.Attachment;
 import ru.nsu.spirin.gamestudios.model.entity.message.Message;
 import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
+import ru.nsu.spirin.gamestudios.service.AccountService;
 import ru.nsu.spirin.gamestudios.service.MessageService;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.Principal;
@@ -36,10 +39,12 @@ import java.util.Optional;
 @RequestMapping("/messages")
 public class MessageController {
     private final MessageService messageService;
+    private final AccountService accountService;
 
     @Autowired
-    public MessageController(MessageService messageService) {
+    public MessageController(MessageService messageService, AccountService accountService) {
         this.messageService = messageService;
+        this.accountService = accountService;
     }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
@@ -140,18 +145,31 @@ public class MessageController {
     }
 
     @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN')")
-    @RequestMapping(method = RequestMethod.POST)
-    public String create(@ModelAttribute("message") Message message,
+    @RequestMapping(path = "/new_message", method = RequestMethod.POST)
+    public String create(@Valid @ModelAttribute("message") Message message,
                          BindingResult bindingResult,
+                         Model model,
                          Principal principal,
                          @RequestParam("file") MultipartFile[] files) throws SQLException, IOException {
+        message.convertReceivers();
+        for (var receiver : message.getReceivers()) {
+            Account account = this.accountService.findAccountByEmail(receiver);
+            if (account == null) {
+                bindingResult.rejectValue("receiversString",
+                        "error.invalidReceiver",
+                        "Such receiver doesn't exist: " + receiver);
+            }
+        }
+
         if (bindingResult.hasErrors()) {
+            User user = (User) ((Authentication) principal).getPrincipal();
+            model.addAttribute("numberOfUnread", this.messageService.getNumberOfUnreadMessages(user.getUsername()));
             return "messages/new_message";
         }
 
         User user = (User) ((Authentication) principal).getPrincipal();
         message.setSender(user.getUsername());
-        message.convertReceivers();
+
         message.setAttachments(new ArrayList<>());
 
         int idx = 0;
@@ -185,7 +203,7 @@ public class MessageController {
 
     @PreAuthorize("hasAnyRole('DEVELOPER', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'ADMIN') && @messageService.canViewMessage(#messageID, #principal)")
     @RequestMapping(path = "/delete_sent/{id}", method = RequestMethod.GET)
-    public String removeSent(@PathVariable("id") Long messageID) {
+    public String removeSent(@PathVariable("id") Long messageID, Principal principal) {
         this.messageService.deleteSentMessage(messageID);
         return "redirect:/messages/sent";
     }

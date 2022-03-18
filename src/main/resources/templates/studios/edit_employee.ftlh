@@ -41,7 +41,7 @@
         <div class="form-group row offset-1" style="align-items: center;">
             <label for="studio" style="width: 100px;">Studio: </label>
             <div class="col-sm-5">
-                <@spring.formSingleSelect "employee.studioID", studios_map "class=\"studioSelect form-control\""/>
+                <@spring.formSingleSelect "employee.studioID", studios_map "class=\"studioSelect form-control\" disabled"/>
             </div>
         </div>
 

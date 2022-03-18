@@ -5,11 +5,12 @@
 <@c.page "New Message">
 <@header.header numberOfUnread/>
 <br/>
-<form method="POST" action="/messages" enctype="multipart/form-data">
+<form method="POST" action="/messages/new_message" enctype="multipart/form-data">
     <div class="form-group row offset-1">
         <label for="receivers">Send to: </label>
         <div class="col-sm-5">
             <@spring.formInput "message.receiversString", "class=\"form-control\""/>
+            <@spring.showErrors "<br>" "color:red;"/>
         </div>
     </div>
 
@@ -17,6 +18,7 @@
         <label for="topic">Topic: </label>
         <div class="col-sm-5">
             <@spring.formInput "message.topic", "class=\"form-control\""/>
+            <@spring.showErrors "<br>" "color:red;"/>
         </div>
     </div>
 
@@ -24,6 +26,7 @@
         <label for="content"></label>
         <div class="col-sm-10">
             <@spring.formTextarea "message.content", "class=\"form-control\" style=\"height: 300px;\""/>
+            <@spring.showErrors "<br>" "color:red;"/>
         </div>
     </div>
 

@@ -2,6 +2,7 @@ package ru.nsu.spirin.gamestudios.model.entity.message;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +12,22 @@ import java.util.Objects;
 public class Message {
     private Long messageID;
     private Timestamp date;
+
+    @NotEmpty
     private String topic;
+
+    @NotEmpty
     private String content;
+
     private List<Attachment> attachments;
+
     private String sender;
+
     private List<String> receivers;
+
     private Boolean read;
 
+    @NotEmpty
     private String receiversString;
 
     public Message(Long messageID, Timestamp date, String topic,

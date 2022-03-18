@@ -115,14 +115,14 @@
                 <td>${employee.birthDate}</td>
                 <td>${studios_map[employee.studioID?string]} (${employee.studioID})</td>
                 <td>
-                    <#if (employee.departmentID!-1) gt -1>
+                    <#if employee.departmentID??>
                         ${departments_map[employee.departmentID?string]} (${employee.departmentID})
                     <#else>
                         None
                     </#if>
                 </td>
                 <td>
-                    <#if (employee.categoryID!-1) gt -1>
+                    <#if employee.categoryID??>
                         ${categories_map[employee.categoryID?string]}
                     <#else>
                         None
@@ -131,7 +131,7 @@
                 <td>${accounts_map[employee.employeeID?string]}</td>
                 <td>${employee.active?c}</td>
                 <td>
-                    <#if s.isAdmin || s.isGeneralDirector || (s.isStudioDirector && employee.categoryID!-1 gt -1)>
+                    <#if s.isAdmin || (s.isGeneralDirector && employee.studioID != 0) || (s.isStudioDirector && employee.categoryID??)>
                         <a class="btn btn-primary" href="/employees/${employee.employeeID}/edit">Edit</a>
                     </#if>
                     <#if s.isAdmin>

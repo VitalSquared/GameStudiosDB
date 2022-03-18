@@ -1,6 +1,7 @@
 package ru.nsu.spirin.gamestudios.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,11 +46,16 @@ public class TestAppRepository extends JdbcDaoSupport {
         if (null == this.getJdbcTemplate()) {
             return null;
         }
-        return this.getJdbcTemplate().queryForObject(
-                TestAppQueries.QUERY_FIND_BY_TEST_ID_AND_STUDIO_ID,
-                new TestAppMapper(),
-                testID, studioID
-        );
+        try {
+            return this.getJdbcTemplate().queryForObject(
+                    TestAppQueries.QUERY_FIND_BY_TEST_ID_AND_STUDIO_ID,
+                    new TestAppMapper(),
+                    testID, studioID
+            );
+        }
+        catch (DataAccessException exception) {
+            return null;
+        }
     }
 
     public void updateResult(Long appID, Long resultID) {

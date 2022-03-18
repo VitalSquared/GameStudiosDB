@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.spirin.gamestudios.model.mapper.MessageReceivedMapper;
@@ -115,27 +117,34 @@ public class MessageRepository extends JdbcDaoSupport {
         return this.getJdbcTemplate().queryForObject(MessageQueries.QUERY_COUNT_MAX_ID, Long.class);
     }
 
-    public void saveSentMessage(Message message) {
+    public Long saveSentMessage(Message message) {
         if (null == this.getJdbcTemplate()) {
-            return;
+            return null;
         }
 
+        KeyHolder generatedKeyHolder = new GeneratedKeyHolder();
         this.getJdbcTemplate().update(
             con -> {
                 PreparedStatement ps = con.prepareStatement(MessageQueries.QUERY_SAVE_SENT_MESSAGE, Statement.RETURN_GENERATED_KEYS);
-                ps.setLong(1, message.getMessageID());
-                ps.setString(2, message.getTopic());
-                ps.setString(3, message.getContent());
-                ps.setString(4, message.getSender());
+                ps.setString(1, message.getTopic());
+                ps.setString(2, message.getContent());
+                ps.setString(3, message.getSender());
 
                 PGobject jsonObject = new PGobject();
                 jsonObject.setType("json");
                 jsonObject.setValue(AttachmentUtils.parseTo(message.getAttachments()));
-                ps.setObject(5, jsonObject);
+                ps.setObject(4, jsonObject);
 
                 return ps;
-            }
+            },
+            generatedKeyHolder
         );
+
+        if (generatedKeyHolder.getKey() == null) {
+            return this.countMaxID();
+        }
+
+        return generatedKeyHolder.getKey().longValue();
     }
 
     public void saveReceivedMessage(Message message, String receiver) {

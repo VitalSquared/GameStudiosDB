@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.nsu.spirin.gamestudios.model.entity.Department;
 import ru.nsu.spirin.gamestudios.model.entity.Employee;
+import ru.nsu.spirin.gamestudios.model.entity.Studio;
 import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
 import ru.nsu.spirin.gamestudios.service.AccountService;
@@ -23,6 +25,8 @@ import ru.nsu.spirin.gamestudios.service.StudioService;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/employees")
@@ -119,9 +123,31 @@ public class EmployeeController {
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String newEmployee(@ModelAttribute("employee") Employee employee,
                               @ModelAttribute("account") Account account,
-                              Model model) {
-        model.addAttribute("studios", this.studioService.getAllStudios());
-        model.addAttribute("departments", this.departmentService.getAllDepartments());
+                              Model model, Principal principal) {
+        User userSelf = (User) ((Authentication) principal).getPrincipal();
+        Account accountSelf = this.accountService.findAccountByEmail(userSelf.getUsername());
+        Employee employeeSelf = this.employeeService.getEmployeeByID(accountSelf.getEmployeeID());
+
+        List<Studio> studios;
+        if (employeeSelf.getStudioID() == 0) {
+            studios = this.studioService.getAllStudios();
+        }
+        else {
+            studios = new ArrayList<>();
+            studios.add(this.studioService.getStudioByID(employeeSelf.getStudioID()));
+        }
+
+
+        List<Department> departments;
+        if (employeeSelf.getStudioID() == 0) {
+            departments = this.departmentService.getAllDepartments();
+        }
+        else {
+            departments = this.departmentService.getAllDepartmentsOfStudio(employeeSelf.getStudioID(), "", "");
+        }
+
+        model.addAttribute("studios", studios);
+        model.addAttribute("departments", departments);
         model.addAttribute("categories", this.categoryService.getAllCategories());
         return "/studios/new_employee";
     }
@@ -132,12 +158,41 @@ public class EmployeeController {
                                  BindingResult bindingResult1,
                                  @Valid @ModelAttribute("account") Account account,
                                  BindingResult bindingResult2,
-                                 Model model) {
-        model.addAttribute("studios", this.studioService.getAllStudios());
-        model.addAttribute("departments", this.departmentService.getAllDepartments());
+                                 Model model, Principal principal) {
+        User userSelf = (User) ((Authentication) principal).getPrincipal();
+        Account accountSelf = this.accountService.findAccountByEmail(userSelf.getUsername());
+        Employee employeeSelf = this.employeeService.getEmployeeByID(accountSelf.getEmployeeID());
+
+        List<Studio> studios;
+        if (employeeSelf.getStudioID() == 0) {
+            studios = this.studioService.getAllStudios();
+        }
+        else {
+            studios = new ArrayList<>();
+            studios.add(this.studioService.getStudioByID(employeeSelf.getStudioID()));
+        }
+
+
+        List<Department> departments;
+        if (employeeSelf.getStudioID() == 0) {
+            departments = this.departmentService.getAllDepartments();
+        }
+        else {
+            departments = this.departmentService.getAllDepartmentsOfStudio(employeeSelf.getStudioID(), "", "");
+        }
+
+        model.addAttribute("studios", studios);
+        model.addAttribute("departments", departments);
         model.addAttribute("categories", this.categoryService.getAllCategories());
 
+        if (employee.getStudioID() == -1) {
+            bindingResult1.rejectValue("studioID", "error.notSelected", "Studio not selected");
+        }
+
         if (bindingResult1.hasErrors() || bindingResult2.hasErrors()) {
+            if (employeeSelf.getStudioID() == 0) {
+                employee.setStudioID(-1L);
+            }
             return "/studios/new_employee";
         }
 
@@ -148,11 +203,16 @@ public class EmployeeController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/{id}/edit", method = RequestMethod.GET)
     public String editEmployee(Model model, @PathVariable("id") Long employeeID) {
+        Employee employee = this.employeeService.getEmployeeByID(employeeID);
+
+        List<Studio> studios = new ArrayList<>();
+        studios.add(this.studioService.getStudioByID(employee.getStudioID()));
+
         model.addAttribute("employeeID", employeeID);
-        model.addAttribute("employee", this.employeeService.getEmployeeByID(employeeID));
+        model.addAttribute("employee", employee);
         model.addAttribute("account", this.accountService.findAccountByEmployeeID(employeeID));
-        model.addAttribute("studios", this.studioService.getAllStudios());
-        model.addAttribute("departments", this.departmentService.getAllDepartments());
+        model.addAttribute("studios", studios);
+        model.addAttribute("departments", this.departmentService.getAllDepartmentsOfStudio(employee.getStudioID(), "", ""));
         model.addAttribute("categories", this.categoryService.getAllCategories());
         return "/studios/edit_employee";
     }
@@ -165,9 +225,15 @@ public class EmployeeController {
                                  BindingResult bindingResult2,
                                  Model model,
                                  @PathVariable("id") Long employeeID) {
+        Employee saved = this.employeeService.getEmployeeByID(employeeID);
+        employee.setStudioID(saved.getStudioID());
+
+        List<Studio> studios = new ArrayList<>();
+        studios.add(this.studioService.getStudioByID(employee.getStudioID()));
+
         model.addAttribute("employeeID", employeeID);
-        model.addAttribute("studios", this.studioService.getAllStudios());
-        model.addAttribute("departments", this.departmentService.getAllDepartments());
+        model.addAttribute("studios", studios);
+        model.addAttribute("departments", this.departmentService.getAllDepartmentsOfStudio(employee.getStudioID(), "", ""));
         model.addAttribute("categories", this.categoryService.getAllCategories());
 
         if (bindingResult1.hasErrors() || bindingResult2.hasErrors()) {

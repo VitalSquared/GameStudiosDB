@@ -44,10 +44,7 @@
         <thead class="thead-dark">
         <tr>
             <th scope="col">ID</th>
-            <th scope="col">Start Date</th>
-            <th scope="col">Dev Name</th>
             <th scope="col">Release Name</th>
-            <th scope="col">Expenses</th>
             <th scope="col">Studio</th>
             <th scope="col">
                 <#if s.isAdmin || s.isGeneralDirector>
@@ -60,10 +57,7 @@
         <#foreach game in games>
             <tr>
                 <td>${game.gameID}</td>
-                <td>${game.startDate}</td>
-                <td>${game.devName}</td>
                 <td>${game.releaseName}</td>
-                <td>${game.expenses}</td>
                 <td>${studios_map[game.studioID?string]} (${game.studioID})</td>
                 <td>
                     <#if s.isAdmin>

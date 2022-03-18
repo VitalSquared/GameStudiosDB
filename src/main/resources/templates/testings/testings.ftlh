@@ -37,9 +37,7 @@
                 <td>${test.appsDeadline}</td>
                 <td>${statuses_map[test.statusID?string]}</td>
                 <td>
-                    <#if s.isAdmin>
-                        <a class="nav-link btn btn-primary" href="/tests/${test.testID}">View</a>
-                    </#if>
+                    <a class="nav-link btn btn-primary" href="/tests/${test.testID}">View</a>
                 </td>
             </tr>
         </#foreach>

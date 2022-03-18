@@ -33,7 +33,12 @@
             </div>
         </div>
 
-        <#assign studios_map = {}>
+        <#if studios?sequence?size == 1>
+            <#assign studios_map = {}>
+        <#else>
+            <#assign studios_map = { -1 : 'Select Studio...' }>
+        </#if>
+
         <#foreach studio in studios>
             <#assign studios_map = studios_map + { studio.studioID : studio.name }>
         </#foreach>
@@ -42,6 +47,7 @@
             <label for="studio" style="width: 100px;">Studio: </label>
             <div class="col-sm-5">
                 <@spring.formSingleSelect "employee.studioID", studios_map "class=\"studioSelect form-control\""/>
+                <@spring.showErrors "<br>" "color:red;"/>
             </div>
         </div>
 
@@ -113,7 +119,6 @@
 
 <script>
     $('select.employeeTypeSelect').on('change', function() {
-        console.log(this.value)
         if (this.value === "developer") {
             $('div.employeeTypeDisable').show();
         }
@@ -123,15 +128,47 @@
     });
     $('select.studioSelect').on('change', function() {
         let studio = this.value;
+        $('#employeeType option').map(function () {
+            if (this.getAttribute("value") === "director") {
+                if (studio === "0") {
+                    $(this).prop("selected", true);
+                    console.log(this.getAttribute("value"));
+                }
+            }
+            else {
+                if (studio === "0") {
+                    $(this).prop("selected", false);
+                }
+            }
+        })
+        if (studio === "0") {
+            $('#employeeType').hide();
+        }
+        else {
+            $('#employeeType').show();
+        }
+        $('#employeeType').change();
+
+        let switched = false;
         $('#departmentID option').map(function () {
             if (this.getAttribute("data-studio") === studio) {
                 $(this).show();
                 $(this).prop("disable", false);
+                if (!switched) {
+                    $(this).prop('selected', true);
+                    console.log(this.getAttribute("value"));
+                    switched = true;
+                }
+                else {
+                    $(this).prop('selected', false);
+                }
             }
             else {
                 $(this).hide();
                 $(this).prop("disable", true);
+                $(this).prop('selected', false);
             }
         })
+        $('#departmentID').change();
     });
 </script>

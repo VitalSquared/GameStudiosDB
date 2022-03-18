@@ -28,6 +28,10 @@ public class Filtration {
     }
 
     public String buildQuery() {
+        if (types.size() == 0) {
+            return " TRUE ";
+        }
+
         StringBuilder sb = new StringBuilder();
         boolean anyFiltersAlready = false;
         for (var key : types.keySet()) {

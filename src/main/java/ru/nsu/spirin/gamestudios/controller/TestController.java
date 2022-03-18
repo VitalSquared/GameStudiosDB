@@ -2,6 +2,8 @@ package ru.nsu.spirin.gamestudios.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -9,11 +11,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import ru.nsu.spirin.gamestudios.model.entity.Employee;
 import ru.nsu.spirin.gamestudios.model.entity.Genre;
 import ru.nsu.spirin.gamestudios.model.entity.Test;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 import ru.nsu.spirin.gamestudios.service.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -25,6 +30,8 @@ public class TestController {
     private final TestStatusService testStatusService;
     private final TestAppResultService testAppResultService;
     private final StudioService studioService;
+    private final AccountService accountService;
+    private final EmployeeService employeeService;
 
     @Autowired
     public TestController(TestService testService,
@@ -32,13 +39,17 @@ public class TestController {
                           GenreService genreService,
                           TestStatusService testStatusService,
                           TestAppResultService testAppResultService,
-                          StudioService studioService) {
+                          StudioService studioService,
+                          AccountService accountService,
+                          EmployeeService employeeService) {
         this.testService = testService;
         this.testAppService = testAppService;
         this.genreService = genreService;
         this.testStatusService = testStatusService;
         this.testAppResultService = testAppResultService;
         this.studioService = studioService;
+        this.accountService = accountService;
+        this.employeeService = employeeService;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
@@ -52,8 +63,12 @@ public class TestController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    public String viewTest(Model model,
+    public String viewTest(Model model, Principal principal,
                            @PathVariable(name = "id") Long testID) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        Account account = this.accountService.findAccountByEmail(user.getUsername());
+        Employee employee = this.employeeService.getEmployeeByID(account.getEmployeeID());
+        model.addAttribute("studioID", employee.getStudioID());
         model.addAttribute("test", this.testService.getTestByID(testID));
         model.addAttribute("apps", this.testAppService.getAppsForTest(testID));
         model.addAttribute("genres", this.genreService.getGenresByTestID(testID));

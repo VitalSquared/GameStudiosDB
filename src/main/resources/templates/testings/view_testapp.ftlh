@@ -45,7 +45,7 @@
         <a class="btn btn-primary" href="/tests/apps/${app.appID}/decline">Decline</a>
     </#if>
     <br/>
-    <#if app.resultID == 1 && (test.statusID == 0 || test.statusID == 1)>
+    <#if (s.isAdmin || s.isGeneralDirector || s.isStudioDirector) && app.resultID == 1 && (test.statusID == 0 || test.statusID == 1)>
         <a class="btn btn-primary" href="/tests/apps/${app.appID}/decline">Quit</a>
         <br/>
     </#if>
@@ -70,7 +70,7 @@
                     <td>${employee.firstName}</td>
                     <td>${employee.lastName}</td>
                     <td>
-                        <#if test.statusID == 0 || test.statusID == 1>
+                        <#if (s.isAdmin || s.isGeneralDirector || s.isStudioDirector) && (test.statusID == 0 || test.statusID == 1)>
                             <a class="nav-link btn btn-primary" href="/tests/apps/${app.appID}/remove_employee/${employee.employeeID}">
                                 Remove from application
                             </a>

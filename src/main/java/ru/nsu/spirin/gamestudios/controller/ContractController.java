@@ -51,13 +51,13 @@ public class ContractController {
         Account account = this.accountService.findAccountByEmail(userName);
         Employee employee = this.employeeService.getEmployeeByID(account.getEmployeeID());
 
-        List<Contract> contracts = this.contractService.getAllContracts();
-        /*if (employee.getStudioID() == 0) {
+        List<Contract> contracts;
+        if (employee.getStudioID() == 0) {
             contracts = this.contractService.getAllContracts();
         }
         else {
             contracts = this.contractService.getAllContractsByStudioID(employee.getStudioID());
-        }*/
+        }
         model.addAttribute("contracts", contracts);
         return "contracts/contracts";
     }

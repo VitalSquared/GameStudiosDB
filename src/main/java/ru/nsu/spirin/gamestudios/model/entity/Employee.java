@@ -2,6 +2,7 @@ package ru.nsu.spirin.gamestudios.model.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.sql.Date;

@@ -27,7 +27,7 @@
                 <td>${contract.percent}</td>
                 <td>${contract.testID}</td>
                 <td>
-                    <#if s.isAdmin>
+                    <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
                         <a class="nav-link btn btn-primary" href="/contracts/${contract.contractID}">View</a>
                     </#if>
                 </td>

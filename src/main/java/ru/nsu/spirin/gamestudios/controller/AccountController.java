@@ -15,7 +15,9 @@ import ru.nsu.spirin.gamestudios.model.PasswordChangeStore;
 import ru.nsu.spirin.gamestudios.model.entity.Employee;
 import ru.nsu.spirin.gamestudios.model.entity.account.Account;
 import ru.nsu.spirin.gamestudios.service.AccountService;
+import ru.nsu.spirin.gamestudios.service.DepartmentService;
 import ru.nsu.spirin.gamestudios.service.EmployeeService;
+import ru.nsu.spirin.gamestudios.service.StudioService;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -24,21 +26,27 @@ import java.security.Principal;
 public class AccountController {
     private final EmployeeService employeeService;
     private final AccountService accountService;
+    private final StudioService studioService;
+    private final DepartmentService departmentService;
 
     @Autowired
-    public AccountController(EmployeeService employeeService, AccountService accountService) {
+    public AccountController(EmployeeService employeeService, AccountService accountService, StudioService studioService, DepartmentService departmentService) {
         this.employeeService = employeeService;
         this.accountService = accountService;
+        this.studioService = studioService;
+        this.departmentService = departmentService;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "/userInfo", method = RequestMethod.GET)
     public String userInfo(Model model, Principal principal) {
-        String userName = principal.getName();
-        Account account = this.accountService.findAccountByEmail(userName);
+        User user = (User) ((Authentication) principal).getPrincipal();
+        Account account = this.accountService.findAccountByEmail(user.getUsername());
         Employee employee = this.employeeService.getEmployeeByID(account.getEmployeeID());
         model.addAttribute("employee", employee);
         model.addAttribute("account", account);
+        model.addAttribute("all_studios", studioService.getAllStudios());
+        model.addAttribute("all_departments", departmentService.getAllDepartments());
         return "myaccount/index";
     }
 

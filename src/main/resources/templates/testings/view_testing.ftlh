@@ -112,7 +112,8 @@
                     <td>${studios_map[app.studioID?string]} (${app.studioID})</td>
                     <td>${results_map[app.resultID?string]}</td>
                     <td>
-                        <#if s.isAdmin>
+                        <#if s.isAdmin || s.isGeneralDirector ||
+                                ((s.isStudioDirector || app.resultID gt 0) && app.studioID == studioID)>
                             <a class="nav-link btn btn-primary" href="/tests/apps/${app.appID}">View</a>
                         </#if>
                     </td>

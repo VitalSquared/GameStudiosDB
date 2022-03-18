@@ -24,9 +24,15 @@ public class MessageService {
 
     public Page<Message> getSentMessagesByUsername(String email, String topic, String receiver, String date, Pageable pageable) {
         Filtration filtration = new Filtration();
-        filtration.addFilter("msg.topic", Filtration.FiltrationType.String, topic);
-        filtration.addFilter("msg.receivers_string", Filtration.FiltrationType.String, receiver);
-        filtration.addFilter("msg.date", Filtration.FiltrationType.DoubleDate, date);
+        if (topic != null && !topic.isEmpty()) {
+            filtration.addFilter("msg.topic", Filtration.FiltrationType.String, topic);
+        }
+        if (receiver != null && !receiver.isEmpty()) {
+            filtration.addFilter("msg.receivers_string", Filtration.FiltrationType.String, receiver);
+        }
+        if (date != null && !date.isEmpty()) {
+            filtration.addFilter("msg.date", Filtration.FiltrationType.DoubleDate, date);
+        }
         return this.messageRepository.findAllSentMessagesByEmail(email, filtration, pageable);
     }
 
@@ -58,9 +64,8 @@ public class MessageService {
             return;
         }
 
-        Long id = this.messageRepository.countMaxID() + 1;
+        Long id = this.messageRepository.saveSentMessage(message);
         message.setMessageID(id);
-        this.messageRepository.saveSentMessage(message);
         for (var receiver : message.getReceivers()) {
             this.messageRepository.saveReceivedMessage(message, receiver);
         }

@@ -134,7 +134,7 @@ public class MessageQueries {
     public static final String QUERY_SAVE_SENT_MESSAGE =
             """
                 INSERT INTO message (message_id, date, topic, content, sender, attachments) VALUES
-                 (?, now(), ?, ?, ?, ?)
+                 (default, now(), ?, ?, ?, ?)
                  RETURNING message_id;
             """;
 

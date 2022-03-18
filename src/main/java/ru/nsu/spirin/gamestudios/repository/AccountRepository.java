@@ -1,6 +1,7 @@
 package ru.nsu.spirin.gamestudios.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +25,15 @@ public class AccountRepository extends JdbcDaoSupport {
         if (null == this.getJdbcTemplate()) {
             return null;
         }
-        return this.getJdbcTemplate().queryForObject(AccountQueries.QUERY_FIND_BY_ID,
-                new AccountMapper(),
-                id
-        );
+        try {
+            return this.getJdbcTemplate().queryForObject(AccountQueries.QUERY_FIND_BY_ID,
+                    new AccountMapper(),
+                    id
+            );
+        }
+        catch (DataAccessException exception) {
+            return null;
+        }
     }
 
     public List<Account> findAll() {

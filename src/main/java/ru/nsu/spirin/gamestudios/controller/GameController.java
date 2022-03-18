@@ -2,6 +2,8 @@ package ru.nsu.spirin.gamestudios.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -9,19 +11,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import ru.nsu.spirin.gamestudios.model.entity.Employee;
-import ru.nsu.spirin.gamestudios.model.entity.Game;
-import ru.nsu.spirin.gamestudios.model.entity.GameRelease;
-import ru.nsu.spirin.gamestudios.model.entity.Genre;
-import ru.nsu.spirin.gamestudios.service.ContractService;
-import ru.nsu.spirin.gamestudios.service.EmployeeService;
-import ru.nsu.spirin.gamestudios.service.GameReleaseService;
-import ru.nsu.spirin.gamestudios.service.GameService;
-import ru.nsu.spirin.gamestudios.service.GenreService;
-import ru.nsu.spirin.gamestudios.service.PlatformService;
-import ru.nsu.spirin.gamestudios.service.StudioService;
+import ru.nsu.spirin.gamestudios.model.entity.*;
+import ru.nsu.spirin.gamestudios.model.entity.account.Account;
+import ru.nsu.spirin.gamestudios.service.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -34,6 +30,7 @@ public class GameController {
     private final GameReleaseService gameReleaseService;
     private final StudioService studioService;
     private final PlatformService platformService;
+    private final AccountService accountService;
 
     @Autowired
     public GameController(GameService gameService,
@@ -42,7 +39,8 @@ public class GameController {
                           ContractService contractService,
                           GameReleaseService gameReleaseService,
                           StudioService studioService,
-                          PlatformService platformService) {
+                          PlatformService platformService,
+                          AccountService accountService) {
         this.gameService = gameService;
         this.genreService = genreService;
         this.employeeService = employeeService;
@@ -50,6 +48,7 @@ public class GameController {
         this.gameReleaseService = gameReleaseService;
         this.studioService = studioService;
         this.platformService = platformService;
+        this.accountService = accountService;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
@@ -76,14 +75,27 @@ public class GameController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.GET)
-    public String newGame(@ModelAttribute("game") Game game, Model model) {
-        model.addAttribute("studios", this.studioService.getAllStudios());
+    public String newGame(@ModelAttribute("game") Game game, Model model, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        Account account = this.accountService.findAccountByEmail(user.getUsername());
+        Employee employee = this.employeeService.getEmployeeByID(account.getEmployeeID());
+        List<Studio> studios;
+        if (employee.getStudioID() == 0) {
+            studios = this.studioService.getAllStudios();
+        }
+        else {
+            studios = new ArrayList<>();
+            studios.add(this.studioService.getStudioByID(employee.getStudioID()));
+        }
+        model.addAttribute("studios", studios);
         return "/games/new_game";
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR')")
     @RequestMapping(path = "/new", method = RequestMethod.POST)
-    public String createGame(@Valid @ModelAttribute("game") Game game, BindingResult bindingResult, Model model) {
+    public String createGame(@Valid @ModelAttribute("game") Game game,
+                             BindingResult bindingResult,
+                             Model model, Principal principal) {
         model.addAttribute("studios", this.studioService.getAllStudios());
 
         if (bindingResult.hasErrors()) {

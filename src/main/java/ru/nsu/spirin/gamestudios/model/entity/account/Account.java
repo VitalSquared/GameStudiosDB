@@ -23,4 +23,12 @@ public class Account {
         this.employeeID = employeeID;
         this.active = active;
     }
+
+    @Override
+    public boolean equals (Object object) {
+        if (object == this) return true;
+        if (!(object instanceof Account)) return false;
+        Account that = (Account) object;
+        return this.email.equals(that.email);
+    }
 }
