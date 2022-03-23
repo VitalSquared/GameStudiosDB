@@ -78,6 +78,7 @@ public class TestService {
     }
 
     public void deleteTest(Long id) {
+        this.testRepository.deleteAllTestGenre(id);
         this.testRepository.delete(id);
     }
 }

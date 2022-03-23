@@ -3,16 +3,16 @@ package ru.nsu.spirin.gamestudios.model.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
 public class Studio {
     private Long studioID;
 
-    @NotEmpty
+    @NotBlank
     private String name;
 
-    @NotEmpty
+    @NotBlank
     private String address;
 }

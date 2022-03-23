@@ -132,6 +132,7 @@ public class EmployeeService {
             this.messageRepository.deleteAllReceivedMessagesByMessageID(sent);
         }
         this.messageRepository.deleteAllSentMessagesByAccount(account.getEmail());
+        this.messageRepository.deleteAllReceivedMessagesByAccount(account.getEmail());
         this.accountRepository.deleteByEmployeeID(employeeID);
         this.gameRepository.deleteAllGameEmployeeByEmployeeID(employeeID);
         this.testAppRepository.deleteAllAppEmployeeByEmployeeID(employeeID);

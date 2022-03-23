@@ -381,8 +381,6 @@ ALTER SEQUENCE test_test_id_seq RESTART WITH 5 ^;
 INSERT INTO test__genre (test_id, genre_id)
 VALUES
        (0, 5),
-       (1, 1),
-       (1, 2),
        (2, 5),
        (2, 7),
        (3, 2),

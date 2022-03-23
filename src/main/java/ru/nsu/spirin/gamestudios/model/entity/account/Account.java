@@ -2,11 +2,11 @@ package ru.nsu.spirin.gamestudios.model.entity.account;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 @Data
 public class Account {
-    @NotEmpty
+    @NotBlank
     private String email;
 
     private String passwordHash;
