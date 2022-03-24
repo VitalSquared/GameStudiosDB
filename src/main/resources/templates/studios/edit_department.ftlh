@@ -29,7 +29,7 @@
 
         <#assign hash2 = { -1 : "None"}>
         <#foreach employee in employees>
-            <#assign hash2 = hash2 + { employee.employeeID : employee.firstName + ' ' + employee.lastName }>
+            <#assign hash2 = hash2 + { employee.employeeID : employee.firstName + ' ' + employee.lastName + ' (' + employee.employeeID + ')' }>
         </#foreach>
 
         <div class="form-group row offset-1" style="align-items: center;">

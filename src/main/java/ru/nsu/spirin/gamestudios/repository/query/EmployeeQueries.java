@@ -175,7 +175,7 @@ public class EmployeeQueries {
                      e.studio_id, e.active
                 FROM (employee NATURAL JOIN
                         (
-                            SELECT dev.category_id, dev.department_id, dep.studio_id
+                            SELECT dev.employee_id, dev.category_id, dev.department_id, dep.studio_id
                             FROM (developer dev CROSS JOIN department dep)
                             WHERE dev.department_id = ? AND dev.department_id = dep.department_id
                         ) as dev1

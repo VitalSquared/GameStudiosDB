@@ -94,7 +94,7 @@ public class DepartmentController {
         Account account = accountService.findAccountByEmail(user.getUsername());
         Employee employee = employeeService.getEmployeeByID(account.getEmployeeID());
         model.addAttribute("studios", studioService.getStudiosListByID(employee.getStudioID()));
-        model.addAttribute("employees", new ArrayList<Employee>());//employeeService.getEmployeesByDepartment(department.getDepartmentID()));
+        model.addAttribute("employees", employeeService.getEmployeesByDepartment(department.getDepartmentID()));
         return "/studios/new_department";
     }
 
