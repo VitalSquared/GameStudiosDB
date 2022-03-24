@@ -10,7 +10,7 @@
         </#foreach>
 
         <div class="form-group row offset-1" style="align-items: center;">
-            <label for="genreID" style="width: 100px;">Genre: </label>
+            <label for="genreID" style="width: 100px;">Employee: </label>
             <div class="col-sm-5">
                 <@spring.formSingleSelect "employee.employeeID", employees_map, "class=\"form-control\""/>
             </div>

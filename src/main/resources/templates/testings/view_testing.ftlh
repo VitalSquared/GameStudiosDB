@@ -74,7 +74,7 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">
-                    <#if (s.isAdmin || s.isGeneralDirector) && test.statusID != 3>
+                    <#if (s.isAdmin || s.isGeneralDirector) && test.statusID != 3 && genres_left?sequence?size gt 0>
                         <a class="nav-link btn btn-primary" href="/tests/${test.testID}/add_genre">Add genre</a>
                     </#if>
                 </th>

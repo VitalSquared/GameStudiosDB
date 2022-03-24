@@ -47,6 +47,8 @@ public class TestAppController {
         model.addAttribute("curDate", Date.from(Instant.now()));
         model.addAttribute("all_results", this.testAppResultService.getAllResults());
         model.addAttribute("all_studios", this.studioService.getAllStudios());
+        model.addAttribute("employees_left",
+                this.employeeService.getEmployeesByStudioExceptTestApp(app.getStudioID(), app.getAppID()));
         return "testings/view_testapp";
     }
 
@@ -69,7 +71,8 @@ public class TestAppController {
     public String addEmployeeGet(@ModelAttribute("employee") Employee employee, Model model,
                                  @PathVariable(name = "id") Long appID) {
         TestApp app = this.testAppService.getAppByID(appID);
-        model.addAttribute("employees", this.employeeService.getEmployeesByStudio(app.getStudioID()));
+        model.addAttribute("employees",
+                this.employeeService.getEmployeesByStudioExceptTestApp(app.getStudioID(), app.getAppID()));
         model.addAttribute("appID", appID);
         return "/testings/testapp_add_employee";
     }

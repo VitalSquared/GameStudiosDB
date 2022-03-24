@@ -8,6 +8,7 @@ import ru.nsu.spirin.gamestudios.repository.GenreRepository;
 import ru.nsu.spirin.gamestudios.repository.TestRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GenreService {
@@ -24,6 +25,18 @@ public class GenreService {
 
     public List<Genre> getAllGenres() {
         return this.genreRepository.findAll();
+    }
+
+    public List<Genre> getAllGenresExceptGame(Long gameID) {
+        List<Genre> gameGenres = this.genreRepository.findAllByGameID(gameID);
+        List<Genre> allGenres = this.genreRepository.findAll();
+        return allGenres.stream().filter(x -> !gameGenres.contains(x)).collect(Collectors.toList());
+    }
+
+    public List<Genre> getAllGenresExceptTest(Long testID) {
+        List<Genre> testGenres = this.genreRepository.findAllByTestID(testID);
+        List<Genre> allGenres = this.genreRepository.findAll();
+        return allGenres.stream().filter(x -> !testGenres.contains(x)).collect(Collectors.toList());
     }
 
     public Genre getGenreByID(Long genreID) {

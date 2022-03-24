@@ -12,6 +12,7 @@ import ru.nsu.spirin.gamestudios.repository.filtration.Filtration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -59,6 +60,18 @@ public class EmployeeService {
 
     public List<Employee> getEmployeesByStudio(Long studioID) {
         return this.employeeRepository.findAllByStudioID(studioID);
+    }
+
+    public List<Employee> getEmployeesByStudioExceptTestApp(Long studioID, Long appID) {
+        List<Employee> apps = this.employeeRepository.findByTestAppID(appID);
+        List<Employee> all = this.employeeRepository.findAllByStudioID(studioID);
+        return all.stream().filter(x -> !apps.contains(x)).collect(Collectors.toList());
+    }
+
+    public List<Employee> getEmployeesByStudioExceptGame(Long studioID, Long gameID) {
+        List<Employee> game = this.employeeRepository.findByGameID(gameID);
+        List<Employee> all = this.employeeRepository.findAllByStudioID(studioID);
+        return all.stream().filter(x -> !game.contains(x)).collect(Collectors.toList());
     }
 
     public List<Employee> getEmployeesByGameID(Long gameID) {

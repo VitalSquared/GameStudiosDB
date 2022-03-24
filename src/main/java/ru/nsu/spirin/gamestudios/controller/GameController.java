@@ -63,13 +63,18 @@ public class GameController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_DIRECTOR', 'STUDIO_DIRECTOR', 'DEVELOPER')")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public String viewGame(Model model, @PathVariable(name = "id") Long gameID) {
-        model.addAttribute("game", this.gameService.getGameByID(gameID));
+        Game game = this.gameService.getGameByID(gameID);
+        model.addAttribute("game", game);
         model.addAttribute("contracts", this.contractService.getContractsByGameID(gameID));
         model.addAttribute("releases", this.gameReleaseService.getReleasesByGameID(gameID));
         model.addAttribute("genres", this.genreService.getGenresByGameID(gameID));
         model.addAttribute("employees", this.employeeService.getEmployeesByGameID(gameID));
         model.addAttribute("all_studios", this.studioService.getAllStudios());
         model.addAttribute("all_platforms", this.platformService.getAllPlatforms());
+        model.addAttribute("genres_left", this.genreService.getAllGenresExceptGame(gameID));
+        model.addAttribute("employees_left",
+                this.employeeService.getEmployeesByStudioExceptGame(game.getStudioID(), gameID));
+        model.addAttribute("platforms_left", this.platformService.getAllPlatformsExceptGame(gameID));
         return "games/view_game";
     }
 
@@ -141,7 +146,7 @@ public class GameController {
     @RequestMapping(path = "/{id}/add_genre", method = RequestMethod.GET)
     public String addGenreGet(@ModelAttribute("genre") Genre genre, Model model,
                               @PathVariable(name = "id") Long gameID) {
-        model.addAttribute("genres", this.genreService.getAllGenres());
+        model.addAttribute("genres", this.genreService.getAllGenresExceptGame(gameID));
         model.addAttribute("gameID", gameID);
         return "/games/add_genre";
     }
@@ -167,7 +172,8 @@ public class GameController {
     public String addEmployeeGet(@ModelAttribute("employee") Employee employee, Model model,
                                  @PathVariable(name = "id") Long gameID) {
         Game game = this.gameService.getGameByID(gameID);
-        model.addAttribute("employees", this.employeeService.getEmployeesByStudio(game.getStudioID()));
+        model.addAttribute("employees",
+                this.employeeService.getEmployeesByStudioExceptGame(game.getStudioID(), gameID));
         model.addAttribute("gameID", gameID);
         return "/games/add_employee";
     }
@@ -193,7 +199,7 @@ public class GameController {
     public String addReleaseGet(@ModelAttribute("release") GameRelease release, Model model,
                                 @PathVariable(name = "id") Long gameID) {
         model.addAttribute("contracts", this.contractService.getContractsByGameID(gameID));
-        model.addAttribute("platforms", this.platformService.getAllPlatforms());
+        model.addAttribute("platforms", this.platformService.getAllPlatformsExceptGame(gameID));
         model.addAttribute("gameID", gameID);
         return "/games/new_release";
     }
@@ -206,7 +212,7 @@ public class GameController {
                                  @PathVariable(name = "id") Long gameID) {
         model.addAttribute("gameID", gameID);
         model.addAttribute("contracts", this.contractService.getContractsByGameID(gameID));
-        model.addAttribute("platforms", this.platformService.getAllPlatforms());
+        model.addAttribute("platforms", this.platformService.getAllPlatformsExceptGame(gameID));
 
         if (bindingResult.hasErrors()) {
             return "/games/new_release";

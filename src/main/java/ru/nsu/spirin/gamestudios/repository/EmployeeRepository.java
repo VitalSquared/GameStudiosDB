@@ -242,4 +242,14 @@ public class EmployeeRepository extends JdbcDaoSupport {
                 studioID
         );
     }
+
+    public List<Long> findAllDevelopersByStudioID(Long studioID) {
+        if (null == this.getJdbcTemplate()) {
+            return new ArrayList<>();
+        }
+        return this.getJdbcTemplate().query(EmployeeQueries.QUERY_FIND_ALL_DEVELOPERS_BY_STUDIO_ID,
+                (rs, rowNum) -> rs.getLong(1),
+                studioID
+        );
+    }
 }

@@ -55,7 +55,7 @@
         <tr>
             <th scope="col">Name</th>
             <th scope="col">
-                <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
+                <#if (s.isAdmin || s.isGeneralDirector || s.isStudioDirector) && genres_left?sequence?size gt 0>
                     <a class="nav-link btn btn-primary" href="/games/${game.gameID}/add_genre">Add genre</a>
                 </#if>
             </th>
@@ -84,7 +84,7 @@
             <th scope="col">First Name</th>
             <th scope="col">Last Name</th>
             <th scope="col">
-                <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
+                <#if (s.isAdmin || s.isGeneralDirector || s.isStudioDirector) && employees_left?sequence?size gt 0>
                     <a class="nav-link btn btn-primary" href="/games/${game.gameID}/add_employee">Add employee</a>
                 </#if>
             </th>
@@ -141,7 +141,7 @@
             <th scope="col">Sold Count</th>
             <th scope="col"></th>
             <th scope="col">
-                <#if s.isAdmin || s.isGeneralDirector || s.isStudioDirector>
+                <#if (s.isAdmin || s.isGeneralDirector || s.isStudioDirector) && platforms_left?sequence?size gt 0>
                     <a class="nav-link btn btn-primary" href="/games/${game.gameID}/new_release">Create release</a>
                 </#if>
             </th>

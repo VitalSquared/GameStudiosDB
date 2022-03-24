@@ -12,4 +12,12 @@ public class Genre {
 
     @NotBlank
     private String name;
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof Genre)) return false;
+        Genre that = (Genre) object;
+        return this.genreID.equals(that.genreID);
+    }
 }

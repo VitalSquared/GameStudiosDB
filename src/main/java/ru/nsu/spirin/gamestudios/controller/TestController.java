@@ -75,6 +75,7 @@ public class TestController {
         model.addAttribute("all_statuses", this.testStatusService.getAllStatuses());
         model.addAttribute("all_results", this.testAppResultService.getAllResults());
         model.addAttribute("all_studios", this.studioService.getAllStudios());
+        model.addAttribute("genres_left", this.genreService.getAllGenresExceptTest(testID));
         return "testings/view_testing";
     }
 
@@ -159,7 +160,7 @@ public class TestController {
     @RequestMapping(path = "/{id}/add_genre", method = RequestMethod.GET)
     public String addGenreGet(@ModelAttribute("genre") Genre genre, Model model,
                               @PathVariable(name = "id") Long testID) {
-        model.addAttribute("genres", this.genreService.getAllGenres());
+        model.addAttribute("genres", this.genreService.getAllGenresExceptTest(testID));
         model.addAttribute("testID", testID);
         return "/testings/add_genre";
     }

@@ -49,18 +49,21 @@
         <a class="btn btn-primary" href="/tests/apps/${app.appID}/decline">Quit</a>
         <br/>
     </#if>
+    <br/>
     <#if app.resultID gt 0>
         Employees:
-        <#if (s.isAdmin || s.isGeneralDirector || s.isStudioDirector) && (test.statusID == 0 || test.statusID == 1)>
-            <a class="nav-link btn btn-primary" href="/tests/apps/${app.appID}/add_employee">Add employee</a>
-        </#if>
         <table class="table">
             <thead class="thead-dark">
             <tr>
                 <th scope="col">ID</th>
                 <th scope="col">First Name</th>
                 <th scope="col">Last Name</th>
-                <th scope="col"></th>
+                <th scope="col">
+                    <#if (s.isAdmin || s.isGeneralDirector || s.isStudioDirector) && (test.statusID == 0 || test.statusID == 1)
+                    && employees_left?sequence?size gt 0>
+                        <a class="nav-link btn btn-primary" href="/tests/apps/${app.appID}/add_employee">Add employee</a>
+                    </#if>
+                </th>
             </tr>
             </thead>
             <tbody>

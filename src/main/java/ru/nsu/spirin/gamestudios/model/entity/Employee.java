@@ -41,4 +41,12 @@ public class Employee {
         this.departmentID = departmentID;
         this.active = active;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof Employee)) return false;
+        Employee that = (Employee) object;
+        return this.employeeID.equals(that.employeeID);
+    }
 }

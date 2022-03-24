@@ -374,7 +374,7 @@ ALTER SEQUENCE test_app_app_id_seq RESTART WITH 8 ^;
 
 INSERT INTO test (test_id, start_date, end_date, grand, min_studios_num, apps_deadline, status_id) OVERRIDING SYSTEM VALUE
 VALUES
-    (4, '2022-04-18', '2022-06-18', 1500000, 1, '2022-04-10', 1) ^;
+    (4, '2022-04-18', '2022-06-18', 1500000, 1, '2022-04-10', 0) ^;
 ALTER SEQUENCE test_test_id_seq RESTART WITH 5 ^;
 
 

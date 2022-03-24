@@ -144,6 +144,13 @@ public class EmployeeQueries {
                 WHERE studio_id = ?;
             """;
 
+    public static final String QUERY_FIND_ALL_DEVELOPERS_BY_STUDIO_ID =
+            """
+                SELECT employee_id
+                FROM developer
+                WHERE studio_id = ?;
+            """;
+
     public static final String QUERY_FIND_ALL_BY_STUDIO_ID =
             """
                 SELECT e.employee_id, e.first_name, e.last_name, e.birth_date,
@@ -164,9 +171,16 @@ public class EmployeeQueries {
     public static final String QUERY_FIND_ALL_BY_GAME_ID =
             """
                 SELECT e.employee_id, e.first_name, e.last_name, e.birth_date,
-                            dev.category_id, dev.department_id, e.active, d.studio_id
-                FROM (employee e NATURAL JOIN (developer dev NATURAL JOIN department d)) NATURAL JOIN game__employee
-                WHERE e.employee_id != 0 AND game_id = ?;
+                            dev.category_id, dev.department_id, e.active,
+                            case when (dir.studio_id is not null) then
+                                dir.studio_id
+                            else
+                                dep.studio_id
+                            end as studio_id
+                FROM employee e NATURAL JOIN game__employee ge
+                    LEFT JOIN director dir on e.employee_id = dir.employee_id
+                    LEFT JOIN (developer dev NATURAL JOIN department dep) on e.employee_id = dev.employee_id
+                WHERE e.employee_id != 0 AND ge.game_id = ?;
             """;
 
     public static final String QUERY_FIND_ALL_BY_DEPARTMENT_ID =
@@ -185,10 +199,16 @@ public class EmployeeQueries {
 
     public static final String QUERY_FIND_ALL_BY_TEST_APP_ID =
             """
-                SELECT e.employee_id, e.first_name, e.last_name, e.birth_date, e.category_id, e.department_id,
-                     e.studio_id, e.active
-                FROM ((employee NATURAL JOIN (developer NATURAL JOIN department) as dev1
-                ) e1 NATURAL JOIN test_app__employee) e
-                WHERE e.employee_id != 0 AND e.app_id = ?;
+                SELECT e.employee_id, e.first_name, e.last_name, e.birth_date,
+                            dev.category_id, dev.department_id, e.active,
+                            case when (dir.studio_id is not null) then
+                                dir.studio_id
+                            else
+                                dep.studio_id
+                            end as studio_id
+                FROM employee e NATURAL JOIN test_app__employee tae
+                    LEFT JOIN director dir on e.employee_id = dir.employee_id
+                    LEFT JOIN (developer dev NATURAL JOIN department dep) on e.employee_id = dev.employee_id
+                WHERE e.employee_id != 0 AND tae.app_id = ?;
             """;
 }

@@ -2,11 +2,13 @@ package ru.nsu.spirin.gamestudios.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.nsu.spirin.gamestudios.model.entity.GameRelease;
 import ru.nsu.spirin.gamestudios.model.entity.Platform;
 import ru.nsu.spirin.gamestudios.repository.GameReleaseRepository;
 import ru.nsu.spirin.gamestudios.repository.PlatformRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PlatformService {
@@ -21,6 +23,13 @@ public class PlatformService {
 
     public List<Platform> getAllPlatforms() {
         return this.platformRepository.findAll();
+    }
+
+    public List<Platform> getAllPlatformsExceptGame(Long gameID) {
+        List<GameRelease> releases = this.gameReleaseRepository.findAllByGameID(gameID);
+        List<Long> platforms = releases.stream().map(GameRelease::getPlatformID).collect(Collectors.toList());
+        List<Platform> all = this.platformRepository.findAll();
+        return all.stream().filter(x -> !platforms.contains(x.getPlatformID())).collect(Collectors.toList());
     }
 
     public Platform getPlatformByID(Long platformID) {
